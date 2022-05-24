@@ -1,0 +1,723 @@
+<?php
+/**
+ * Class DirScanner
+ * TODO: 兼容windows系统目录结构
+ */
+
+Class DirScanner {
+    private $nginxSecureOn = false;                     //Nginx防盗链开启状态
+    private $nginxSecret = 'foo=bar';                   //Nginx防盗链密钥
+    private $userIp = '127.0.0.1';                      //用户IP地址
+    private $nginxSecureTimeout = 1800;                 //Nginx防盗链有效期，单位：秒
+    private $nginxSecureLinkMd5Pattern = '{secure_link_expires}{uri}{remote_addr} {secret}';         //Nginx防盗链MD5加密方式
+    private $allowReadContentFileExtensions = [     //允许读取文件内容的文件类型
+        'txt',
+        'md',
+        'url',
+    ];
+    private $fields = [                             //私有属性字段名和说明
+        'directory' => '目录名',
+        'filename' => '文件名',
+        'realpath' => '完整路径',
+        'path' => '相对网址',
+        'extension' => '文件后缀',
+        'fstat' => '资源状态',                      //同php方法fstat: https://www.php.net/manual/en/function.fstat.php
+        'content' => 'MD文件内容',
+        'shortcut' => 'URL快捷方式',
+
+        'description' => '描述',
+        'keywords' => '关键词',
+        'snapshot' => '快照图片',
+    ];
+    private $rootDir;                               //当前扫描的根目录
+    private $webRoot = '/content/';                 //网站静态文件相对路径的根目录
+    private $scanningDirLevel = 0;                  //当前扫描的目录深度
+    private $scanStartTime = 0;                     //扫描开始时间，单位：秒
+    private $scanResults = [];                      //目录扫描结果
+    private $tree = [];                             //目录扫描树形结构
+
+
+    protected $supportFileExtensions = [            //支持的文件类型
+        'txt',     //纯文本
+        'md',      //纯文本
+        'url',     //快捷方式
+        'jpg',     //图片
+        'jpeg',    //图片
+        'png',     //图片
+        'gif',     //图片
+        'ico',     //图标
+        'mp4',     //视频
+        'ts',      //视频
+        'm3u8',    //视频
+    ];
+    protected $maxReadFilesize = [                  //默认每种文件读取内容最大大小
+        'txt' => 100*1024,          //纯文本
+        'md' => 5*1024*1024,        //纯文本
+        'url' => 20*1024,           //快捷方式
+        'jpg' => 500*1024,          //图片
+        'jpeg' => 500*1024,         //图片
+        'png' => 500*1024,          //图片
+        'gif' => 500*1024,          //图片
+        'ico' => 50*1024,           //图标
+        'mp4' => 100*1024*1024,     //视频
+        'ts' => 10*1024*1024,       //视频
+        'm3u8' => 10*1024*1024,     //视频
+    ];
+    protected $securedFileExtensions = [            //开启Nginx防盗链的文件类型
+        'jpg',     //图片
+        'jpeg',     //图片
+        'png',     //图片
+        'gif',     //图片
+        'ico',     //图标
+        'mp4',     //视频
+        'ts',      //视频
+        'm3u8',    //视频
+    ];
+
+    public $scanTimeCost = 0;                       //上一次目录扫描耗时，单位：毫秒
+
+
+    //判断目录名或文件名是否合法
+    //不允许包含斜杠/，反斜杠\，单引号'，双引号"，空格字符
+    private function isValid($name) {
+        return str_replace(['/', '\\', "'", '"', ' '], '', $name) == $name;
+    }
+
+    //解析描述文件内容
+    //snapshot相对路径完善，支持secure_link
+    private function parseDescriptionFiles($realpath) {
+        $pathinfo = pathinfo($realpath);
+        $tmp = explode('_', $pathinfo['filename']);
+        $field = array_pop($tmp);
+        $content = @file_get_contents($realpath);
+        if (empty($content)) {return [];}
+        $content = trim($content);
+
+        $data = [];
+        if (in_array($field, ['title', 'snapshot'])) {
+            if ($field == 'snapshot') {
+                $img_realpath = realpath("{$pathinfo['dirname']}/{$content}");
+                if (file_exists($img_realpath)) {
+                    $id = $this->getId($img_realpath);
+                    $fp = fopen($img_realpath, 'r');
+                    $fstat = fstat($fp);
+                    fclose($fp);
+                    $img_pathinfo = pathinfo($img_realpath);
+                    $extension = strtolower($img_pathinfo['extension']);
+                    $content = $this->getFilePath( $id, $this->getRelativeDirname($img_pathinfo['dirname']), $img_pathinfo['filename'], $extension, $fstat['mtime'] );
+                }
+            }
+        }
+        $data[$field] = $content;
+
+        return $data;
+    }
+
+    //解析快捷方式文件内容
+    private function parseShortCuts($realpath, $filename) {
+        $content = @file_get_contents($realpath);
+        if (empty($content) || !preg_match('/\[InternetShortcut\]/i', $content)) {return false;}
+        $content = trim($content);
+
+        preg_match('/URL=(\S+)/i', $content, $matches);
+        if (empty($matches) || empty($matches[1])) {
+            return false;
+        }
+
+        return [
+            'name' => $filename,
+            'url' => $matches[1],
+        ];
+    }
+
+    //根据文件路径生成唯一编号
+    //使用相对路径计算md5值
+    private function getId($realpath) {
+        if (!empty($this->rootDir)) {
+            $realpath = str_replace($this->rootDir, '', $realpath);
+        }
+        return !empty($realpath) ? md5($realpath) : '';
+    }
+
+    //判断Nginx防盗链MD5加密方式字符串是否合格
+    private function isNginxSecureLinkMd5PatternValid($pattern) {
+        $valid = true;
+
+        $fieldsNeeded = [
+                '{secure_link_expires}',
+                '{uri}',
+                '{remote_addr}',
+                '{secret}',
+            ];
+        foreach($fieldsNeeded as $needle) {
+            if (strstr($pattern, $needle) === false) {
+                $valid = false;
+                break;
+            }
+        }
+
+        return $valid;
+    }
+
+    //根据路径生成目录数组
+    private function getDirData($realpath, $files) {
+        $id = $this->getId($realpath);
+        $data = [
+            'id' => $id,
+            'directory' => basename($realpath),
+            'realpath' => $realpath,
+            'path' => $this->getDirPath($id),
+        ];
+
+        $sub_dirs = [];
+        $sub_files = [];
+
+        //try to merge description data
+        if (!empty($files[$id])) {
+            $data = array_merge($data, $files[$id]);
+            unset($files[$id]);
+        }
+
+        //区分目录和文件
+        foreach ($files as $id => $item) {
+            if (!empty($item['directory'])) {
+                $sub_dirs[$id] = $item;
+            }else {
+                $sub_files[$id] = $item;
+            }
+        }
+
+        if (!empty($sub_dirs)) {
+            $data['directories'] = $sub_dirs;
+        }
+        if (!empty($sub_files)) {
+            $data['files'] = $sub_files;
+        }
+
+        return $data;
+    }
+
+    //根据路径生成文件数组，兼容URL文件
+    private function getFileData($realpath) {
+        $id = $this->getId($realpath);
+        $fp = fopen($realpath, 'r');
+        $fstat = fstat($fp);
+        fclose($fp);
+        $pathinfo = pathinfo($realpath);
+        $extension = strtolower($pathinfo['extension']);
+        $data = [
+            'id' => $id,
+            'filename' => $pathinfo['filename'],
+            'extension' => $extension,
+            'fstat' => [
+                'size' => $fstat['size'],
+                'atime' => $fstat['atime'],
+                'mtime' => $fstat['mtime'],
+                'ctime' => $fstat['ctime'],
+            ],
+            'realpath' => $realpath,
+            'path' => $this->getFilePath( $id, $this->getRelativeDirname($pathinfo['dirname']), $pathinfo['filename'], $extension, $fstat['mtime'] ),
+        ];
+
+        if ($extension == 'url') {
+            $data['shortcut'] = $this->parseShortCuts($realpath, $pathinfo['filename']);
+        }
+
+        return $data;
+    }
+
+    //根据路径和根目录获取当前扫描的目录深度
+    private function getScanningLevel($rootDir, $dir) {
+        $level = 0;
+
+        $rootDir = realpath($rootDir);
+        $dir = realpath($dir);
+
+        if ($dir == $rootDir) {
+            $level = 1;
+        }else {
+            $dirs = explode('/', str_replace($rootDir, '', $dir));
+            $level = count($dirs);
+        }
+
+        return $level;
+    }
+
+    //根据路径和当前扫描深度获取目录名
+    private function getRelativeDirname($dirname) {
+        return str_replace($this->rootDir, '', $dirname);
+    }
+
+    //合并描述文件内容到md文件或者目录数据
+    private function mergeDescriptionData($realpath) {
+        $data = [];
+        $ext = $this->parseDescriptionFiles($realpath);
+
+        //try to find the md file
+        $targetFile = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.md', $realpath);
+        if (file_exists($targetFile)) {
+            $fileId = $this->getId($targetFile);
+            if (empty($this->scanResults[$fileId])) {
+                $ext['id'] = $fileId;
+                $this->scanResults[$fileId] = $ext;
+                $data = $ext;
+            }else {
+                $data = $this->scanResults[$fileId];
+                $data = array_merge($data, $ext);
+                $this->scanResults[$fileId] = $data;
+            }
+        }else {
+            //try to merge to the parent directory
+            $targetDir = preg_replace('/\/[a-z0-9]+\.txt$/i', '', $realpath);
+            if (is_dir($targetDir)) {
+                $dirId = $this->getId($targetDir);
+                if (empty($this->scanResults[$dirId])) {
+                    $ext['id'] = $dirId;
+                    $this->scanResults[$dirId] = $ext;
+                    $data = $ext;
+                }else {
+                    $data = $this->scanResults[$dirId];
+                    $data = array_merge($data, $ext);
+                    $this->scanResults[$dirId] = $data;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+
+    //根据文件生成防盗链网址
+    //参考：https://nginx.org/en/docs/http/ngx_http_secure_link_module.html#secure_link
+    //防盗链参数名：md5, expires
+    protected function getSecureLink($path) {
+        $expires = time() + $this->nginxSecureTimeout;
+        $originStr = str_replace([
+                '{secure_link_expires}',
+                '{uri}',
+                '{remote_addr}',
+                '{secret}',
+            ], [
+                $expires,
+                $path,
+                $this->userIp,
+                $this->nginxSecret,
+            ], $this->nginxSecureLinkMd5Pattern);
+
+        $md5 = base64_encode( md5($originStr, true) );
+        $md5 = strtr($md5, '+/', '-_');
+        $md5 = str_replace('=', '', $md5);
+
+        return "{$path}?md5={$md5}&expires={$expires}";
+    }
+
+    //根据文件生成相对路径
+    //@ver: 增加静态文件的更新时间戳作为文件版本参数
+    protected function getFilePath($id, $directory, $filename, $extension, $mtime) {
+        if (empty($directory)) {
+            $directory = '/';
+        }
+        if (!preg_match('/\/$/', $directory)) {
+            $directory .= '/';
+        }
+        if (!preg_match('/^\//', $directory)) {
+            $directory = "/{$directory}";
+        }
+
+        $webRoot = preg_replace('/\/$/', '', $this->webRoot);
+        $extensionPathMap = [                  //默认每种文件读取内容最大大小
+            'txt' => '',
+            'md' => '/view/',
+            'url' => '/link/',
+            'm3u8' => '/m3u8/',
+            'jpg' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'jpeg' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'png' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'gif' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'ico' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'mp4' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'ts' => "{$webRoot}{$directory}{$filename}.{$extension}",
+        ];
+
+        $path = isset($extensionPathMap[$extension]) ? $extensionPathMap[$extension] : '';
+
+        if (!empty($path) && in_array($extension, ['md', 'url', 'm3u8'])) {
+            if ($this->nginxSecureOn && $extension == 'm3u8') {
+                $path = $this->getSecureLink($path);
+                $path = "{$path}&id={$id}";
+            }else {
+                $path = "{$path}?id={$id}";
+            }
+        }else if (!empty($path) && $this->nginxSecureOn) {
+            $path = $this->getSecureLink($path);
+        }
+
+        //增加版本号ver参数
+        if (!in_array($extension, ['md', 'url', 'txt'])) {
+            $path .= strpos($path, '?') !== false ? "&ver={$mtime}" : "?ver={$mtime}";
+        }
+
+        return $path;
+    }
+
+    //根据目录生成相对路径
+    protected function getDirPath($id) {
+        return "/list/?id={$id}";
+    }
+
+
+    //设置Nginx防盗链开启或关闭，以及密钥、加密方式、超时时长
+    public function setNginxSecure($secureOn, $secret = '', $userIp = '', $pattern = '', $timeout = 0) {
+        $status = false;
+        if (is_string($secureOn) && strtolower($secureOn) == 'on') {
+            $status = true;
+        }else if (is_string($secureOn) && strtolower($secureOn) == 'off') {
+            $status = false;
+        }else if ((bool)$secureOn == true) {
+            $status = true;
+        }
+        $this->nginxSecureOn = $status;
+
+        if (!empty($secret) && is_string($secret)) {
+            $this->nginxSecret = $secret;
+        }
+
+        if (!empty($userIp) && is_string($userIp)) {
+            $this->userIp = $userIp;
+        }
+
+        if (!empty($pattern) && is_string($pattern)) {
+            if ($this->isNginxSecureLinkMd5PatternValid($pattern) == false) {
+                throw new Exception("Invalid Nginx secure link md5 pattern: {$pattern}", 500);
+            }
+            $this->nginxSecureLinkMd5Pattern = $pattern;
+        }
+
+        if ((int)$timeout > 0) {
+            $this->nginxSecureTimeout = (int)$timeout;
+        }
+    }
+
+    //设置Nginx防盗链密钥
+    public function setNginxSecret($secret) {
+        if (!empty($secret) && is_string($secret)) {
+            $this->nginxSecret = $secret;
+        }
+    }
+
+    //获取Nginx防盗链密钥
+    public function getNginxSecret() {
+        return $this->nginxSecret;
+    }
+
+    //设置Nginx防盗链密钥
+    public function setUserIp($userIp) {
+        if (!empty($userIp) && is_string($userIp)) {
+            $this->userIp = $userIp;
+        }
+    }
+
+    //获取Nginx防盗链密钥
+    public function getUserIp() {
+        return $this->userIp;
+    }
+
+    //设置Nginx防盗链MD5加密方式
+    /**
+     * Nginx防盗链MD5加密方式参考下面网址中的示例，
+     * 将Nginx的变量替换$符号为英文大括号；
+     * 
+     * 示例：
+     * ```
+     * {secure_link_expires}{uri}{remote_addr} {secret}
+     * ```
+     * Nginx文档参考：http://nginx.org/en/docs/http/ngx_http_secure_link_module.html#secure_link_md5
+     */
+    public function setNginxSecureLinkMd5Pattern($pattern) {
+        if (!empty($pattern) && is_string($pattern)) {
+            if ($this->isNginxSecureLinkMd5PatternValid($pattern) == false) {
+                throw new Exception("Invalid Nginx secure link md5 pattern: {$pattern}", 500);
+            }
+            $this->nginxSecureLinkMd5Pattern = $pattern;
+        }
+    }
+
+    //获取Nginx防盗链MD5加密方式
+    public function getNginxSecureLinkMd5Pattern() {
+        return $this->nginxSecureLinkMd5Pattern;
+    }
+
+    //设置Nginx防盗链超时时长，单位：秒
+    public function setNginxSecureTimeout($timeout) {
+        if ((int)$timeout > 0) {
+            $this->nginxSecureTimeout = (int)$timeout;
+        }
+    }
+
+    //获取Nginx防盗链超时时长，单位：秒
+    public function getNginxSecureTimeout() {
+        return $this->nginxSecureTimeout;
+    }
+
+    //设置网站静态文件相对根目录
+    public function setWebRoot($webRoot) {
+        if (!empty($webRoot) && !preg_match('/^\//', $webRoot)) {
+            $webRoot = "/{$webRoot}";
+        }
+
+        if (!empty($webRoot) && !preg_match('/\/$/', $webRoot)) {
+            $webRoot = "{$webRoot}/";
+        }
+
+        $this->webRoot = $webRoot;
+    }
+
+    //获取网站静态文件相对根目录
+    public function getWebRoot() {
+        return $this->webRoot;
+    }
+
+    //获取是否开启防盗链
+    public function isSecureOn() {
+        return $this->nginxSecureOn;
+    }
+
+    //扫描目录获取目录和文件列表，支持指定目录扫描深度（目录级数）
+    public function scan($dir, $levels = 3) {
+        if (empty($this->scanStartTime)) {
+            $this->scanStartTime = microtime(true);
+        }
+
+        $tree = array();
+
+        $ignore_files = array('.', '..');
+        if (is_dir($dir)) {
+            if (!preg_match('/\/$/', $dir)) {$dir .= '/';}
+            if (empty($this->rootDir)) {
+                $this->rootDir = realpath($dir);
+            }
+            $this->scanningDirLevel = $this->getScanningLevel($this->rootDir, $dir);
+            $nextLevels = $levels - $this->scanningDirLevel;
+
+            $files = scandir($dir);
+            foreach($files as $file) {
+                if (in_array($file, $ignore_files) || !$this->isValid($file)) {continue;}
+
+                $branch = [];
+                $realpath = realpath("{$dir}{$file}");
+                if (is_dir($realpath)) {
+                    $files = [];
+                    if ($nextLevels >= 0) {
+                        $files = $this->scan($realpath, $nextLevels);
+                        if (!empty($files)) {
+                            foreach($files as $file) {
+                                $this->scanResults[$file['id']] = $file;
+                            }
+                        }
+                    }
+
+                    $branch = $this->getDirData($realpath, $files);
+
+                    //add parent directory's id
+                    $pid = $this->getId(realpath($dir));
+                    if (!empty($pid)) {
+                        $branch = array_merge(['pid' => $pid], $branch);
+                    }
+                }else {
+                    $pathinfo = pathinfo($realpath);
+                    $extension = strtolower($pathinfo['extension']);
+                    if ( in_array($extension, $this->supportFileExtensions) ) {
+                        if ($extension != 'txt') {
+                            $branch = $this->getFileData($realpath);
+
+                            //add parent directory's id
+                            $pid = $this->getId(realpath($dir));
+                            if (!empty($pid)) {
+                                $branch = array_merge(['pid' => $pid], $branch);
+                            }
+                        }else {
+                            //把描述文件内容合并到被描述的目录或md文件数据中
+                            $branch = $this->mergeDescriptionData($realpath);
+                        }
+                    }
+                }
+
+                if (!empty($branch)) {
+                    $this->scanResults[$branch['id']] = $branch;
+                    $tree[$branch['id']] = $branch;
+                }
+            }
+        }
+
+        $this->tree = $tree;
+
+        $time = microtime(true);
+        $this->scanTimeCost = $this->scanStartTime > 0 ? ceil( ($time - $this->scanStartTime)*1000 ) : 0;
+
+        return $tree;
+    }
+
+    //获取扫描结果
+    public function getScanResults() {
+        return $this->scanResults;
+    }
+
+    //获取菜单，扫描结果中的目录结构
+    public function getMenus($tree = []) {
+        $results = empty($tree) ? $this->tree : $tree;
+        $menus = [];
+        if (empty($results)) {return $menus;}
+
+        foreach ($results as $id => $item) {
+            $dir = [];
+            if (!empty($item['directory'])) {
+                $dir = [
+                            'id' => $item['id'],
+                            'directory' => $item['directory'],
+                            'path' => $item['path'],
+                        ];
+                if (!empty($item['snapshot'])) {
+                    $dir['snapshot'] = $item['snapshot'];
+                }
+                if (!empty($item['title'])) {
+                    $dir['title'] = $item['title'];
+                }
+                if (!empty($item['description'])) {
+                    $dir['description'] = $item['description'];
+                }
+                if (!empty($item['pid'])) {
+                    $dir['pid'] = $item['pid'];
+                }
+            }
+
+            if (!empty($item['directories'])) {
+                $dirs = $this->getMenus($item['directories']);
+                if (!empty($dirs)) {
+                    $dir['directories'] = $dirs;
+                }
+            }
+
+            if (!empty($dir)) {
+                $menus[] = $dir;
+            }
+        }
+
+        return $menus;
+    }
+
+    //获取.md文件中的h1-h6标题
+    public function getMDTitles($id) {
+        if (empty($this->scanResults[$id])) {return [];}
+        $file = $this->scanResults[$id];
+
+        $content = @file_get_contents($file['realpath']);
+        if (empty($content)) {return [];}
+        $content = trim($content);
+
+        # standardize line breaks
+        $content = str_replace(array("\r\n", "\r"), "\n", $content);
+        # remove surrounding line breaks
+        $content = trim($content, "\n");
+        # split text into lines
+        $lines = explode("\n", $content);
+
+        $titles = [];
+        if (!empty($lines)) {
+            foreach($lines as $line) {
+                preg_match_all('/^#(.+)/u', $line, $matches);
+                if (!empty($matches[1])) {
+                    foreach($matches[1] as $title) {
+                        $num = substr_count($title, '#');
+                        $titles[] = [
+                            'name' => trim(str_replace('#', '', $title)),
+                            'heading' => 'h' . ($num+1),
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $titles;
+    }
+
+    //替换.md文件解析之后的HTML中的静态文件URL为相对路径path
+    public function fixMDUrls($realpath, $html) {
+        $pathinfo = pathinfo($realpath);
+
+        $matches = [];
+
+        //匹配图片地址
+        $reg_imgs = '/src="([^"]+)"/i';
+        preg_match_all($reg_imgs, $html, $img_matches);
+        if (!empty($img_matches[1])) {
+            $matches = $img_matches[1];
+        }
+
+        //匹配a链接
+        $reg_links = '/href="([^"]+)"/i';
+        preg_match_all($reg_links, $html, $link_matches);
+        if (!empty($link_matches[1])) {
+            $matches = array_merge($matches, $link_matches[1]);
+        }
+
+        if (!empty($matches)) {
+            foreach ($matches as $url) {
+                if (preg_match('/^http(s)?:\/\//i', $url) || preg_match('/^\//i', $url)) {continue;}
+
+                $src_realpath = realpath("{$pathinfo['dirname']}/{$url}");
+                if (file_exists($src_realpath)) {
+                    $id = $this->getId($src_realpath);
+                    $fp = fopen($src_realpath, 'r');
+                    $fstat = fstat($fp);
+                    fclose($fp);
+                    $src_pathinfo = pathinfo($src_realpath);
+                    $extension = strtolower($src_pathinfo['extension']);
+
+                    $src_path = $this->getFilePath( $id, $this->getRelativeDirname($src_pathinfo['dirname']), $src_pathinfo['filename'], $extension, $fstat['mtime'] );
+
+                    $html = str_replace("\"{$url}\"", "\"{$src_path}\"", $html);
+                }
+            }
+        }
+
+        return $html;
+    }
+
+    //获取指定目录下名称为README.md的文件
+    public function getDefaultReadme($dirid = '') {
+        $readme = null;
+        $md = null;
+
+        if (empty($dirid) && !empty($this->tree)) {
+            foreach($this->tree as $id => $file) {
+                if (!empty($file['extension']) && $file['extension'] == 'md') {
+                    $md = $file;
+                    if (strtoupper($file['filename']) == 'README') {
+                        $readme = $file;
+                        break;
+                    }
+                }
+            }
+        }else if (!empty($this->scanResults)) {
+            $directory = $this->scanResults[$dirid];
+            if (!empty($directory) && !empty($directory['files'])) {
+                foreach($directory['files'] as $id => $file) {
+                    if (!empty($file['extension']) && $file['extension'] == 'md') {
+                        if (empty($md)) {$md = $file;}      //取第一个md文件
+                        if (strtoupper($file['filename']) == 'README') {
+                            $readme = $file;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (empty($readme) && !empty($md)) {
+            $readme = $md;
+        }
+
+        return $readme;
+    }
+
+}

@@ -1,0 +1,25 @@
+/* for theme manual */
+*,html,body{padding:0:;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"}
+.header{padding:10px 10px 0 10px;position: fixed;top: 0;left: 0;right: 0;background-color: rgb(53, 54, 58)}
+.header .logo{display: inline-block;margin:0 10px 6px 10px;font-size: 1.86em;color: #e8eaed}
+.header .logo img{vertical-align: middle;}
+.header a{color: #aaadb2;text-decoration: none}
+.indexes{width:22%;position:fixed;top:55px;bottom:0;text-align:left;padding:0.5em;overflow-y:auto}
+.content{margin-top: 55px;margin-left:23.5%;padding:0.5em}
+.indexes h1,.indexes h2,.indexes h3,.indexes h4,.indexes h5,.indexes h6{padding:2px 0 3px 5px;font-size:1.2em;font-weight:normal;margin-bottom:0.35em}
+.indexes h1{display:none}
+.indexes h2{margin-top:1em;padding-top:4px;padding-bottom:4px;box-shadow:1px 1px 2px 1px rgba(0, 0, 0, 0.1)}
+.indexes h3,.indexes h4,.indexes h5,.indexes h6{text-indent:1em}
+.indexes h3{font-size:1.1em}
+.indexes h4{font-size:1em}
+.indexes h5{font-size:0.9em}
+.indexes h6{font-size:0.8em}
+.indexes a{background-color:transparent;color:#0969da;text-decoration:none}
+@media (max-width: 640px) {
+    .header{position: static}
+    .indexes{position:static;width:auto;padding-bottom:0.5em;margin-bottom:0.5em;margin-top: 0}
+    .indexes h1{display:block;padding-left:0;padding-bottom:0.3em;text-align:center;font-size:1.3em}
+    .indexes h1 a{color:inherit}
+    .content{margin-left:0;margin-top:0}
+    .content h1{display:none}
+}
