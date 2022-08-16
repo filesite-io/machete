@@ -67,6 +67,7 @@ https://git.filesite.io/filesite/machete/archive/master.zip
   | 名称 | 网址 |
 | ---- | ---- |
 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory.filesite.io</a> |
+| Web3速查手册 | <a href="https://web3.filesite.io" target="_blank">Web3.filesite.io</a> |
 
 3. 小说站
 
@@ -171,7 +172,15 @@ filesite.io二次开发参考：
 
 ## 反馈与建议
 
-待续
+如果使用中遇到任何问题，
+请在下面仓库提出：
+
+* <a href="https://github.com/filesite-io/machete/issues" target="_blank">去Github提交问题/反馈</a> (海外推荐使用)
+* <a href="https://gitcode.net/filesite/machete/-/issues" target="_blank">去Gitcode提交问题/反馈</a> (国内推荐使用)
+
+如果觉得好用，
+别忘了点仓库右上角**🌟星号**加收藏。
+
 
 ## 赞助捐赠
 

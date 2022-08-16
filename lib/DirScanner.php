@@ -249,13 +249,25 @@ Class DirScanner {
     }
 
     //合并描述文件内容到md文件或者目录数据
+    //增加视频文件：mp4, m3u8描述文件支持
     private function mergeDescriptionData($realpath) {
         $data = [];
         $ext = $this->parseDescriptionFiles($realpath);
 
         //try to find the md file
-        $targetFile = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.md', $realpath);
-        if (file_exists($targetFile)) {
+        $targetFile = '';
+        $targetFile_md = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.md', $realpath);
+        $targetFile_mp4 = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.mp4', $realpath);
+        $targetFile_m3u8 = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.m3u8', $realpath);
+        if (file_exists($targetFile_md)) {
+            $targetFile = $targetFile_md;
+        }else if (file_exists($targetFile_mp4)) {
+            $targetFile = $targetFile_mp4;
+        }else if (file_exists($targetFile_m3u8)) {
+            $targetFile = $targetFile_m3u8;
+        }
+
+        if (!empty($targetFile)) {
             $fileId = $this->getId($targetFile);
             if (empty($this->scanResults[$fileId])) {
                 $ext['id'] = $fileId;
@@ -508,7 +520,7 @@ Class DirScanner {
                 if (is_dir($realpath)) {
                     $files = [];
                     if ($nextLevels >= 0) {
-                        $files = $this->scan($realpath, $nextLevels);
+                        $files = $this->scan($realpath, $levels);
                         if (!empty($files)) {
                             foreach($files as $file) {
                                 $this->scanResults[$file['id']] = $file;

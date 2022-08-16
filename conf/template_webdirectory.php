@@ -26,7 +26,7 @@ return array(
 
     //for themes
     //'googleimage' => [
-    //    'imageHeight' => 180,           //图片高度，单位：px
+    //    'imageHeight' => 350,           //图片高度，单位：px
     //    'contact' => 'FileSite图片网站订制联系：<a href="https://filesite.io" target="_blank">FileSite.io</a>',
     //],
 );

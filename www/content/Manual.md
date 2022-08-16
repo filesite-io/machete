@@ -163,11 +163,12 @@ URL=https://microsoft.com/
 
 | 文件名 | 用途 | 字段 |
 | ---- | ---- | ---- |
+| title.txt | 标题 | title |
 | description.txt | 描述信息 | description |
 | keywords.txt | 关键词信息 | keywords |
 | snapshot.txt | 快照图片 | snapshot |
 
-特殊描述文件都是可选的，如果有则优先使用里面的内容。
+特殊描述文件都是可选的，如果有则优先使用里面的内容，其它需要扩展的字段只需添加{英文小写}.txt后缀的文件即可。
 
 说明：
 其中snapshot.txt里的内容为跟当前txt文件**同目录的图片文件名**，
@@ -184,6 +185,7 @@ URL=https://microsoft.com/
      |_f_ snapshot.txt
      |_f_ 金庸小说封面图_1.jpg
      |_f_ 金庸小说封面图_new.png
+     |_f_ author.txt
 ```
 
 描述文件和被描述的文件命名规则：
