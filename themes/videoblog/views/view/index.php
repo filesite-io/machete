@@ -1,8 +1,8 @@
 <?php
 $videoUrl = '';
 $poster = '';
-$imgExts = ['jpg', 'jpeg', 'png', 'gif'];
-$videoExts = ['mp4', 'm3u8'];
+$imgExts = array('jpg', 'jpeg', 'png', 'gif');
+$videoExts = array('mp4', 'm3u8');
 
 if (!empty($viewData['video'])) {
     $video = $viewData['video'];

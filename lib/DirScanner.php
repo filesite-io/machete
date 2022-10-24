@@ -10,12 +10,12 @@ Class DirScanner {
     private $userIp = '127.0.0.1';                      //用户IP地址
     private $nginxSecureTimeout = 1800;                 //Nginx防盗链有效期，单位：秒
     private $nginxSecureLinkMd5Pattern = '{secure_link_expires}{uri}{remote_addr} {secret}';         //Nginx防盗链MD5加密方式
-    private $allowReadContentFileExtensions = [     //允许读取文件内容的文件类型
+    private $allowReadContentFileExtensions = array(     //允许读取文件内容的文件类型
         'txt',
         'md',
         'url',
-    ];
-    private $fields = [                             //私有属性字段名和说明
+    );
+    private $fields = array(                             //私有属性字段名和说明
         'directory' => '目录名',
         'filename' => '文件名',
         'realpath' => '完整路径',
@@ -28,16 +28,16 @@ Class DirScanner {
         'description' => '描述',
         'keywords' => '关键词',
         'snapshot' => '快照图片',
-    ];
+    );
     private $rootDir;                               //当前扫描的根目录
     private $webRoot = '/content/';                 //网站静态文件相对路径的根目录
     private $scanningDirLevel = 0;                  //当前扫描的目录深度
     private $scanStartTime = 0;                     //扫描开始时间，单位：秒
-    private $scanResults = [];                      //目录扫描结果
-    private $tree = [];                             //目录扫描树形结构
+    private $scanResults = array();                      //目录扫描结果
+    private $tree = array();                             //目录扫描树形结构
 
 
-    protected $supportFileExtensions = [            //支持的文件类型
+    protected $supportFileExtensions = array(            //支持的文件类型
         'txt',     //纯文本
         'md',      //纯文本
         'url',     //快捷方式
@@ -49,21 +49,21 @@ Class DirScanner {
         'mp4',     //视频
         'ts',      //视频
         'm3u8',    //视频
-    ];
-    protected $maxReadFilesize = [                  //默认每种文件读取内容最大大小
-        'txt' => 100*1024,          //纯文本
-        'md' => 5*1024*1024,        //纯文本
-        'url' => 20*1024,           //快捷方式
-        'jpg' => 500*1024,          //图片
-        'jpeg' => 500*1024,         //图片
-        'png' => 500*1024,          //图片
-        'gif' => 500*1024,          //图片
-        'ico' => 50*1024,           //图标
-        'mp4' => 100*1024*1024,     //视频
-        'ts' => 10*1024*1024,       //视频
-        'm3u8' => 10*1024*1024,     //视频
-    ];
-    protected $securedFileExtensions = [            //开启Nginx防盗链的文件类型
+    );
+    protected $maxReadFilesize = array(                  //默认每种文件读取内容最大大小
+        'txt' => 102400,          //纯文本
+        'md' => 5242880,        //纯文本
+        'url' => 20480,           //快捷方式
+        'jpg' => 512000,          //图片
+        'jpeg' => 512000,         //图片
+        'png' => 512000,          //图片
+        'gif' => 512000,          //图片
+        'ico' => 51200,           //图标
+        'mp4' => 104857600,     //视频
+        'ts' => 10485760,       //视频
+        'm3u8' => 10485760,     //视频
+    );
+    protected $securedFileExtensions = array(            //开启Nginx防盗链的文件类型
         'jpg',     //图片
         'jpeg',     //图片
         'png',     //图片
@@ -72,9 +72,10 @@ Class DirScanner {
         'mp4',     //视频
         'ts',      //视频
         'm3u8',    //视频
-    ];
+    );
 
     public $scanTimeCost = 0;                       //上一次目录扫描耗时，单位：毫秒
+    public $isApi = false;                          //如果为API获取数据，则realpath只返回相对路径
 
 
     //判断目录名或文件名是否合法
@@ -86,14 +87,15 @@ Class DirScanner {
     //解析描述文件内容
     //snapshot相对路径完善，支持secure_link
     private function parseDescriptionFiles($realpath) {
+        $filename = $this->getFilenameWithoutExtension($realpath);
         $pathinfo = pathinfo($realpath);
-        $tmp = explode('_', $pathinfo['filename']);
+        $tmp = explode('_', $filename);
         $field = array_pop($tmp);
         $content = @file_get_contents($realpath);
         if (empty($content)) {return [];}
         $content = trim($content);
 
-        $data = [];
+        $data = array();
         if (in_array($field, ['title', 'snapshot'])) {
             if ($field == 'snapshot') {
                 $img_realpath = realpath("{$pathinfo['dirname']}/{$content}");
@@ -102,9 +104,10 @@ Class DirScanner {
                     $fp = fopen($img_realpath, 'r');
                     $fstat = fstat($fp);
                     fclose($fp);
+                    $img_filename = $this->getFilenameWithoutExtension($img_realpath);
                     $img_pathinfo = pathinfo($img_realpath);
                     $extension = strtolower($img_pathinfo['extension']);
-                    $content = $this->getFilePath( $id, $this->getRelativeDirname($img_pathinfo['dirname']), $img_pathinfo['filename'], $extension, $fstat['mtime'] );
+                    $content = $this->getFilePath( $id, $this->getRelativeDirname($img_pathinfo['dirname']), $img_filename, $extension, $fstat['mtime'] );
                 }
             }
         }
@@ -143,12 +146,12 @@ Class DirScanner {
     private function isNginxSecureLinkMd5PatternValid($pattern) {
         $valid = true;
 
-        $fieldsNeeded = [
+        $fieldsNeeded = array(
                 '{secure_link_expires}',
                 '{uri}',
                 '{remote_addr}',
                 '{secret}',
-            ];
+            );
         foreach($fieldsNeeded as $needle) {
             if (strstr($pattern, $needle) === false) {
                 $valid = false;
@@ -159,18 +162,32 @@ Class DirScanner {
         return $valid;
     }
 
+    //获取路径中的最后一个目录名，支持中文
+    private function basename($realpath) {
+        $realpath = preg_replace('/\/$/', '', $realpath);
+        $arr = explode('/', $realpath);
+        if (count($arr) < 2) {return $realpath;}
+
+        return array_pop($arr);
+    }
+
+    //获取文件名，不含文件后缀
+    private function getFilenameWithoutExtension($realpath) {
+        return preg_replace('/\.[a-z]+$/i', '', $this->basename($realpath));
+    }
+
     //根据路径生成目录数组
     private function getDirData($realpath, $files) {
         $id = $this->getId($realpath);
-        $data = [
+        $data = array(
             'id' => $id,
-            'directory' => basename($realpath),
-            'realpath' => $realpath,
+            'directory' => $this->basename($realpath),
+            'realpath' => $this->isApi ? $this->getRelativeDirname($realpath) : $realpath,
             'path' => $this->getDirPath($id),
-        ];
+        );
 
-        $sub_dirs = [];
-        $sub_files = [];
+        $sub_dirs = array();
+        $sub_files = array();
 
         //try to merge description data
         if (!empty($files[$id])) {
@@ -205,22 +222,23 @@ Class DirScanner {
         fclose($fp);
         $pathinfo = pathinfo($realpath);
         $extension = strtolower($pathinfo['extension']);
-        $data = [
+        $filename = $this->getFilenameWithoutExtension($realpath);
+        $data = array(
             'id' => $id,
-            'filename' => $pathinfo['filename'],
+            'filename' => $filename,
             'extension' => $extension,
-            'fstat' => [
+            'fstat' => array(
                 'size' => $fstat['size'],
                 'atime' => $fstat['atime'],
                 'mtime' => $fstat['mtime'],
                 'ctime' => $fstat['ctime'],
-            ],
-            'realpath' => $realpath,
-            'path' => $this->getFilePath( $id, $this->getRelativeDirname($pathinfo['dirname']), $pathinfo['filename'], $extension, $fstat['mtime'] ),
-        ];
+            ),
+            'realpath' => $this->isApi ? $this->getRelativeDirname($realpath) : $realpath,
+            'path' => $this->getFilePath( $id, $this->getRelativeDirname($pathinfo['dirname']), $filename, $extension, $fstat['mtime'] ),
+        );
 
         if ($extension == 'url') {
-            $data['shortcut'] = $this->parseShortCuts($realpath, $pathinfo['filename']);
+            $data['shortcut'] = $this->parseShortCuts($realpath, $filename);
         }
 
         return $data;
@@ -251,7 +269,7 @@ Class DirScanner {
     //合并描述文件内容到md文件或者目录数据
     //增加视频文件：mp4, m3u8描述文件支持
     private function mergeDescriptionData($realpath) {
-        $data = [];
+        $data = array();
         $ext = $this->parseDescriptionFiles($realpath);
 
         //try to find the md file
@@ -337,7 +355,7 @@ Class DirScanner {
         }
 
         $webRoot = preg_replace('/\/$/', '', $this->webRoot);
-        $extensionPathMap = [                  //默认每种文件读取内容最大大小
+        $extensionPathMap = array(                  //默认每种文件读取内容最大大小
             'txt' => '',
             'md' => '/view/',
             'url' => '/link/',
@@ -349,7 +367,7 @@ Class DirScanner {
             'ico' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'mp4' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'ts' => "{$webRoot}{$directory}{$filename}.{$extension}",
-        ];
+        );
 
         $path = isset($extensionPathMap[$extension]) ? $extensionPathMap[$extension] : '';
 
@@ -515,10 +533,10 @@ Class DirScanner {
             foreach($files as $file) {
                 if (in_array($file, $ignore_files) || !$this->isValid($file)) {continue;}
 
-                $branch = [];
+                $branch = array();
                 $realpath = realpath("{$dir}{$file}");
                 if (is_dir($realpath)) {
-                    $files = [];
+                    $files = array();
                     if ($nextLevels >= 0) {
                         $files = $this->scan($realpath, $levels);
                         if (!empty($files)) {
@@ -575,19 +593,19 @@ Class DirScanner {
     }
 
     //获取菜单，扫描结果中的目录结构
-    public function getMenus($tree = []) {
+    public function getMenus($tree = array()) {
         $results = empty($tree) ? $this->tree : $tree;
-        $menus = [];
+        $menus = array();
         if (empty($results)) {return $menus;}
 
         foreach ($results as $id => $item) {
-            $dir = [];
+            $dir = array();
             if (!empty($item['directory'])) {
-                $dir = [
+                $dir = array(
                             'id' => $item['id'],
                             'directory' => $item['directory'],
                             'path' => $item['path'],
-                        ];
+                        );
                 if (!empty($item['snapshot'])) {
                     $dir['snapshot'] = $item['snapshot'];
                 }
@@ -633,17 +651,17 @@ Class DirScanner {
         # split text into lines
         $lines = explode("\n", $content);
 
-        $titles = [];
+        $titles = array();
         if (!empty($lines)) {
             foreach($lines as $line) {
                 preg_match_all('/^#(.+)/u', $line, $matches);
                 if (!empty($matches[1])) {
                     foreach($matches[1] as $title) {
                         $num = substr_count($title, '#');
-                        $titles[] = [
+                        $titles[] = array(
                             'name' => trim(str_replace('#', '', $title)),
                             'heading' => 'h' . ($num+1),
-                        ];
+                        );
                     }
                 }
             }
@@ -656,7 +674,7 @@ Class DirScanner {
     public function fixMDUrls($realpath, $html) {
         $pathinfo = pathinfo($realpath);
 
-        $matches = [];
+        $matches = array();
 
         //匹配图片地址
         $reg_imgs = '/src="([^"]+)"/i';
@@ -682,10 +700,11 @@ Class DirScanner {
                     $fp = fopen($src_realpath, 'r');
                     $fstat = fstat($fp);
                     fclose($fp);
+                    $src_filename = $this->getFilenameWithoutExtension($src_realpath);
                     $src_pathinfo = pathinfo($src_realpath);
                     $extension = strtolower($src_pathinfo['extension']);
 
-                    $src_path = $this->getFilePath( $id, $this->getRelativeDirname($src_pathinfo['dirname']), $src_pathinfo['filename'], $extension, $fstat['mtime'] );
+                    $src_path = $this->getFilePath( $id, $this->getRelativeDirname($src_pathinfo['dirname']), $src_filename, $extension, $fstat['mtime'] );
 
                     $html = str_replace("\"{$url}\"", "\"{$src_path}\"", $html);
                 }

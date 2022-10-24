@@ -9,7 +9,7 @@ Class SiteController extends Controller {
 
     public function actionIndex() {
         //获取数据
-        $titles = [];
+        $titles = array();
         $content = '';
         $html = '';
 

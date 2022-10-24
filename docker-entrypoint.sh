@@ -14,8 +14,9 @@ cp "template_${theme}.php" app.php
 
 ## 启动nginx和php-fpm
 if [ -e /usr/sbin/nginx ]; then
+    echo "Start nginx."
     /usr/sbin/nginx
 fi
-if [ -e /usr/sbin/php-fpm8 ]; then
-    /usr/sbin/php-fpm8 -F
-fi
+
+echo "Start php-fpm."
+php-fpm -F

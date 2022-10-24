@@ -42,8 +42,8 @@ eof;
 
 <div class="content">
 	<?php
-		$imgExts = ['jpg', 'jpeg', 'png', 'gif'];
-		$videoExts = ['mp4', 'm3u8'];
+		$imgExts = array('jpg', 'jpeg', 'png', 'gif');
+		$videoExts = array('mp4', 'm3u8');
 		$category = $viewData['scanResults'][$selectedId];
 
 		//当前目录的描述介绍
@@ -102,6 +102,10 @@ eof;
 						echo <<<eof
 	<img data-src="{$first_img['path']}" class="lazyload" alt="{$first_img['filename']}">
 eof;
+                    }else {
+                        echo <<<eof
+        <img src="/img/default.png" alt="default image">
+eof;
 					}
 				}
 
@@ -133,7 +137,9 @@ eof;
 				}
 
 				$duration = !empty($category['duration']) ? $category['duration'] : '';
-				$snapshot = !empty($file['snapshot']) ? $file['snapshot'] : (!empty($category['snapshot']) ? $category['snapshot'] : $first_img['path']);
+				$snapshot = !empty($file['snapshot']) ? $file['snapshot'] : (!empty($category['snapshot']) ? $category['snapshot'] :
+                            (!empty($first_img['path']) ? $first_img['path'] : '/img/default.png')
+                        );
 
 				$title = !empty($category['title']) ? $category['title'] : $file['filename'];
 				echo <<<eof

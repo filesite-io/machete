@@ -34,7 +34,8 @@ docker run --name machete -p 1080:80 -itd filesite/machete [皮肤名]
 [
     'manual',           //文档网站
     'webdirectory',     //导航网站
-    'googleimage'       //图片网站
+    'googleimage',      //图片网站
+    'videoblog'         //视频网站
 ]
 ```
 
@@ -56,7 +57,16 @@ docker run --name machete -p 1080:80 \
     manual
 ```
 
-这样可以通过更新本地内容目录的文件来实时更新网站内容。
+这样可以通过更新本地内容目录```/mine/content/```的文件来实时更新网站内容。
+
+不同皮肤对应的容器目录如下：
+
+| 皮肤名 | 容器目录 |
+| ---- | ---- |
+| manual | /var/www/machete/www/content/ |
+| webdirectory | /var/www/machete/www/navs/ |
+| googleimage | /var/www/machete/www/girls/ |
+| videoblog | /var/www/machete/www/videos/ |
 
 
 查看容器：

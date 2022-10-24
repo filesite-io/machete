@@ -42,8 +42,8 @@ eof;
 
 <div class="content">
 	<?php
-		$imgExts = ['jpg', 'jpeg', 'png', 'gif'];
-		$category = $viewData['scanResults'][$selectedId];
+		$imgExts = array('jpg', 'jpeg', 'png', 'gif');
+		$category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
 
 		//当前目录的描述介绍
 		if (!empty($category['description'])) {
@@ -83,6 +83,10 @@ eof;
 					if (in_array($first_img['extension'], $imgExts)) {
 						echo <<<eof
 	<img data-src="{$first_img['path']}" class="lazyload" alt="{$first_img['filename']}">
+eof;
+                    }else {
+                        echo <<<eof
+    <img src="/img/default.png" alt="default image">
 eof;
 					}
 				}

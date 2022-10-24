@@ -1,0 +1,19 @@
+{
+    "name": "gregwar/captcha",
+    "type": "library",
+    "description": "Captcha generator",
+    "keywords": ["captcha", "spam", "bot"],
+    "homepage": "https://github.com/Gregwar/Captcha",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.0",
+        "ext-gd": "*",
+        "ext-mbstring": "*",
+        "symfony/finder": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gregwar\\": "src/Gregwar"
+        }
+    }
+}

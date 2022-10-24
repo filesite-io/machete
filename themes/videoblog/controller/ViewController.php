@@ -26,7 +26,7 @@ Class ViewController extends ListController {
         //获取目录
         $menus = $scanner->getMenus();
 
-        $titles = [];
+        $titles = array();
         $htmlReadme = '';
         $readmeFile = $scanner->getDefaultReadme();
         if (!empty($readmeFile)) {

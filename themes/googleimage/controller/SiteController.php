@@ -9,6 +9,11 @@ Class SiteController extends Controller {
 
     public function actionIndex() {
         //获取数据
+        $menus = array();        //菜单，一级目录
+        $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
+        $htmlCateReadme = '';   //当前目录下的Readme.md 内容
+        $menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
+        
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
         $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 4);
@@ -16,12 +21,14 @@ Class SiteController extends Controller {
 
         //获取目录
         $menus = $scanner->getMenus();
-        $cateId = $this->get('id', $menus[0]['id']);
 
-        $titles = [];
-        $htmlReadme = '';
+        $titles = array();
         $readmeFile = $scanner->getDefaultReadme();
         if (!empty($readmeFile)) {
+            if (!empty($readmeFile['sort'])) {
+                $menus_sorted = explode("\n", $readmeFile['sort']);
+            }
+
             $titles = $scanner->getMDTitles($readmeFile['id']);
 
             $Parsedown = new Parsedown();
@@ -30,10 +37,17 @@ Class SiteController extends Controller {
             $htmlReadme = $scanner->fixMDUrls($readmeFile['realpath'], $htmlReadme);
         }
 
+        //排序
+        $sortedTree = $this->sortMenusAndDirTree($menus_sorted, $menus, $dirTree);
+        if (!empty($sortedTree)) {
+            $menus = $sortedTree['menus'];
+            $dirTree = $sortedTree['dirTree'];
+        }
+
+        $cateId = $this->get('id', $menus[0]['id']);
         $subcate = $scanResults[$cateId];
 
         //获取当前目录下的readme
-        $htmlCateReadme = '';
         $cateReadmeFile = $scanner->getDefaultReadme($cateId);
         if (!empty($cateReadmeFile)) {
             $Parsedown = new Parsedown();

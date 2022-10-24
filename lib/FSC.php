@@ -7,7 +7,7 @@ Class FSC {
     protected static $start_time = 0;
 
     //call function in controller
-    public static function run($config = []) {   
+    public static function run($config = array()) {
         self::$start_time = !empty($config['start_time']) ? $config['start_time'] : microtime(true);
 
         try {
@@ -81,11 +81,22 @@ Class FSC {
         //call class and function
         $className = ucfirst($controller) . 'Controller';
         $funName = 'action' . ucfirst($action);
-        $controllerFile = __DIR__ . "/../controller/{$className}.php";
+
+        $controllerFile = $baseControllerFile = $themeControllerFile = '';
+
+        $baseControllerFile = __DIR__ . "/../controller/{$className}.php";
         if (!empty($config['theme'])) {
-            $controllerFile = __DIR__ . "/../themes/{$config['theme']}/controller/{$className}.php";
+            $themeControllerFile = __DIR__ . "/../themes/{$config['theme']}/controller/{$className}.php";
         }
-        if (file_exists($controllerFile)) {
+
+        //优先使用皮肤目录下的控制器，其次默认controller目录下的
+        if (!empty($themeControllerFile) && file_exists($themeControllerFile)) {
+            $controllerFile = $themeControllerFile;
+        }else if (file_exists($baseControllerFile)) {
+            $controllerFile = $baseControllerFile;
+        }
+
+        if (!empty($controllerFile)) {
             require_once $controllerFile;
             $cls = new $className();
             if (method_exists($className, $funName)) {

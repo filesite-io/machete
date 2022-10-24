@@ -81,7 +81,9 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 
 5. 视频站
 
-  -
+  | 名称 | 网址 |
+| ---- | ---- |
+| 在线学 | <a href="https://duan.filesite.io" target="_blank">Duan.Filesite.io</a> |
 
 
 ## 源码下载
@@ -134,11 +136,13 @@ FileSite.io官方提供的皮肤都包含在最新版的源码目录```themes/``
 | WebDirectory | webdirectory | 导航站 |
 | Manual | manual | 文档站 |
 | GoogleImage | googleimage | 图片站 |
+| VideoBlog | videoblog | 视频站 |
 
 官方皮肤介绍如下：
 * [导航站皮肤WebDirectory](./Theme_WebDirectory.md)
 * [文档站皮肤Manual](./Theme_Manual.md)
 * [图片站皮肤GoogleImage](./Theme_GoogleImage.md)
+* [视频站皮肤VideoBlog](./Theme_VideoBlog.md)
 
 
 第三方提供的皮肤下载：

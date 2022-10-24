@@ -15,7 +15,7 @@ Class ViewController extends Controller {
         }
 
         //获取数据
-        $titles = [];
+        $titles = array();
         $content = '';
         $html = '';
 
