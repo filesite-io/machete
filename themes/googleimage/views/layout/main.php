@@ -25,7 +25,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
 
     <div class="header">
         <a href="/" class="logo">
-            <img src="/content/machete_icon.png" alt="Logo of FileSite.io" height="34">
+            <img src="/content/machete_icon.png" alt="Logo of FileSite.io" width="34" height="34">
             FileSite.io
         </a>
         <a href="#modal_about" role="button" class="about btn-open">

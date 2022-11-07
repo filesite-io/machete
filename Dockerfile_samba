@@ -1,0 +1,62 @@
+FROM centos:centos7.9.2009
+
+RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm \
+    && yum -y install https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
+    && yum -y install yum-utils \
+    && yum-config-manager --disable 'remi-php*' \
+    && yum-config-manager --enable remi-safe \
+    && yum -y install php82-php-fpm php82-php-gd php82-php-mbstring nginx wget rsync samba \
+    && ln -s /opt/remi/php82/root/usr/sbin/php-fpm /usr/sbin/php-fpm \
+    && cd /etc/opt/remi/php82/ \
+    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 10M/g' php.ini \
+    && mkdir -p /var/www/downloads && cd /var/www/downloads/ \
+    && wget "https://git.filesite.io/filesite/machete/archive/master.tar.gz" \
+    && tar -zxvf master.tar.gz \
+    && rm -f master.tar.gz \
+    && mv machete/ /var/www/ \
+    && cd /var/www/machete/ \
+    && mkdir www/navs/ && mkdir www/girls/ && mkdir www/videos/ \
+    && chown apache:apache runtime/ \
+    && chown -R apache:apache www/content/ \
+    && chown apache:apache www/navs/ \
+    && chown apache:apache www/girls/ \
+    && chown apache:apache www/videos/ \
+    && cd /var/www/downloads/ \
+    && wget "https://git.filesite.io/wen/jialuomaadmin/archive/master.tar.gz" \
+    && tar -zxvf master.tar.gz \
+    && rm -f master.tar.gz \
+    && rm -rf /var/www/machete/www/admin/ \
+    && mv jialuomaadmin/dist/ /var/www/machete/www/admin \
+    && rm -f /etc/nginx/nginx.conf \
+    && cp /var/www/machete/conf/nginx.conf /etc/nginx/nginx.conf \
+    && cp /var/www/machete/conf/nginx_machete.conf /etc/nginx/conf.d/machete.conf \
+    && ln -s /var/www/machete/bin/upgrade.sh /usr/bin/upgrade_machete \
+    && mkdir -p /var/www/sambashare/filesite/ \
+    && cd /var/www/sambashare/filesite/ \
+    && mv /var/www/machete/www/content/ ./ \
+    && mv /var/www/machete/www/navs/ ./ \
+    && mv /var/www/machete/www/girls/ ./ \
+    && mv /var/www/machete/www/videos/ ./ \
+    && ln -s /var/www/sambashare/filesite/content/ /var/www/machete/www/content \
+    && ln -s /var/www/sambashare/filesite/navs/ /var/www/machete/www/navs \
+    && ln -s /var/www/sambashare/filesite/girls/ /var/www/machete/www/girls \
+    && ln -s /var/www/sambashare/filesite/videos/ /var/www/machete/www/videos \
+    && chgrp apache /var/www/sambashare/ \
+    && useradd -M -d /var/www/sambashare/filesite -s /usr/sbin/nologin -G apache filesite \
+    && chown -R filesite:apache /var/www/sambashare/filesite \
+    && chmod -R 775 /var/www/sambashare/filesite \
+    && rm -f /etc/samba/smb.conf && cp /var/www/machete/conf/smb.conf /etc/samba/ \
+    && /var/www/machete/bin/smbpwd.sh filesite 88888888 \
+    && ln -s /var/www/machete/bin/smbpwd.sh /usr/bin/smbpwd \
+    && yum -y install kde-l10n-Chinese \
+    && yum -y reinstall glibc-common \
+    && localedef -c -f UTF-8 -i zh_CN zh_CN.utf8 \
+    && echo 'LANG="zh_CN.UTF-8"' > /etc/locale.conf \
+    && echo 'export LC_ALL="zh_CN.UTF-8"' >> ~/.bashrc
+
+EXPOSE 9000/tcp
+EXPOSE 80/tcp
+EXPOSE 445/tcp
+ENTRYPOINT ["/var/www/machete/docker-entrypoint.sh"]
+# 默认使用导航站皮肤：manual
+CMD ["manual"]

@@ -18,7 +18,6 @@ Class SiteController extends Controller {
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
         $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 4);
         $scanResults = $scanner->getScanResults();
-
         //获取目录
         $menus = $scanner->getMenus();
 
@@ -56,6 +55,13 @@ Class SiteController extends Controller {
             $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
         }
 
+        //获取默认mp3文件
+        $rootCateId = $this->get('id', '');
+        $mp3File = $scanner->getDefaultFile('mp3', $rootCateId);
+        if (empty($mp3File)) {
+            $mp3File = $scanner->getDefaultFile('mp3');
+        }
+
         $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
         if (!empty($readmeFile['title'])) {
             $pageTitle = $readmeFile['title'];
@@ -64,7 +70,10 @@ Class SiteController extends Controller {
             $pageTitle = "{$subcate['directory']}照片，来自{$pageTitle}";
         }
         $viewName = 'index';
-        $params = compact('cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme');
+        $params = compact(
+            'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme',
+            'mp3File'
+        );
         return $this->render($viewName, $params, $pageTitle);
     }
 

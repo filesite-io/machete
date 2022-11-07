@@ -131,7 +131,7 @@ http://127.0.0.1:1080
 
 FileSite.io官方提供的皮肤都包含在最新版的源码目录```themes/```中，详情如下：
 
-| 皮肤名称 | 目录名 | 适用网站类型 |
+| 皮肤名称 | 皮肤目录 | 适用网站类型 |
 | ---- | ---- | ---- |
 | WebDirectory | webdirectory | 导航站 |
 | Manual | manual | 文档站 |
@@ -151,10 +151,7 @@ FileSite.io官方提供的皮肤都包含在最新版的源码目录```themes/``
 | ---- | ---- | ---- | ---- |
 | - | - | - | - |
 
-如果你基于Machete开发了皮肤想要共享给大家使用，
-请在这里提交：
-
-待续
+如果你基于Machete开发了皮肤想要共享给大家使用，请在联系我们提交下载地址。
 
 
 ## 使用手册
@@ -182,10 +179,9 @@ filesite.io二次开发参考：
 * <a href="https://github.com/filesite-io/machete/issues" target="_blank">去Github提交问题/反馈</a> (海外推荐使用)
 * <a href="https://gitcode.net/filesite/machete/-/issues" target="_blank">去Gitcode提交问题/反馈</a> (国内推荐使用)
 
-如果觉得好用，
-别忘了点仓库右上角**🌟星号**加收藏。
+如果觉得好用，别忘了点仓库右上角**⭐星号**加收藏以示支持。
 
 
-## 赞助捐赠
+## 联系我们
 
-待续
+<img src="./wx_jialuoma.jpeg" alt="扫描微信二维码加好友" width="240" />

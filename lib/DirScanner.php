@@ -1,7 +1,6 @@
 <?php
 /**
  * Class DirScanner
- * TODO: 兼容windows系统目录结构
  */
 
 Class DirScanner {
@@ -21,7 +20,7 @@ Class DirScanner {
         'realpath' => '完整路径',
         'path' => '相对网址',
         'extension' => '文件后缀',
-        'fstat' => '资源状态',                      //同php方法fstat: https://www.php.net/manual/en/function.fstat.php
+        'fstat' => '资源状态',      //同php方法fstat: https://www.php.net/manual/en/function.fstat.php
         'content' => 'MD文件内容',
         'shortcut' => 'URL快捷方式',
 
@@ -44,8 +43,10 @@ Class DirScanner {
         'jpg',     //图片
         'jpeg',    //图片
         'png',     //图片
+        'webp',    //图片
         'gif',     //图片
         'ico',     //图标
+        'mp3',     //音乐
         'mp4',     //视频
         'ts',      //视频
         'm3u8',    //视频
@@ -57,18 +58,22 @@ Class DirScanner {
         'jpg' => 512000,          //图片
         'jpeg' => 512000,         //图片
         'png' => 512000,          //图片
+        'webp' => 512000,         //图片
         'gif' => 512000,          //图片
         'ico' => 51200,           //图标
-        'mp4' => 104857600,     //视频
-        'ts' => 10485760,       //视频
-        'm3u8' => 10485760,     //视频
+        'mp3' => 10485760,      //音乐，10M
+        'mp4' => 104857600,     //视频，100M
+        'ts' => 10485760,       //视频，10M
+        'm3u8' => 10485760,     //视频，10M
     );
     protected $securedFileExtensions = array(            //开启Nginx防盗链的文件类型
         'jpg',     //图片
-        'jpeg',     //图片
+        'jpeg',    //图片
         'png',     //图片
+        'webp',    //图片
         'gif',     //图片
         'ico',     //图标
+        'mp3',     //音乐
         'mp4',     //视频
         'ts',      //视频
         'm3u8',    //视频
@@ -80,8 +85,9 @@ Class DirScanner {
 
     //判断目录名或文件名是否合法
     //不允许包含斜杠/，反斜杠\，单引号'，双引号"，空格字符
+    //忽略.开头的隐藏文件
     private function isValid($name) {
-        return str_replace(['/', '\\', "'", '"', ' '], '', $name) == $name;
+        return str_replace(['/', '\\', "'", '"', ' '], '', $name) == $name && !preg_match('/^\..+/', $name);
     }
 
     //解析描述文件内容
@@ -173,7 +179,7 @@ Class DirScanner {
 
     //获取文件名，不含文件后缀
     private function getFilenameWithoutExtension($realpath) {
-        return preg_replace('/\.[a-z]+$/i', '', $this->basename($realpath));
+        return preg_replace('/\.[^\.]+$/i', '', $this->basename($realpath));
     }
 
     //根据路径生成目录数组
@@ -363,8 +369,10 @@ Class DirScanner {
             'jpg' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'jpeg' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'png' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'webp' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'gif' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'ico' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'mp3' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'mp4' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'ts' => "{$webRoot}{$directory}{$filename}.{$extension}",
         );
@@ -716,26 +724,31 @@ Class DirScanner {
 
     //获取指定目录下名称为README.md的文件
     public function getDefaultReadme($dirid = '') {
+        return $this->getDefaultFile('md', $dirid);
+    }
+
+    //根据扩展名在根目录下或者指定目录下获取一个文件
+    public function getDefaultFile($extension, $dirid = '') {
         $readme = null;
         $md = null;
 
         if (empty($dirid) && !empty($this->tree)) {
             foreach($this->tree as $id => $file) {
-                if (!empty($file['extension']) && $file['extension'] == 'md') {
+                if (!empty($file['extension']) && $file['extension'] == $extension) {
                     $md = $file;
-                    if (strtoupper($file['filename']) == 'README') {
+                    if ($extension == 'md' && strtoupper($file['filename']) == 'README') {
                         $readme = $file;
                         break;
                     }
                 }
             }
-        }else if (!empty($this->scanResults)) {
+        }else if (!empty($dirid) && !empty($this->scanResults)) {
             $directory = $this->scanResults[$dirid];
             if (!empty($directory) && !empty($directory['files'])) {
                 foreach($directory['files'] as $id => $file) {
-                    if (!empty($file['extension']) && $file['extension'] == 'md') {
+                    if (!empty($file['extension']) && $file['extension'] == $extension) {
                         if (empty($md)) {$md = $file;}      //取第一个md文件
-                        if (strtoupper($file['filename']) == 'README') {
+                        if ($extension == 'md' && strtoupper($file['filename']) == 'README') {
                             $readme = $file;
                             break;
                         }

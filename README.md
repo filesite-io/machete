@@ -21,12 +21,23 @@ Filesite.io也一样，它短小精悍，使用它把常见的本地文件制作
 docker pull filesite/machete
 ```
 
+支持samba文件共享管理内容的版本：
+```
+docker pull filesite/machete:samba
+```
+
 
 启动machete容器：
 
 ```
 docker run --name machete -p 1080:80 -itd filesite/machete [皮肤名]
 ```
+
+samba文件共享版本容器启动：
+```
+docker run --name machete_samba -p 1081:80 -p 445:445 -itd filesite/machete:samba [皮肤名]
+```
+
 
 其中皮肤名称可选值：
 
@@ -61,12 +72,12 @@ docker run --name machete -p 1080:80 \
 
 不同皮肤对应的容器目录如下：
 
-| 皮肤名 | 容器目录 |
-| ---- | ---- |
-| manual | /var/www/machete/www/content/ |
-| webdirectory | /var/www/machete/www/navs/ |
-| googleimage | /var/www/machete/www/girls/ |
-| videoblog | /var/www/machete/www/videos/ |
+| 皮肤名 | 容器目录 | 共享目录 |
+| ---- | ---- | ---- |
+| manual | /var/www/machete/www/content/ | content |
+| webdirectory | /var/www/machete/www/navs/ | navs |
+| googleimage | /var/www/machete/www/girls/ | girls |
+| videoblog | /var/www/machete/www/videos/ | videos |
 
 
 查看容器：
@@ -80,3 +91,65 @@ docker ps
 ```
 http://127.0.0.1:1080
 ```
+
+samba文件共享版本本地网址访问：
+```
+http://127.0.0.1:1081
+```
+
+
+## 后台管理内容
+
+最新版本已经支持网页版后台和samba文件共享方式管理内容。
+
+### 网页版后台
+
+网址为域名后面加/admin/来访问，
+网址格式为：
+```
+http://服务器ip或域名/admin/
+```
+
+默认账号密码：
+> 账号：filesite
+> 密码：88888888
+
+账号密码可在```conf/app.php```里修改。
+
+
+### samba文件共享
+
+同时支持windows、macos和linux，
+文件共享网址格式为：
+```
+//filesite:88888888@服务器ip或域名/machete
+```
+
+默认账号密码：
+> 账号：filesite
+> 密码：88888888
+
+账号密码可在容器中执行命令修改：
+```
+smbpwd filesite 新密码
+```
+
+
+### 文件共享使用方法
+
+
+windows下在**运行**里输入：
+```
+\\服务器ip或域名\machete
+```
+
+然后在弹出的登陆框里输入账号密码就可以完成远程磁盘挂载。
+
+
+macos下挂载共享目录的命令：
+```
+mount_smbfs //filesite:88888888@服务器ip或域名/machete 本地目录
+```
+
+挂载好之后就可以打开Finder看到共享目录了，
+点击进去就可以跟管理本地文件和目录一样操作了。

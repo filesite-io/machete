@@ -18,6 +18,10 @@ Class ApiController extends Controller {
         'systemError' => 500,
     );
 
+    //目录名和文件名最大长度限制
+    protected $maxDirLen = 50;
+    protected $maxFileLen = 60;
+
     //show api list
     public function actionIndex() {
         $params = array(
@@ -28,26 +32,43 @@ Class ApiController extends Controller {
                 '目录/文件列表' => '/api/ls/',
 
                 //文件操作
-                '重命名' => '/api/rename/',
-                '删除文件' => '/api/delete/',
-                '移动目录/文件' => '/api/move/',
                 'base64文件上传' => '/api/uploadbase64/',
+                '重命名目录/文件' => '/api/rename/',
+                '移动目录/文件' => '/api/move/',
+                '删除文件' => '/api/delete/',
 
                 //目录操作
                 '创建目录' => '/api/mkdir/',
                 '删除目录' => '/api/rmdir/',
+
+                //其它
+                '切换皮肤' => '/api/switchtheme/',
             ),
         );
         return $this->renderJson($params);
     }
 
+    private function getParentDir($realpath) {
+        if ($realpath == '/') {return $realpath;}
+
+        $realpath = preg_replace('/\/$/', '', $realpath);
+        $arr = explode('/', $realpath);
+        if (count($arr) < 2 || empty($arr[0])) {return '/';}
+
+        array_pop($arr);
+        return implode('/', $arr);
+    }
+
     //判断父目录是否合法
     protected function isParentDirectoryValid($parentDir) {
-        if (empty($parentDir) || strpos($parentDir, '../') !== false) {
+        if (empty($parentDir) || strpos($parentDir, '..') !== false) {
             return false;
+        }else if ($realpath == '/') {
+            return true;
         }
 
         $valid = true;
+        $parentDir = preg_replace('/^\//', '', $parentDir);
         $target = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'] . "/{$parentDir}";
         if (!is_dir($target)) {
             $valid = false;
@@ -56,7 +77,7 @@ Class ApiController extends Controller {
         return $valid;
     }
 
-    //判断文件名是否合法，不能为空以及不能包含空白字符
+    //判断目录/文件名是否合法，不能为空以及不能包含空白字符
     protected function isFilenameValid($filename) {
         $notAllowedLetters = array(
             '"',
@@ -145,7 +166,7 @@ Class ApiController extends Controller {
 
         $parentDir = $this->post('parent', '');
         $newDir = $this->post('dir', '');
-        $maxDirLen = 20;
+        $maxDirLen = $this->maxDirLen;
         if (empty($newDir) || mb_strlen($newDir, 'utf-8') > $maxDirLen) {
             $err = "目录名不能为空且最长 {$maxDirLen} 个字符";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
@@ -166,8 +187,9 @@ Class ApiController extends Controller {
         }
 
         try {
-            $res = mkdir("{$target}/{$newDir}");
+            $res = mkdir("{$target}/{$newDir}", 0775);
             if ($res) {
+                chmod("{$target}/{$newDir}", 0775);
                 $code = 1;
                 $msg = '目录创建完成';
             }else {
@@ -194,7 +216,7 @@ Class ApiController extends Controller {
 
         $parentDir = $this->post('parent', '');
         $delDir = $this->post('dir', '');
-        $maxDirLen = 20;
+        $maxDirLen = $this->maxDirLen;
         if (empty($delDir) || mb_strlen($delDir, 'utf-8') > $maxDirLen) {
             $err = "目录名不能为空且最长 {$maxDirLen} 个字符";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
@@ -215,7 +237,7 @@ Class ApiController extends Controller {
         }
 
         try {
-            $res = rmdir("{$target}/{$delDir}");
+            $res = $this->deleteDirTree( realpath("{$target}/{$delDir}") );
             if ($res) {
                 $code = 1;
                 $msg = '目录删除完成';
@@ -241,22 +263,47 @@ Class ApiController extends Controller {
         }
 
         $fromDir = $this->post('from', '');
+        $fromParent = $this->getParentDir($fromDir);
         $toDir = $this->post('to', '');
-        $maxDirLen = 50;
-        if (empty($fromDir) || mb_strlen($fromDir, 'utf-8') > $maxDirLen || empty($toDir) || mb_strlen($toDir, 'utf-8') > $maxDirLen) {
-            $err = "目录名不能为空且最长 {$maxDirLen} 个字符";
+        $toParent = $this->getParentDir($toDir);
+        if (empty($fromDir) || empty($toDir)) {
+            $err = "目录名不能为空";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
-        }else if ($this->isParentDirectoryValid($fromDir) == false) {       //目录合法性检查
-            $err = "目录{$fromDir}不存在";
+        }else if ($this->isParentDirectoryValid($fromParent) == false) {     //父目录合法性检查
+            $err = "被移动目录{$fromParent}不存在";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
-        }else if ($this->isParentDirectoryValid($toDir) == false) {         //目录合法性检查
-            $err = "目录{$toDir}不存在";
+        }else if ($this->isParentDirectoryValid($toParent) == false) {      //父目录合法性检查
+            $err = "目标目录{$toParent}不存在";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
+        }
+
+        //如果from是一个文件，而to是目录
+        if (preg_match('/\.\w+$/', $fromDir) && (
+                preg_match('/\/$/', $toDir) || preg_match('/\/[^\.]+$/', $toDir)
+            )
+        ) {
+            if ($this->isParentDirectoryValid($toDir) == false) {      //目录合法性检查
+                $err = "目标目录{$toDir}不存在";
+                return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
+            }
+
+            $fromFile = $this->basename($fromDir);
+            $toDir = preg_match('/\/$/', $toDir) ? "{$toDir}{$fromFile}" : "{$toDir}/{$fromFile}";
         }
 
         $target = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
         try {
-            $res = rename("{$target}/{$fromDir}", "{$target}/{$toDir}");
+            //兼容已经存在的目录，则移动进去，而不是重命名
+            if ($toDir == '/') {
+                $basename = $this->basename($fromDir);
+                $res = rename("{$target}/{$fromDir}", "{$target}/{$basename}");
+            }else if (!realpath("{$target}/{$toDir}")) {
+                $res = rename("{$target}/{$fromDir}", "{$target}/{$toDir}");
+            }else {
+                $basename = $this->basename($fromDir);
+                $res = rename("{$target}/{$fromDir}", "{$target}/{$toDir}/{$basename}");
+            }
+
             if ($res) {
                 $code = 1;
                 $msg = '目录/文件移动完成';
@@ -285,12 +332,11 @@ Class ApiController extends Controller {
         $parentDir = $this->post('parent', '');
         $fromDir = $this->post('from', '');
         $toDir = $this->post('to', '');
-        $maxDirLen = 20;
-        if (empty($fromDir) || mb_strlen($fromDir, 'utf-8') > $maxDirLen || empty($toDir) || mb_strlen($toDir, 'utf-8') > $maxDirLen) {
-            $err = "目录名不能为空且最长 {$maxDirLen} 个字符";
+        if (empty($fromDir) || empty($toDir)) {
+            $err = "目录名不能为空";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'));
         }else if (!$this->isFilenameValid($fromDir) || !$this->isFilenameValid($toDir)) {
-            $err = "目录名称中不能包含空格、单双引号、斜杠和分号字符！";
+            $err = "目录/文件名称中不能包含空格、单双引号、斜杠和分号字符！";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
         }
 
@@ -309,9 +355,9 @@ Class ApiController extends Controller {
             $res = rename("{$target}/{$fromDir}", "{$target}/{$toDir}");
             if ($res) {
                 $code = 1;
-                $msg = '目录移动完成';
+                $msg = '重命名完成';
             }else {
-                $err = '目录移动失败，请确认被移动目录存在及目标目录权限配置正确！';
+                $err = '重命名失败，请确认被重命名目录/文件存在及目标目录权限配置正确！';
             }
         }catch(Exception $e) {
             $err = $e->getMessage();
@@ -334,9 +380,9 @@ Class ApiController extends Controller {
 
         $parentDir = $this->post('parent', '');
         $delFile = $this->post('file', '');
-        $maxDirLen = 30;
-        if (empty($delFile) || mb_strlen($delFile, 'utf-8') > $maxDirLen) {
-            $err = "文件名不能为空且最长 {$maxDirLen} 个字符";
+        $maxFileLen = $this->maxFileLen;
+        if (empty($delFile) || mb_strlen($delFile, 'utf-8') > $maxFileLen) {
+            $err = "文件名不能为空且最长 {$maxFileLen} 个字符";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
         }else if (!$this->isFilenameValid($delFile)) {
             $err = "待删除的文件名称中不能包含空格、单双引号、斜杠和分号字符！";
@@ -378,7 +424,8 @@ Class ApiController extends Controller {
         $refresh = (int)$this->post('refresh', 0);
 
         try {
-            $builder = new CaptchaBuilder;
+            $randNumber = rand(10000, 99999);
+            $builder = new CaptchaBuilder("{$randNumber}");
             $builder->build();
             $captcha_jpg = $builder->get();
             $captcha_code = $builder->getPhrase();
@@ -395,6 +442,35 @@ Class ApiController extends Controller {
         }
 
         return $this->renderJson(compact('code', 'msg', 'err', 'data'));
+    }
+
+    //删除目录及其子目录和子文件
+    protected function deleteDirTree($parentDir) {
+        if (empty($parentDir)) {return false;}
+
+        $res = true;
+
+        try {
+            $dir = opendir($parentDir);
+
+            while(false !== ($file = readdir($dir))) {
+                if ($file != '.' && $file != '..') {
+                    $subpath = "{$parentDir}/{$file}";
+                    if (is_dir($subpath)) {
+                        $res = $this->deleteDirTree($subpath);
+                    }else {
+                        unlink($subpath);
+                    }
+                }
+            }
+
+            closedir($dir);
+            rmdir($parentDir);
+        }catch(Excepiton $e) {
+            $res = false;
+        }
+
+        return $res;
     }
 
     //从runtime/admin/目录里获取管理员当前ip相关的缓存数据
@@ -506,6 +582,7 @@ Class ApiController extends Controller {
             $base64 = str_replace(' ', '+', $base64);
             $fileContent = base64_decode($base64);
             file_put_contents($filePath, $fileContent);
+            chmod($filePath, 0664);
 
             //判断文件大小
             $maxLength = FSC::$app['config']['admin']['maxUploadFileSize'] * 1024*1024;
@@ -535,14 +612,19 @@ Class ApiController extends Controller {
             return '';
         }
 
-        return strtolower(array_pop($arr));
+        $suffix = array_pop($arr);
+        if (in_array($suffix, ['jpg', 'jpeg'])) {
+            $suffix = 'jpg';
+        }
+
+        return strtolower($suffix);
     }
 
     //从文件类型中解析文件后缀
     protected function getSuffixFromFileType($fileType) {
         $arr = explode('/', $fileType);
         if (count($arr) < 2) {
-            return '';
+            return $fileType;
         }
 
         $suffix = array_pop($arr);
@@ -571,8 +653,13 @@ Class ApiController extends Controller {
         $parentDir = $this->post('parent', '');
         $upfile = $this->post('file', '');
         $filename = $this->post('name', '');
+
+        $maxFileLen = $this->maxFileLen;
         if (empty($upfile) || empty($filename)) {
             $err = '所有参数都不能为空！';
+            return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
+        }else if (mb_strlen($filename, 'utf-8') > $maxFileLen) {
+            $err = "文件名最长 {$maxFileLen} 个字符！";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
         }else if (!$this->isFilenameValid($filename)) {
             $err = '文件名不能包含空格、单双引号、斜杠和分号字符！';
@@ -636,15 +723,18 @@ Class ApiController extends Controller {
 
         $themeName = $this->post('theme', '');
         $contentDirectory = $this->post('contentdir', '');
-        $allowedThemes = FSC::$app['config']['allowedThemes'];
+        $allowedThemes = array_keys( FSC::$app['config']['allowedThemes'] );
         if (empty($themeName)) {
             $err = '参数不能为空！';
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
         }else if (!in_array($themeName, $allowedThemes)) {
             $err = "不支持的皮肤：{$themeName}";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
-        }else if (!empty($contentDirectory) && strpos($contentDirectory, '/') !== false) {
-            $err = "内容目录名称中不能包含斜杠字符！";
+        }else if (!empty($contentDirectory) && $this->isFilenameValid($contentDirectory) == false) {
+            $err = "内容目录名不能包含空格、单双引号、斜杠和分号字符！";
+            return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
+        }else if (!empty($contentDirectory) && $this->isParentDirectoryValid($contentDirectory) == false) {
+            $err = "内容目录不存在！";
             return $this->renderJson(compact('code', 'msg', 'err', 'data'), $this->httpStatus['notAllowed']);
         }
 
@@ -656,6 +746,21 @@ Class ApiController extends Controller {
 
             if (!empty($contentDirectory)) {
                 $jsonData['content_directory'] = $contentDirectory;
+            }else {
+                switch($themeName) {
+                    case 'manual':
+                        $jsonData['content_directory'] = 'content';
+                        break;
+                    case 'webdirectory':
+                        $jsonData['content_directory'] = 'navs';
+                        break;
+                    case 'googleimage':
+                        $jsonData['content_directory'] = 'girls';
+                        break;
+                    case 'videoblog':
+                        $jsonData['content_directory'] = 'videos';
+                        break;
+                }
             }
 
             if (file_exists($customConfigFile)) {
@@ -672,6 +777,29 @@ Class ApiController extends Controller {
         }catch(Exception $e) {
             $err = '皮肤修改失败：' . $e->getMessage();
         }
+
+        return $this->renderJson(compact('code', 'msg', 'err', 'data'));
+    }
+
+    //config，获取系统配置信息
+    public function actionConfig() {
+        $code = 0;
+        $msg = $err = '';
+        $data = array();
+
+        $configs = FSC::$app['config'];
+
+        $data['version'] = $configs['version'];
+        $data['supportedThemes'] = $configs['allowedThemes'];
+        $data['currentTheme'] = $configs['theme'];
+        $data['admin_captcha'] = $configs['admin']['captcha'];
+        $data['admin_maxUploadFileSize'] = $configs['admin']['maxUploadFileSize'] * 1024*1024;
+        $data['admin_supportedFileTypes'] = $configs['admin']['allowedUploadFileTypes'];
+        $data['admin_maxUploadFileNumber'] = $configs['admin']['maxUploadFileNumber'];
+
+        $code = 1;
+        $msg = '';
+        $err = '';
 
         return $this->renderJson(compact('code', 'msg', 'err', 'data'));
     }

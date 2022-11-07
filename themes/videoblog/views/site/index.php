@@ -127,12 +127,20 @@ eof;
 
 		if (!empty($category['files'])) {		//一级目录支持，目录下直接存放视频文件
 			$first_img = '';
+
+			//如果目录没有封面图，则先找出第一个图片做封面
+            if (empty($category['snapshot'])) {
+                foreach($category['files'] as $file) {
+                    if (empty($first_img) && in_array($file['extension'], $imgExts)) {
+                        $first_img = $file;
+                        break;
+                    }
+                }
+            }
+
 			foreach($category['files'] as $file) {
+				//跳过非视频文件
 				if (!in_array($file['extension'], $videoExts)) {
-					//如果是最后一层视频目录，取第一张图片做封面
-					if (empty($first_img) && empty($category['snapshot']) && in_array($file['extension'], $imgExts)) {
-						$first_img = $file;
-					}
 					continue;
 				}
 

@@ -3,6 +3,7 @@
  * Config
  */
 $configs = array(
+    'version' => '0.1.0',
     'default_timezone' => 'Asia/Shanghai',   //timezone
 
     //文档站皮肤
@@ -30,26 +31,27 @@ $configs = array(
     'debug' => true,
 
     //for themes
-    /*
     //图片皮肤配置
     'googleimage' => array(
         'imageHeight' => 350,           //图片高度，单位：px
         'contact' => 'FileSite图片网站订制联系：<a href="https://filesite.io" target="_blank">FileSite.io</a>',
+        'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif'),
     ),
-    */
 
+    /*
     //视频皮肤配置
     'videoblog' => array(
         'imageHeight' => 180,           //图片高度，单位：px
         'contact' => 'FileSite视频网站订制联系：<a href="https://filesite.io" target="_blank">FileSite.io</a>',
     ),
+    */
 
     //目前支持的皮肤
     'allowedThemes' => array(
-        'manual',
-        'webdirectory',
-        'googleimage',
-        'videoblog',
+        'manual' => '文档站',
+        'webdirectory' => '导航站',
+        'googleimage' => '图片站',
+        'videoblog' => '视频站',
     ),
 
     //md5加密前缀
@@ -61,6 +63,7 @@ $configs = array(
         'password' => '88888888',
         'captcha' => true,      //后台登陆是否开启验证码
 
+        'maxUploadFileNumber' => 5,    //一次批量上传文件数量
         'maxUploadFileSize' => 20,       //单位：Mb
         'allowedUploadFileTypes' => array(
             'image/jpeg',

@@ -26,6 +26,10 @@ a{color: #aaadb2;text-decoration: none}
 .img-item strong{display: block;color: #bdc1c6;font-family: Roboto,Arial,sans-serif;font-size: 12px;letter-spacing: .2px;line-height: 20px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
 .catedesc{padding: 0 10px}
 .cateinfo{margin-bottom: 1em;padding: 5px 10px 10px 10px}
+.hide{display:none}
+.mbtns{position:fixed;width:30px;height:30px;z-index:100;right:15px;top:102px;border-radius:5px;cursor:pointer}
+.mbtn{width:100%;height:100%;color:#FFF}
+.mbtn svg{width:100%;height:100%}
 
 /* for mobile */
 @media only screen and (max-width: 767px) {

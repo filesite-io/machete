@@ -58,6 +58,13 @@ Class ListController extends Controller {
             $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
         }
 
+        //获取默认mp3文件
+        $rootCateId = $this->get('id', '');
+        $mp3File = $scanner->getDefaultFile('mp3', $rootCateId);
+        if (empty($mp3File)) {
+            $mp3File = $scanner->getDefaultFile('mp3');
+        }
+
         $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
         if (!empty($subcate)) {
             $pageTitle = "{$subcate['directory']}的照片，来自{$pageTitle}";
@@ -66,7 +73,10 @@ Class ListController extends Controller {
             }
         }
         $viewName = '//site/index';     //共享视图
-        $params = compact('cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme');
+        $params = compact(
+            'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
+            'mp3File'
+        );
         return $this->render($viewName, $params, $pageTitle);
     }
 

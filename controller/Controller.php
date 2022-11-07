@@ -279,6 +279,7 @@ Class Controller {
 
     //get basename of realpath, support chinese
     protected function basename($realpath) {
+        $realpath = preg_replace('/\/$/', '', $realpath);
         $arr = explode('/', $realpath);
         if (count($arr) < 2) {return $realpath;}
 
