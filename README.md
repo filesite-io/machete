@@ -153,3 +153,12 @@ mount_smbfs //filesite:88888888@服务器ip或域名/machete 本地目录
 
 挂载好之后就可以打开Finder看到共享目录了，
 点击进去就可以跟管理本地文件和目录一样操作了。
+
+
+## 参与讨论
+
+欢迎加入QQ群：
+<a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">图片视频建站讨论群</a>
+
+手机QQ扫码加入：
+<img src="https://static.jialuoma.cn/img/qq_jialuoma.png" width="200" alt="嘉洛马图片视频建站讨论QQ群">
