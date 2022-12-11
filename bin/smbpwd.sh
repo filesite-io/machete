@@ -1,11 +1,7 @@
 #!/bin/sh
 
-username=$1
-password=$2
-
-if [ -z $username ]; then
-    user='filesite'
-fi
+password=$1
+username='filesite'
 
 if [ -z $password ]; then
     user='88888888'

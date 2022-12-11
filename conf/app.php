@@ -5,6 +5,7 @@
 $configs = array(
     'version' => '0.1.0',
     'default_timezone' => 'Asia/Shanghai',   //timezone
+    'site_name' => 'FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统',
 
     //文档站皮肤
     //'content_directory' => 'content/',      //directory of contents in /www/
@@ -17,7 +18,8 @@ $configs = array(
 
     //图片站皮肤
     'content_directory' => 'girls/',           //directory of contents in /www/
-    'theme' => 'googleimage',                 //name of theme which is enabled
+    //'theme' => 'googleimage',                 //name of theme which is enabled
+    'theme' => 'beauty',                        //皮肤美图
 
     //视频站皮肤
     //'content_directory' => 'videos/',           //directory of contents in /www/
@@ -48,10 +50,11 @@ $configs = array(
 
     //目前支持的皮肤
     'allowedThemes' => array(
-        'manual' => '文档站',
-        'webdirectory' => '导航站',
-        'googleimage' => '图片站',
-        'videoblog' => '视频站',
+        'manual' => '文档站-默认',
+        'webdirectory' => '导航站-默认',
+        'googleimage' => '图片站-默认',
+        'beauty' => '图片站-美图',
+        'videoblog' => '视频站-默认',
     ),
 
     //md5加密前缀
@@ -64,7 +67,7 @@ $configs = array(
         'captcha' => true,      //后台登陆是否开启验证码
 
         'maxUploadFileNumber' => 5,    //一次批量上传文件数量
-        'maxUploadFileSize' => 20,       //单位：Mb
+        'maxUploadFileSize' => 10,       //单位：Mb
         'allowedUploadFileTypes' => array(
             'image/jpeg',
             'image/png',

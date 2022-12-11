@@ -13,17 +13,15 @@ Class SiteController extends Controller {
         $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
         $htmlCateReadme = '';   //当前目录下的Readme.md 内容
         $menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
-
+        
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
         $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 4);
         $scanResults = $scanner->getScanResults();
-
         //获取目录
         $menus = $scanner->getMenus();
 
         $titles = array();
-        $htmlReadme = '';
         $readmeFile = $scanner->getDefaultReadme();
         if (!empty($readmeFile)) {
             if (!empty($readmeFile['sort'])) {
@@ -45,7 +43,6 @@ Class SiteController extends Controller {
             $dirTree = $sortedTree['dirTree'];
         }
 
-        //默认显示的目录
         $cateId = $this->get('id', $menus[0]['id']);
         $subcate = $scanResults[$cateId];
 
@@ -58,16 +55,25 @@ Class SiteController extends Controller {
             $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
         }
 
+        //获取默认mp3文件
+        $rootCateId = $this->get('id', '');
+        $mp3File = $scanner->getDefaultFile('mp3', $rootCateId);
+        if (empty($mp3File)) {
+            $mp3File = $scanner->getDefaultFile('mp3');
+        }
 
-        $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
+        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
         if (!empty($readmeFile['title'])) {
-            $pageTitle = "{$readmeFile['title']}，来自{$defaultTitle}";
+            $pageTitle = $readmeFile['title'];
         }
         if (!empty($subcate)) {
-            $pageTitle = "{$subcate['directory']}，来自{$defaultTitle}";
+            $pageTitle = "{$subcate['directory']}照片，来自{$pageTitle}";
         }
         $viewName = 'index';
-        $params = compact('cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme');
+        $params = compact(
+            'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme',
+            'mp3File'
+        );
         return $this->render($viewName, $params, $pageTitle);
     }
 

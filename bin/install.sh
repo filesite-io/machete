@@ -20,7 +20,8 @@ rpm -ql php82-php-fpm-8.2.0~rc5-18.el7.remi
 
 ## replace configs in php.ini
 cd /etc/opt/remi/php82/
-sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 10M/g' php.ini
+sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 20M/g' php.ini
+sed -i 's/post_max_size = 8M/post_max_size = 20M/g' php.ini
 
 ## zh_CN support
 yum -y install kde-l10n-Chinese

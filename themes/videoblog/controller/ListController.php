@@ -58,11 +58,11 @@ Class ListController extends Controller {
             $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
         }
 
-        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
+        $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
         if (!empty($subcate)) {
-            $pageTitle = "{$subcate['directory']}的照片，来自{$pageTitle}";
+            $pageTitle = "{$subcate['directory']}相关视频，来自{$defaultTitle}";
             if (!empty($subcate['title'])) {
-                $pageTitle = $subcate['title'];
+                $pageTitle = "{$subcate['title']}，来自{$defaultTitle}";
             }
         }
         $viewName = '//site/index';     //共享视图

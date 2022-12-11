@@ -1,4 +1,4 @@
-# Nginx config example
+# Nginx config example of FileSite.io
 
 * Domain: `fsc.org`
 * Web directory: `/var/www/fscphp/www/`

@@ -1,41 +1,41 @@
 /* for theme GoogleImage */
-body{background-color:#202124;color: #e8eaed;font-family: Roboto,HelveticaNeue,Arial,sans-serif;font-size: small;margin: 0}
-a{color: #aaadb2;text-decoration: none}
-.header{padding:10px 10px 0 10px;position: relative;}
-.header .logo{display: inline-block;margin:10px 10px 6px 10px;font-size: 1.65em;color: #e8eaed}
-.header .logo img{vertical-align: middle;}
-.indexes{position:fixed;min-width:68px;top: 80px;left: 4px;bottom: 100px;background-color: #2b2c2e;padding: 5px 5px 10px 5px;border-radius: 5px;max-height:500px;overflow-y: auto;}
-.indexes a{display: block;line-height: 2;font-size: 16px;font-weight: 500;}
-.hr{border-bottom: solid 1px #3c4043;margin-bottom: 11px}
-.about{display: block;position: absolute;right: 10px;top: 14px;width: 24px;height: 24px;padding: 8px;border-radius: 50%}
-.about:hover{background-color: #303134}
-.about svg{fill: currentColor;cursor: pointer;}
-.modal-mask{display: none;background: rgba(0,0,0,.6);position: fixed;left: 0;right: 0;top: 0;bottom: 0;overflow: hidden;z-index: 9000;}
-.modal-about{background: #202124;bottom: 0;overflow-y: auto;position: fixed;right: 0px;top: 0;width: 360px;max-width: 100%;}
-.modal-about h3{color: #e8eaed;font-size: 24px;font-weight: 300;margin-top: 0;margin-bottom: 20px;text-align: left;}
-.modal-about .modal-head{padding: 20px 24px 0 24px}
-.modal-about .btn-close{color: #9aa0a6;cursor: pointer;display: block;float: right;position: relative;top: -45px;}
-.modal-about .btn-close svg{fill: currentColor;flex-shrink: 0;}
-.modal-body{padding: 10px;background-color: inherit;}
-.modal-about .modal-body h1{display: none;}
-.breadcrumbs{padding-left: 1.5em;padding-bottom: 10px;}
-.content{padding: 20px 10px;padding-left: 90px}
-.introduction{padding: 0 0 20px 90px}
-.clearfix::after {content: "";clear: both;display: table;}
-.url-group{margin-bottom: 10px}
-.url-group h3{margin-top: 0}
-.url-group h4{margin-top: 0;padding-bottom: 5px;text-indent: 1em;border-bottom: 1px solid #666;}
-.url-group .url{padding: 5px;width: 140px;float: left;margin-right: 10px;margin-bottom: 10px;background-color: #2b2c2e}
-.url-group .url strong,.url-group .url small{display: block;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
-.url-group .url small{font-size: 12px;color: gray}
+body{background-color:#202124;color:#e8eaed;font-family:Roboto,HelveticaNeue,Arial,sans-serif;font-size:small;margin:0}
+a{color:#aaadb2;text-decoration:none}
+.header{padding:10px 10px 0 10px;position:relative}
+.header .logo{display:inline-block;margin:10px 10px 6px 10px;font-size:1.65em;color:#e8eaed}
+.header .logo img{vertical-align:middle}
+.indexes{position:fixed;min-width:68px;top:80px;left:4px;bottom:100px;background-color:#2b2c2e;padding:5px 4px 10px 3px;border-radius:5px;max-height:500px;overflow-y:auto}
+.indexes a{display:block;line-height:2;font-size:16px;font-weight:500}
+.hr{border-bottom:solid 1px #3c4043;margin-bottom:11px}
+.about{display:block;position:absolute;right:10px;top:14px;width:24px;height:24px;padding:8px;border-radius:50%}
+.about:hover{background-color:#303134}
+.about svg{fill:currentColor;cursor:pointer}
+.modal-mask{display:none;background:rgba(0,0,0,.6);position:fixed;left:0;right:0;top:0;bottom:0;overflow:hidden;z-index:9000}
+.modal-about{background:#202124;bottom:0;overflow-y:auto;position:fixed;right:0px;top:0;width:360px;max-width:100%}
+.modal-about h3{color:#e8eaed;font-size:24px;font-weight:300;margin-top:0;margin-bottom:20px;text-align:left}
+.modal-about .modal-head{padding:20px 24px 0 24px}
+.modal-about .btn-close{color:#9aa0a6;cursor:pointer;display:block;float:right;position:relative;top:-45px}
+.modal-about .btn-close svg{fill:currentColor;flex-shrink:0}
+.modal-body{padding:10px;background-color:inherit}
+.modal-about .modal-body h1{display:none}
+.breadcrumbs{padding-left:1.5em;padding-bottom:10px}
+.content{padding:20px 10px;padding-left:90px}
+.introduction{padding:0 0 20px 90px}
+.clearfix::after {content:"";clear:both;display:table}
+.url-group{margin-bottom:10px}
+.url-group h3{margin-top:0}
+.url-group h4{margin-top:0;padding-bottom:5px;text-indent:1em;border-bottom:1px solid #666}
+.url-group .url{padding:5px;width:140px;float:left;margin-right:10px;margin-bottom:10px;background-color:#2b2c2e}
+.url-group .url strong,.url-group .url small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.url-group .url small{font-size:12px;color:gray}
 
 /* for mobile */
-@media only screen and (max-width: 767px) {
-    .url-group .url{width: 120px;margin-right: 7px}
+@media only screen and (max-width:767px) {
+    .url-group .url{width:120px;margin-right:7px}
 }
-@media only screen and (min-width: 540px) and (max-width: 767px) {
-    .url-group .url{width: 128px;margin-right: 7px}
+@media only screen and (min-width:540px) and (max-width:767px) {
+    .url-group .url{width:128px;margin-right:7px}
 }
-@media only screen and (max-width: 360px) {
-    .url-group .url{width: 114px;margin-right: 6px}
+@media only screen and (max-width:360px) {
+    .url-group .url{width:114px;margin-right:6px}
 }

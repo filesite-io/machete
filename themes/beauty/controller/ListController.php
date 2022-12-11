@@ -1,11 +1,11 @@
 <?php
 /**
- * Site Controller
+ * List Controller
  */
 require_once __DIR__ . '/../../../lib/DirScanner.php';
 require_once __DIR__ . '/../../../plugins/Parsedown.php';
 
-Class SiteController extends Controller {
+Class ListController extends Controller {
 
     public function actionIndex() {
         //获取数据
@@ -23,13 +23,12 @@ Class SiteController extends Controller {
         $menus = $scanner->getMenus();
 
         $titles = array();
-        $htmlReadme = '';
         $readmeFile = $scanner->getDefaultReadme();
         if (!empty($readmeFile)) {
             if (!empty($readmeFile['sort'])) {
                 $menus_sorted = explode("\n", $readmeFile['sort']);
             }
-
+            
             $titles = $scanner->getMDTitles($readmeFile['id']);
 
             $Parsedown = new Parsedown();
@@ -45,9 +44,10 @@ Class SiteController extends Controller {
             $dirTree = $sortedTree['dirTree'];
         }
 
-        //默认显示的目录
+        //获取目录面包屑
         $cateId = $this->get('id', $menus[0]['id']);
         $subcate = $scanResults[$cateId];
+        $breadcrumbs = $this->getBreadcrumbs($menus, $subcate);
 
         //获取当前目录下的readme
         $cateReadmeFile = $scanner->getDefaultReadme($cateId);
@@ -58,17 +58,48 @@ Class SiteController extends Controller {
             $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
         }
 
+        //获取默认mp3文件
+        $rootCateId = $this->get('id', '');
+        $mp3File = $scanner->getDefaultFile('mp3', $rootCateId);
+        if (empty($mp3File)) {
+            $mp3File = $scanner->getDefaultFile('mp3');
+        }
 
-        $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
-        if (!empty($readmeFile['title'])) {
-            $pageTitle = "{$readmeFile['title']}，来自{$defaultTitle}";
-        }
+        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
         if (!empty($subcate)) {
-            $pageTitle = "{$subcate['directory']}，来自{$defaultTitle}";
+            $pageTitle = "{$subcate['directory']}的照片，来自{$pageTitle}";
+            if (!empty($subcate['title'])) {
+                $pageTitle = $subcate['title'];
+            }
         }
-        $viewName = 'index';
-        $params = compact('cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme');
+        $viewName = '//site/index';     //共享视图
+        $params = compact(
+            'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
+            'mp3File'
+        );
         return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //根据目录结构以及当前目录获取面包屑
+    protected function getBreadcrumbs($menus, $subcate) {
+        $breads = array();
+
+        array_push($breads, [
+            'id' => $subcate['id'],
+            'name' => $subcate['directory'],
+            'url' => $subcate['path'],
+        ]);
+
+        $foundKey = array_search($subcate['pid'], array_column($menus, 'id'));
+        if ($foundKey !== false) {
+            array_unshift($breads, [
+                'id' => $menus[$foundKey]['id'],
+                'name' => $menus[$foundKey]['directory'],
+                'url' => $menus[$foundKey]['path'],
+            ]);
+        }
+
+        return $breads;
     }
 
 }

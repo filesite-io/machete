@@ -52,11 +52,11 @@ Class ViewController extends ListController {
             $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
         }
 
-        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
+        $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
         if (!empty($video)) {
-            $pageTitle = "{$video['directory']}，来自{$pageTitle}";
+            $pageTitle = "{$video['filename']}，来自{$defaultTitle}";
             if (!empty($video['title'])) {
-                $pageTitle = $video['title'];
+                $pageTitle = "{$video['title']}，来自{$defaultTitle}";
             }
         }
         $viewName = 'index';

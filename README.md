@@ -13,6 +13,20 @@ Filesite.io也一样，它短小精悍，使用它把常见的本地文件制作
 所以我们将filesite.io的**源码**命名为```machete```。
 
 
+## 视频教程
+
+在Docker中如何用filesite/machete源码快速搭建支持文件共享方式管理内容的图片网站、视频网站、导航网站和文档站的视频教程。
+
+主要步骤：
+1. docker pull filesite/machete
+2. docker run ...
+3. 本地测试网站和后台
+4. 在docker容器中升级最新版
+5. 如何在macos中挂载远程磁盘来管理图片等内容
+
+[![IMAGE ALT TEXT HERE](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
+
+
 ## Docker使用
 
 从dockerhub下载镜像：
@@ -153,12 +167,3 @@ mount_smbfs //filesite:88888888@服务器ip或域名/machete 本地目录
 
 挂载好之后就可以打开Finder看到共享目录了，
 点击进去就可以跟管理本地文件和目录一样操作了。
-
-
-## 参与讨论
-
-欢迎加入QQ群：
-<a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">图片视频建站讨论群</a>
-
-手机QQ扫码加入：
-<img src="https://static.jialuoma.cn/img/qq_jialuoma.png" width="200" alt="嘉洛马图片视频建站讨论QQ群">
