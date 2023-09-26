@@ -40,7 +40,7 @@
         }
 
         $.ajax({
-            url: '/api/addfav',
+            url: '/frontapi/addfav',
             method: 'POST',
             dataType: 'JSON',
             data: postData

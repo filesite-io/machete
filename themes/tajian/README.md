@@ -10,7 +10,7 @@
 
 ## API
 
-* 添加新视频：/api/addfav/
+* 添加新视频：/frontapi/addfav/
 
 参数：
 ```
@@ -38,7 +38,7 @@ POST
 返回JSON格式数据。
 
 
-* 获取分类列表：/api/tags/
+* 获取分类列表：/frontapi/tags/
 
 参数：
 无
@@ -59,7 +59,7 @@ GET
 ```
 
 
-* 获取视频列表：/api/videos/
+* 获取视频列表：/frontapi/videos/
 
 参数：
 ```

@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../../plugins/Parsedown.php';
 require_once __DIR__ . '/../../../plugins/Html.php';
 require_once __DIR__ . '/SiteController.php';
 
-Class ApiController extends SiteController {
+Class FrontApiController extends SiteController {
 
     public function actionIndex() {
         $code = 0;
