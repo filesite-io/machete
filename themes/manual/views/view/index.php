@@ -1,5 +1,5 @@
 <div class="indexes">
-	<p><a href="/">&lt;&lt;返回</a></p>
+	<p><a href="javascript:history.back(-1);">&lt;&lt;返回</a></p>
 <?php
 if (!empty($viewData['titles'])) {
 	foreach($viewData['titles'] as $title) {

@@ -48,6 +48,19 @@ $configs = array(
     ),
     */
 
+    //皮肤TaJian相关
+    'tajian' => array(
+        'data_dir' => 'data/',    //数据目录
+        'tag_dir' => 'tags/',     //tag分类目录
+        'task_dir' => 'task/',    //分享视频下载任务文件保存目录
+        'supportedPlatforms' => array(
+            '抖音',
+            '快手',
+            '西瓜视频',
+            'B站',
+        ),
+    ),
+
     //目前支持的皮肤
     'allowedThemes' => array(
         'manual' => '文档站-默认',
@@ -55,6 +68,7 @@ $configs = array(
         'googleimage' => '图片站-默认',
         'beauty' => '图片站-美图',
         'videoblog' => '视频站-默认',
+        'tajian' => 'TA荐-视频分享',
     ),
 
     //md5加密前缀

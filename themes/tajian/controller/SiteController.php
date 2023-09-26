@@ -38,13 +38,6 @@ Class SiteController extends Controller {
             $htmlReadme = $scanner->fixMDUrls($readmeFile['realpath'], $htmlReadme);
         }
 
-        //排序
-        $sortedTree = $this->sortMenusAndDirTree($menus_sorted, $menus, $dirTree);
-        if (!empty($sortedTree)) {
-            $menus = $sortedTree['menus'];
-            $dirTree = $sortedTree['dirTree'];
-        }
-
         //默认显示的目录
         $cateId = $this->get('id', $menus[0]['id']);
         $subcate = $scanResults[$cateId];
@@ -58,6 +51,14 @@ Class SiteController extends Controller {
             $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
         }
 
+        //获取tags分类
+        $tags = $this->getTags($dirTree);
+
+        //排序
+        if (!empty($menus_sorted) && !empty($tags)) {
+            $tags = $this->sortTags($menus_sorted, $tags);
+        }
+
 
         $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
         if (!empty($subcate)) {
@@ -66,9 +67,67 @@ Class SiteController extends Controller {
         if (!empty($readmeFile['title'])) {
             $pageTitle = "{$readmeFile['title']}，来自{$defaultTitle}";
         }
+
         $viewName = 'index';
-        $params = compact('cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme');
+        $params = compact('cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'tags');
         return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //获取tag分类
+    protected function getTags($dirTree, $noFiles = false) {
+        $tags = array();
+
+        $tagDir = null;
+        $tagSaveDirName = str_replace('/', '', FSC::$app['config']['tajian']['tag_dir']);
+        foreach($dirTree as $id => $item) {
+            if (!empty($item['directory']) && $item['directory'] == $tagSaveDirName) {
+                $tagDir = $item;
+                break;
+            }
+        }
+
+        if (!empty($tagDir) && !empty($tagDir['files'])) {
+            foreach($tagDir['files'] as $id => $item) {
+                if (empty($item['realpath'])) {        //如果是txt描述文件
+                    $tag = $this->getTagItem($item, $noFiles);
+                    $tags[$tag['id']] = $tag;
+                }
+            }
+        }
+
+        return $tags;
+    }
+
+    protected function getTagItem($tagFile, $noFiles = false) {
+        $tag = array();
+
+        foreach($tagFile as $name => $item) {
+            if ($name == 'id') {
+                $tag['id'] = $item;
+            }else {
+                $tag['name'] = $name;
+                if ($noFiles == false) {
+                    $tag['files'] = explode("\n", $item);
+                }
+            }
+        }
+
+        return $tag;
+    }
+
+    protected function sortTags($menus_sorted, $tags) {
+        $sorted_tags = array();
+
+        foreach($menus_sorted as $tag) {
+            foreach($tags as $id => $item) {
+                if ($item['name'] == $tag) {
+                    $sorted_tags[$id] = $item;
+                }
+            }
+
+        }
+
+        return $sorted_tags;
     }
 
 }

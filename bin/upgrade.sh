@@ -15,6 +15,7 @@ rsync -vruL machete/* /var/www/machete/ \
     --exclude=www/navs/ \
     --exclude=www/girls/ \
     --exclude=www/videos/ \
+    --exclude=www/tajian/ \
     --exclude=runtime/
 
 # upgrade admin

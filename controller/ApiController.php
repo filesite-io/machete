@@ -754,6 +754,7 @@ Class ApiController extends Controller {
                     case 'webdirectory':
                         $jsonData['content_directory'] = 'navs';
                         break;
+                    case 'beauty':
                     case 'googleimage':
                         $jsonData['content_directory'] = 'girls';
                         break;

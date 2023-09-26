@@ -60,6 +60,7 @@ docker run --name machete_samba -p 1081:80 -p 445:445 -itd filesite/machete:samb
     'manual',           //文档网站
     'webdirectory',     //导航网站
     'googleimage',      //图片网站
+    'beauty',           //图片网站，设计精美
     'videoblog'         //视频网站
 ]
 ```
@@ -91,6 +92,7 @@ docker run --name machete -p 1080:80 \
 | manual | /var/www/machete/www/content/ | content |
 | webdirectory | /var/www/machete/www/navs/ | navs |
 | googleimage | /var/www/machete/www/girls/ | girls |
+| beauty | /var/www/machete/www/girls/ | girls |
 | videoblog | /var/www/machete/www/videos/ | videos |
 
 
@@ -145,7 +147,7 @@ http://服务器ip或域名/admin/
 
 账号密码可在容器中执行命令修改：
 ```
-smbpwd filesite 新密码
+smbpwd 新密码
 ```
 
 

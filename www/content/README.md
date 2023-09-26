@@ -1,241 +1,195 @@
-# FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统
-![Filesite.io - Machete](./machete_icon.png)
+
+# FileSite.io，一个基于文件和目录管理网址、文章、图片、视频的标准
+
+**摘要：**
+
+我们基于已有的文件格式定义了一个管理几种用户常用数据类型的**标准**，旨在帮助用户在保留现有内容管理习惯的前提下，更容易地把自己的创作建设成网站、App，同时还能更简单地把创作发布到各种平台。
+
+此标准目前支持网址、文章、图片和视频四种类型的数据，如有需要还将扩展其它的数据类型。
 
 
-Markdown及其编辑器的普及，以及类似Jekyll以文件为基础的博客系统的出现，为博主们提供了一种更为专注的写作方式，
-在自己的电脑本地且不必联网的情况下就能创作，不再依赖于像WordPress这类系统后台。
+## 简介
 
-对于喜欢写作的创作者们，显然已经从Markdown的使用中由原来的在线编辑转为本地编辑获得了更高的自由度和效率，
-除了博客，放眼到其它行业，基于文件、目录就能管理内容的典型还有代码托管（如Github）、网盘和云存储（如iCloud），
-那我们何不把这个成功的经验推广到更多的内容创作领域，如：小说、摄影、播客，帮助创作者简化将内容制作成网站的工作，
-于是FileSite.io诞生了。
+我们相信每个人都是一名创作者，他/她可以是作家，可以是摄影师，还可以是摄像师，也许他/她还会把自己喜欢的网站收藏并加以分类。
 
+因为现有的平台和环境，多数人的创作只能静静地躺在电脑的硬盘里，但终将有一天，在许许多多的从业者们的推动下，把个人的创作内容建设成网站、App的门槛会越来越低，那时人人都可以轻松、快捷地创建自己的网站和App，能用一键上传的功能就能把作品发布到各大平台。
 
-## 愿景
+我们还坚信，**每个人的作品所有权始终都归作者所有**，无论他/她已经把作品发布到哪个平台，只要他/她愿意，随时都能删除某个平台上他/她所有的数据，从电脑把作品快速上传到另一个平台是如此简单，这将改变平台和创作者之间的关系，不再是创作者依赖平台，而是**平台依赖创作者**。
 
-**进一步降低**内容分享者、创作者把内容变成网站的**门槛**，
-以常见的本地磁盘目录+文件的形式作为网站数据来源，
-修改磁盘文件内容上传到服务器就可以生成网页，
-让大家更易于同时维护本地和网站的内容。
-
-FileSite.io希望帮助到他们：
-* 经常用Markdown写文档/文章的朋友
-* 网址导航站经营者、收藏夹/网址分享者
-* 小说网站经营者、小说创作者、博客主、作家、自媒体人
-* 图片网站经营者、摄影师、摄影爱好者、驴友
-* 视频网站经营者、播客、摄影师、航拍爱好者、运动爱好者、潜水爱好者
+正因为如此，我们提出了一个新标准，它没有采用任何新技术，完全基于已有的操作系统、文件系统和文件类型，以及大部分人现有的使用习惯，它也是一次抛砖引玉，让这一天早点到来吧！
 
 
-## 视频教程
+## 版本
 
-在Docker中如何用filesite/machete源码快速搭建支持文件共享方式管理内容的图片网站、视频网站、导航网站和文档站的视频教程。
+名称：filesite_2023
 
-主要步骤：
-1. docker pull filesite/machete
-2. docker run ...
-3. 本地测试网站和后台
-4. 在docker容器中升级最新版
-5. 如何在macos中挂载远程磁盘来管理图片等内容
+版本号：20230130
 
-<div style="max-width:1024px">
-  <video width="100%" preload="metadata" playsinline controls>
-    <source src="https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4" type="video/mp4">
-  </video>
-</div>
+修改时间：2023-01-30
 
 
-## 使用流程
+## 目录和文件
 
-filesite使用非常简单，一旦部署好之后，以后只需将本地最新内容上传覆盖即可。
+本标准所说的目录和文件，是指Windows、Linux、MacOS等常用操作系统中的文件和目录。
 
-1. 下载filesite源码，并参考[Nginx配置示例](./Nginx.conf.md)部署到你的服务器上；
-  
-  用git下载：
-```
-git clone https://git.filesite.io/filesite/machete.git
-```
-  或下载zip压缩包（[点我直接下载](https://git.filesite.io/filesite/machete/archive/master.zip)）：
-```
-https://git.filesite.io/filesite/machete/archive/master.zip
-```
-
-2. 修改配置文件``config/app.php``，简单设置后上传到服务器完成部署；
-
-  指定内容目录和使用的皮肤：
-```
-'content_directory' => 'content/',      //内容存放目录
-'theme' => 'manual',                    //皮肤名称，如：文档站选manual，图片站选googleimage
-```
-
-3. 将本地内容目录及文件上传到网站目录：``www/content/``
-
-  不同皮肤请上传到对应的目录，详情参考Machete源码Readme。
-
-4. 打开网址浏览最新内容；
-
-有了filesite，你可以保留现有的本地内容创作习惯，并非常容易地把它们制作成一个网站分享给他人。
+如果市面上不同操作系统中对文件和目录的命名规范存在差异，本标准则采用他们都支持的部分。
 
 
-## 在线体验
+## 数据类型
 
-1. 文档站
+当前版本支持以下几种类型的数据：
 
-  | 名称 | 网址 |
+| 类型 | 格式 |
 | ---- | ---- |
-| FileSite | <a href="https://filesite.io" target="_blank">Filesite.io</a> |
-
-2. 导航站
-
-  | 名称 | 网址 |
-| ---- | ---- |
-| 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory.FileSite.io</a> |
-| Web3速查手册 | <a href="https://web3.filesite.io" target="_blank">Web3.FileSite.io</a> |
-
-3. 小说站
-
-  -
-
-4. 图片站
-
-  | 名称 | 网址 |
-| ---- | ---- |
-| 看美女 | <a href="https://googleimage.filesite.io" target="_blank">GoogleImage.Filesite.io</a> |
-| 在线演示 | <a href="https://demo.jialuoma.cn" target="_blank">带后台版Machete在线演示</a> |
-
-5. 视频站
-
-  | 名称 | 网址 |
-| ---- | ---- |
-| 在线学 | <a href="https://duan.filesite.io" target="_blank">Duan.Filesite.io</a> |
+| 网址 | .url 快捷方式 |
+| 文章 | .md markdown文件 |
+| 图片 | .jpg, .png, .gif, .ico |
+| 视频 | .mp4, .m3u8, .ts |
 
 
-## 源码下载
+## 数据说明
 
-Machete是砍刀，它能砍、能削、能切、能剁，最适合披荆斩棘；
+如果需要对上述类型的数据进行扩展说明，请使用.txt格式的纯文本文件保存，我们把这类.txt文件称为“**描述文件**”。
 
-砍刀不像大刀、长剑、长矛为战场而生，但在日常生活中使用也是得心应手。
-
-Filesite.io也一样，它短小精悍，使用它把常见的本地文件制作成网站，就像拿起砍刀一样简单， 所以我们将FileSite.io的源码命名为**machete**。
-
-点击下面网址查看源码或者下载源码：
-
-* 查看<a href="https://git.filesite.io/filesite/machete" target="_blank">FileSite.io源码Machete</a>。
-
-* 用git下载：
+描述文件命名规则如下：
 ```
-git clone https://git.filesite.io/filesite/machete.git
+目录的描述文件：{英文小写属性名}.txt
+文件的描述文件：{被描述文件名_}{英文小写属性名}.txt
 ```
 
-* 下载zip压缩包（[点我直接下载](https://git.filesite.io/filesite/machete/archive/master.zip)）：
-```
-https://git.filesite.io/filesite/machete/archive/master.zip
-```
+几个常用的属性描述文件如下：
 
-* 从Docker Hub下载镜像：
-```
-docker pull filesite/machete
-```
-
-  支持samba文件共享管理内容的版本：
-```
-docker pull filesite/machete:samba
-```
-
-  启动容器：
-```
-docker run --name machete -p 1080:80 -itd filesite/machete
-```
-
-  samba文件共享版本容器启动：
-```
-docker run --name machete_samba -p 1081:80 -p 445:445 -itd filesite/machete:samba
-```
-
-  文件共享挂载远程目录默认账号密码：
-> 账号：filesite
-> 密码：88888888
-
-  在浏览器打开本地网址预览：
-```
-http://127.0.0.1:1080
-```
-
-  samba文件共享版本本地网址访问：
-```
-http://127.0.0.1:1081
-```
-
-* 基于Vue的文件目录管理后台源码
-
-  <a href="https://github.com/filesite-io/admin-vue" target="_blank">去Github下载</a> (海外推荐使用)
-  
-  <a href="https://gitcode.net/filesite/admin-vue" target="_blank">去Gitcode下载</a> (国内推荐使用)
-
-
-更多使用说明见Machete源码README.md。
-
-
-
-## 皮肤下载
-
-FileSite.io官方提供的皮肤都包含在最新版的源码目录```themes/```中，详情如下：
-
-| 皮肤名称 | 皮肤目录 | 适用网站类型 |
+| 文件名 | 说明 | 属性名 |
 | ---- | ---- | ---- |
-| WebDirectory | webdirectory | 导航站 |
-| Manual | manual | 文档站 |
-| GoogleImage | googleimage | 图片站 |
-| VideoBlog | videoblog | 视频站 |
-
-官方皮肤介绍如下：
-* [导航站皮肤WebDirectory](./Theme_WebDirectory.md)
-* [文档站皮肤Manual](./Theme_Manual.md)
-* [图片站皮肤GoogleImage](./Theme_GoogleImage.md)
-* [视频站皮肤VideoBlog](./Theme_VideoBlog.md)
+| title.txt | 标题 | title |
+| description.txt | 描述信息 | description |
+| keywords.txt | 关键词信息 | keywords |
+| snapshot.txt | 快照图片 | snapshot |
 
 
-第三方提供的皮肤下载：
+## 目录和文件结构
 
-| 皮肤名称 | 目录名 | 适用网站类型 | 下载地址 |
-| ---- | ---- | ---- | ---- |
-| - | - | - | - |
+目录里可包含子目录和文件，目录层级**最多支持 5 级**。
 
-如果你基于Machete开发了皮肤想要共享给大家使用，请在联系我们提交下载地址。
+用目录对数据进行**分组**，同一分组的文件放在同一个目录里。
+
+示例（字母**d**代表目录，字母**f**代表文件）：
+```
+-d- 小说
+  |_d_ 金庸小说
+       |_f_ 最爱金庸网站图标.ico
+       |_f_ 最爱金庸.url
+  |_d_ 古龙小说
+       |_f_ 最爱古龙网站图标.ico
+       |_f_ 最爱古龙.url
+-d- 图片
+  |_d_ 图片搜索
+       |_f_ 谷歌图片搜索图标.ico
+       |_f_ 谷歌图片搜索.url
+       |_f_ description.txt
+  |_d_ 必应图片搜索
+       |_f_ bing图标.ico
+       |_f_ bing.url
+       |_f_ title.txt
+```
 
 
-## 使用手册
 
-如果要基于Machete做二次开发，请先仔细阅读下面手册。
+## API数据结构
 
-FileSite.io核心代码参考：
-* [Filesite.io core lib](./FSC.md)
-* [Nginx配置示例](./Nginx.conf.md)
+### 目录-Directory
 
-FileSite.io二次开发参考：
-* [FileSite.io使用手册](./Manual.md)
-* [类DirScanner定义](./Class_DirScanner.md)
+```
+[
+    'id' => '根据完整路径生成的唯一编号',
+    'pid' => '父目录id',              //如果有父目录的话
+    'directory' => '倚天屠龙记',
+    'realpath' => '/www/webroot/content/倚天屠龙记/',
+    'path' => '/list/?id={id}',
+    'snapshot' => '/content/倚天屠龙记封面图.jpg',
+    'files' => [...],         //文件列表
+    'directories' => [...]    //目录列表
+]
+```
+
+### 文件-File
+
+除网址之外的文章、图片、视频文件。
+
+```
+[
+    'id' => '根据完整路径生成的唯一编号',
+    'pid' => '父目录id',              //如果有父目录的话
+    'filename' => '第一章',
+    'realpath' => '/www/webroot/content/倚天屠龙记/第一章.md',
+    'path' => '/view/?id={id}',
+    'extension' => 'md',
+    'fstat' => [...],       //同php方法fstat: https://www.php.net/manual/en/function.fstat.php
+    'content' => '文章内容...',
+    'description' => '文章简介...',
+    'keywords' => '文章关键词...',
+    'snapshot' => '/content/倚天屠龙记/第一章封面图.jpg',
+]
+```
+
+.txt，.md和.url 3 种文件说明：
+* .txt文件是其它所有文件的描述文件，不会出现在文件列表里；
+* .md会读取文件内容并存储在属性content里；
+* .url读取文件内容并存储在属性shortcut里；
 
 
-如果上面的手册还不能帮助解决你的问题，
-请按下面方式提交反馈与建议。
+### 网址-Shortcut
+
+.url文件是一种通用的网页快捷方式，它的数据结构比上述文件数据结构多了一个属性：**shortcut**。
+
+```
+[
+    'id' => '根据完整路径生成的唯一编号',
+    'pid' => '父目录id',              //如果有父目录的话
+    'filename' => 'filesite.io',
+    'realpath' => '/www/webroot/content/网址导航/filesite.io.url',
+    'path' => '/link/?id={id}',
+    'extension' => 'url',
+    'fstat' => [...],       //同php方法fstat: https://www.php.net/manual/en/function.fstat.php
+    'shortcut' => [    
+        'name' => 'filesite.io',
+        'url' => 'https://filesite.io',
+    ],
+]
+```
+
+.url文件内容示例：
+```
+[InternetShortcut]
+URL=https://microsoft.com/
+```
 
 
-## 反馈与建议
+## PHP版实现
 
-如果使用中遇到任何问题，
-请在下面仓库提出：
+我们基于本标准用php做了一个名为Machete的开源程序，你可以在github上找到它：
+```
+https://github.com/filesite-io/machete/
+```
 
-* <a href="https://github.com/filesite-io/machete/issues" target="_blank">去Github提交问题/反馈</a> (海外推荐使用)
-* <a href="https://gitcode.net/filesite/machete/-/issues" target="_blank">去Gitcode提交问题/反馈</a> (国内推荐使用)
+详细介绍参见：
 
-如果觉得好用，别忘了点仓库右上角**⭐星号**加收藏以示支持。
+[Machete - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统](./Machete_Doc.md)
 
 
 ## 联系我们
 
-加入QQ群：
-<a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">网址导航、图片、视频网站交流群</a>
+如果你觉得Filesite.io对你有帮助，并愿意在某个项目中使用它，很高兴你跟我们分享你的故事：
 
-扫码加微信好友：
+* 加入QQ群：
 
-<img src="./wx_jialuoma.jpeg" alt="扫描微信二维码加好友" width="240" />
+  <a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">网址导航、图片、视频网站交流群</a>
+
+* 扫码加微信好友：
+
+  <img src="./wx_jialuoma.jpeg" alt="扫描微信二维码加好友" width="240" />
+
+
+## English Version
+
+[FileSite.io - A standard for managing URLs, articles, images, and videos based on files and directories](./en/README.md)
