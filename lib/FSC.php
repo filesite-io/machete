@@ -48,7 +48,27 @@ Class FSC {
         $arr = parse_url($url);
         $path = !empty($arr['path']) ? $arr['path'] : '/';
 
-        @list(, $controller, $action) = explode('/', $path);
+        $controller = $action = $user_id = '';
+        if (!empty($config['multipleUserUriParse'])) {    //如果开启了多用户解析支持
+            $pathArr = explode('/', $path);
+            if (count($pathArr) >= 2 && is_numeric($pathArr[1])) {
+                $user_id = $pathArr[1];
+                if (!empty($pathArr[2])) {
+                    $controller = $pathArr[2];
+                }
+                if (!empty($pathArr[3])) {
+                    $action = $pathArr[3];
+                }
+            }else {
+                @list(, $controller, $action) = $pathArr;
+                if (!empty($config['defaultUserId'])) {
+                    $user_id = $config['defaultUserId'];
+                }
+            }
+        }else {
+            @list(, $controller, $action) = explode('/', $path);
+        }
+
         if (empty($controller)) {
             $controller = !empty($config['defaultController']) ? $config['defaultController'] : 'site';
         }else if(preg_match('/\w+\.\w+/i', $controller)) { //not controller but some file not exist
@@ -63,7 +83,7 @@ Class FSC {
             $action = preg_replace('/\W/', '', $action);
         }
 
-        return compact('controller', 'action');
+        return compact('controller', 'action', 'user_id');
     }
 
     //add themes support
@@ -73,10 +93,16 @@ Class FSC {
         $arr = self::getControllerAndAction($requestUrl, $config);
         $controller = $arr['controller'];
         $action = $arr['action'];
+        $user_id = $arr['user_id'];
         $start_time = self::$start_time;
 
+        //如果多用户解析支持开启
+        if (!empty($config['multipleUserUriParse']) && !empty($user_id)) {
+            $config['content_directory'] = "{$config['content_directory']}{$user_id}/";
+        }
+
         //set parameters
-        self::$app = compact('config', 'controller', 'action', 'requestUrl', 'start_time');
+        self::$app = compact('config', 'controller', 'action', 'user_id', 'requestUrl', 'start_time');
 
         //call class and function
         $className = ucfirst($controller) . 'Controller';

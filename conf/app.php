@@ -7,6 +7,15 @@ $configs = array(
     'default_timezone' => 'Asia/Shanghai',   //timezone
     'site_name' => 'FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统',
 
+    //多用户网址解析开关，默认为关闭状态
+    //规则：当此开关打开的情况下，网址中域名后面第一个目录，如果是纯数字，则把它作为用户ID
+    //示例：https://tajian.tv/1000/site/index，其中的1000就是用户ID
+    //解析成功后会将用户ID保存在FSC::$app全局变量中，通过：FSC::$app['user_id']访问
+    //并自动把用户ID加入到数据目录content_directory路径后面
+    'multipleUserUriParse' => false,
+    //只有上面这个开关开启，此默认用户ID才会被使用
+    'defaultUserId' => '1000',
+
     //文档站皮肤
     //'content_directory' => 'content/',      //directory of contents in /www/
     //when it's empty, use layout and views in directory views/
@@ -53,6 +62,7 @@ $configs = array(
         'data_dir' => 'data/',    //数据目录
         'tag_dir' => 'tags/',     //tag分类目录
         'task_dir' => 'task/',    //分享视频下载任务文件保存目录
+        'task_log' => 'tasks.log',    //分享视频下载任务文件日志文件
         'supportedPlatforms' => array(
             '抖音',
             '快手',
@@ -87,6 +97,26 @@ $configs = array(
             'image/png',
             'image/webp',
             'image/gif',
+        ),
+    ),
+
+    //对接HeroUnion英雄联盟，实现提交任务和接收任务完成回调通知
+    'heroUnionEnable' => false,
+    'heroUnion' => array(
+        'server_url' => 'https://herounion.filesite.io',
+        'uuid' => 'machete_tajian',
+        'token' => 'machete_tajian',
+        'contract' => 'tajiantv',
+        'country' => 'cn',
+        'lang' => 'zh',
+        'data_mode' => 'json',
+        'notify_domain' => 'https://tajian.tv',
+
+        'supportedPlatforms' => array(
+            '抖音' => 'douyin',
+            '快手' => 'kuaishou',
+            '西瓜视频' => 'xigua',
+            'B站' => 'bilibili',
         ),
     ),
 

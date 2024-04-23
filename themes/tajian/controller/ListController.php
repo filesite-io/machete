@@ -14,7 +14,7 @@ Class ListController extends SiteController {
         $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
         $htmlCateReadme = '';   //当前目录下的Readme.md 内容
         $menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
-        
+
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
         $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
@@ -58,16 +58,21 @@ Class ListController extends SiteController {
             }
         }
 
+        //昵称支持
+        $nickname = $this->getNickname($readmeFile);
 
         $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
         if (!empty($tagItem)) {
-            $pageTitle = "{$tagItem['name']}相关视频，来自{$defaultTitle}";
+            $pageTitle = "{$tagItem['name']}精选视频，来自{$defaultTitle}";
             if (!empty($tagItem['title'])) {
                 $pageTitle = "{$tagItem['title']}，来自{$defaultTitle}";
             }
         }
         $viewName = '//site/index';     //共享视图
-        $params = compact('cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme', 'tags');
+        $params = compact(
+                'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme',
+                'breadcrumbs', 'htmlCateReadme', 'tags', 'nickname'
+        );
         return $this->render($viewName, $params, $pageTitle);
     }
 

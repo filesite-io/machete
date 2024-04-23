@@ -1,34 +1,39 @@
 /* for theme VideoBlog */
-body{background-color:#202124;color: #e8eaed;font-family: Roboto,HelveticaNeue,Arial,sans-serif;font-size: small;margin: 0}
-a{color: #aaadb2;text-decoration: none}
-.header{padding:10px 10px 0 10px;position: relative;}
-.header .logo{display: inline-block;margin:10px 10px 6px 10px;font-size: 1.86em;color: #e8eaed}
-.header .logo img{vertical-align: middle;}
-.menu{max-width: 80%;white-space: nowrap;overflow-x:auto;overflow-y: hidden;margin: 0 auto;font-size:18px}
-.menu a{display: inline-block;line-height:1;margin: 0 1px;padding: 16px 12px 12px 10px;text-align: center}
-.menu .selected{color: #8ab4f8;border-bottom: 3px solid #8ab4f8;padding: 20px 12px 11px 10px;}
-.hr{border-bottom: solid 1px #3c4043;margin-bottom: 11px}
-.about{display: block;position: absolute;right: 10px;top: 14px;width: 24px;height: 24px;padding: 8px;border-radius: 50%}
-.about:hover{background-color: #303134}
-.about svg{fill: currentColor;cursor: pointer;}
-.modal-mask{display: none;background: rgba(0,0,0,.6);position: fixed;left: 0;right: 0;top: 0;bottom: 0;overflow: hidden;z-index: 9000;}
-.modal-about{background: #202124;bottom: 0;overflow-y: auto;position: fixed;right: 0px;top: 0;width: 360px;max-width: 100%;}
-.modal-about h3{color: #e8eaed;font-size: 24px;font-weight: 300;margin-top: 0;margin-bottom: 20px;text-align: left;}
-.modal-about .modal-head{padding: 20px 24px 0 24px}
-.modal-about .btn-close{color: #9aa0a6;cursor: pointer;display: block;float: right;position: relative;top: -45px;}
-.modal-about .btn-close svg{fill: currentColor;flex-shrink: 0;}
-.modal-body{padding: 10px;background-color: inherit;}
-.modal-about .modal-body h1{display: none;}
-.breadcrumbs{padding-left: 1.5em;padding-bottom: 10px;}
-.content{padding: 20px 10px}
-.img-item{display: inline-block;margin-left: 10px;margin-right: 10px;margin-bottom: 20px;cursor: pointer;max-width: 250px}
-.img-item img{height: 180px;width: 100% !important;object-fit: cover;}
-.img-item strong{display: block;color: #bdc1c6;font-family: Roboto,Arial,sans-serif;font-size: 12px;letter-spacing: .2px;line-height: 20px;overflow: hidden;text-overflow: ellipsis}
-.img-item .img-con{display:block;position: relative;width: 100%;height: auto;text-align:center}
-.img-item .duration{display: block;position: absolute;right: 2px;bottom: 5px;background-color: #000;opacity: 0.6;padding: 1px 3px;color: #FFF;border-radius:3px;font-weight: bold;}
-.img-item:hover .vjs-big-play-button{display: inherit !important}
-.catedesc{padding: 0 10px}
-.cateinfo{margin-bottom: 1em;padding: 5px 10px 10px 10px}
+body{background-color:#202124;color:#e8eaed;font-family:Roboto,HelveticaNeue,Arial,sans-serif;font-size:small;margin:0}
+a{color:#aaadb2;text-decoration:none}
+.header{padding:10px 10px 0 10px;position:relative}
+.header .logo{display:inline-block;margin:10px 10px 6px 10px;font-size:1.86em;color:#e8eaed}
+.header .logo img{vertical-align:middle}
+.menu{max-width:80%;white-space:nowrap;overflow-x:auto;overflow-y:hidden;margin:0 auto;font-size:18px}
+.menu a{display:inline-block;line-height:1;margin:0 1px;padding:16px 12px 12px 10px;text-align:center}
+.menu .selected{color:#8ab4f8;border-bottom:3px solid #8ab4f8;padding:20px 12px 11px 10px}
+.hr{border-bottom:solid 1px #3c4043;margin-bottom:11px}
+.about{display:block;position:absolute;right:10px;top:14px;width:24px;height:24px;padding:8px;border-radius:50%}
+.about:hover{background-color:#303134}
+.about svg{fill:currentColor;cursor:pointer}
+.modal-mask{display:none;background:rgba(0,0,0,.6);position:fixed;left:0;right:0;top:0;bottom:0;overflow:hidden;z-index:9000}
+.modal-about{background:#202124;bottom:0;overflow-y:auto;position:fixed;right:0px;top:0;width:360px;max-width:100%}
+.modal-about h3{color:#e8eaed;font-size:24px;font-weight:300;margin-top:0;margin-bottom:20px;text-align:left}
+.modal-about .modal-head{padding:20px 24px 0 24px}
+.modal-about .btn-close{color:#9aa0a6;cursor:pointer;display:block;float:right;position:relative;top:-45px}
+.modal-about .btn-close svg{fill:currentColor;flex-shrink:0}
+.modal-body{padding:10px;background-color:inherit}
+.modal-about .modal-body h1{display:none}
+.modal-body img{max-width:250px}
+.breadcrumbs{padding-left:1.5em;padding-bottom:10px}
+.content{padding:20px 10px}
+.img-item{display:inline-block;margin-left:10px;margin-right:10px;margin-bottom:20px;cursor:pointer;max-width:250px}
+.img-item img{height:180px;width:100% !important;object-fit:cover}
+.img-item strong{display:block;color:#bdc1c6;font-family:Roboto,Arial,sans-serif;font-size:12px;letter-spacing:.2px;line-height:20px;overflow:hidden;text-overflow:ellipsis}
+.img-item .img-con{display:block;position:relative;width:100%;height:auto;text-align:center}
+.img-item .duration{display:block;position:absolute;right:2px;bottom:5px;background-color:#000;opacity:0.6;padding:1px 3px;color:#FFF;border-radius:3px;font-weight:bold}
+.img-item:hover .vjs-big-play-button{display:inherit !important}
+.catedesc{padding:0 10px}
+.cateinfo{margin-bottom:1em;padding:5px 10px 10px 10px}
+.footer .markdown-body{padding:1em 0}
+.footer .copyright{margin-top:1em}
+.footer .markdown-body img{max-width:250px}
+.footer .markdown-body li{list-style:none}
 
 .form-controll{padding:5px}
 .txt-input{min-width:60%}
@@ -37,19 +42,19 @@ a{color: #aaadb2;text-decoration: none}
 
 
 /* for mobile */
-@media only screen and (max-width: 767px) {
-    .menu{max-width:96%;font-size: 15px}
-    .img-item{margin-left: 0;width: 48%;margin-right: 5px}
-    .img-item strong{font-size: 14px;}
+@media only screen and (max-width:767px) {
+    .menu{max-width:96%;font-size:15px}
+    .img-item{margin-left:0;width:48%;margin-right:5px}
+    .img-item strong{font-size:14px}
     .txt-input{min-width:50%}
 }
 
-@media only screen and (max-width: 359px) {
-    .img-item{margin-left: 0;width: 100%;margin-right: 5px}
+@media only screen and (max-width:359px) {
+    .img-item{margin-left:0;width:100%;margin-right:5px}
 }
 
 /* for pad */
-@media only screen and (min-width: 768px) and (max-width: 1024px) {
-    .img-item{max-width: 226px}
-    .img-item strong{font-size: 13px;}
+@media only screen and (min-width:768px) and (max-width:1024px) {
+    .img-item{max-width:226px}
+    .img-item strong{font-size:13px}
 }

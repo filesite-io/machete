@@ -92,31 +92,35 @@ Class DirScanner {
 
     //解析描述文件内容
     //snapshot相对路径完善，支持secure_link
+    //bug fix: 允许空内容文件，如：刚创建的分类文件
     private function parseDescriptionFiles($realpath) {
         $filename = $this->getFilenameWithoutExtension($realpath);
         $pathinfo = pathinfo($realpath);
         $tmp = explode('_', $filename);
-        $field = array_pop($tmp);
+        $field = array_pop($tmp);        //['title', 'snapshot']
         $content = @file_get_contents($realpath);
-        if (empty($content)) {return [];}
-        $content = trim($content);
+        if (!empty($content)) {
+            $content = trim($content);
+        }
 
         $data = array();
-        if (in_array($field, ['title', 'snapshot'])) {
-            if ($field == 'snapshot') {
-                $img_realpath = realpath("{$pathinfo['dirname']}/{$content}");
-                if (file_exists($img_realpath)) {
-                    $id = $this->getId($img_realpath);
-                    $fp = fopen($img_realpath, 'r');
-                    $fstat = fstat($fp);
-                    fclose($fp);
-                    $img_filename = $this->getFilenameWithoutExtension($img_realpath);
-                    $img_pathinfo = pathinfo($img_realpath);
-                    $extension = strtolower($img_pathinfo['extension']);
-                    $content = $this->getFilePath( $id, $this->getRelativeDirname($img_pathinfo['dirname']), $img_filename, $extension, $fstat['mtime'] );
-                }
+
+        //如果是快照图片，获取图片相对路径
+        if (!empty($content) && $field == 'snapshot') {
+            $img_realpath = realpath("{$pathinfo['dirname']}/{$content}");
+            if (file_exists($img_realpath)) {
+                $id = $this->getId($img_realpath);
+                $fp = fopen($img_realpath, 'r');
+                $fstat = fstat($fp);
+                fclose($fp);
+                $img_filename = $this->getFilenameWithoutExtension($img_realpath);
+                $img_pathinfo = pathinfo($img_realpath);
+                $extension = strtolower($img_pathinfo['extension']);
+                $content = $this->getFilePath( $id, $this->getRelativeDirname($img_pathinfo['dirname']), $img_filename, $extension, $fstat['mtime'] );
             }
         }
+
+        //返回文件数据
         $data[$field] = $content;
 
         return $data;

@@ -191,7 +191,9 @@ Class Controller {
     }
 
     //request url via curl
-    protected function request($url, $postFields = array(), $timeout = 10, $pc = false) { 
+    protected function request(
+        $url, $postFields = array(), $timeout = 10, $pc = false, $options = array()
+    ) {
         $s = curl_init();
 
         curl_setopt($s, CURLOPT_URL, $url);
@@ -201,6 +203,10 @@ Class Controller {
         if (!empty($postFields)) {
             curl_setopt($s, CURLOPT_POST, true);
             curl_setopt($s, CURLOPT_POSTFIELDS, $postFields);
+        }
+
+        if (!empty($options)) {
+            curl_setopt( $s, CURLOPT_HTTPHEADER, $options);
         }
 
         //iphone client

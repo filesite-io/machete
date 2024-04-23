@@ -1,0 +1,24 @@
+{
+    "theme": "tajian",
+    "content_directory": "tajian/",
+    "multipleUserUriParse": true,
+    "defaultUserId": "1000",
+    "heroUnionEnable": true,
+    "heroUnion": {
+        "server_url": "https://herounion.filesite.io",
+        "uuid": "machete_tajian",
+        "token": "machete_tajian",
+        "contract": "tajiantv",
+        "country": "cn",
+        "lang": "zh",
+        "data_mode": "json",
+        "notify_domain": "https://tajian.tv",
+
+        "supportedPlatforms": {
+            "抖音": "douyin",
+            "快手": "kuaishou",
+            "西瓜视频": "xigua",
+            "B站": "bilibili"
+        }
+    }
+}

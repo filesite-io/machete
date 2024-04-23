@@ -1,11 +1,12 @@
-# 视频分享站 - TaJian皮肤演示
-![TaJian - a theme of Filesite.io](https://filesite.io/content/wx_jialuoma.jpeg?ver=1666663097)
+# Ta荐 - TaJian.tv
 
-视频分享网站皮肤**TaJian**。
+每天分享精彩视频，帮你精选来自抖音、快手、西瓜视频、B站-Bilibili的新鲜事实和观点。
+
+加我们的微信分享你的想法吧：
+
+![TaJian - a theme of Filesite.io](./wx_jialuoma.jpeg)
 
 
-## 皮肤特点
+### 免责申明
 
-* 支持tag分类
-* 适应任何尺寸的图片
-* 兼容PC和手机
+本站所有视频均来自以上平台，如果某个视频涉嫌违规，请联系我们第一时间删除。

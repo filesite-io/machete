@@ -2,6 +2,11 @@
 //常用方法
 require_once __DIR__ . '/../../../../plugins/Html.php';
 
+$linkPrefix = '';
+//多用户路径支持
+if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['user_id'])) {
+    $linkPrefix = '/' . FSC::$app['user_id'];
+}
 ?><!DocType html>
 <html>
 <head>
@@ -10,27 +15,64 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
 <link rel="icon" type="image/x-icon" href="/favicon.ico?v1.0">
-<link href="/css/main.css?v.1.1" rel="stylesheet">
-<!--for theme videoblog-->
-<link href="/css/github-markdown-dark.css" rel="stylesheet">
-<link href="/css/video-js.min.css" rel="stylesheet">
-<link href="/css/videoblog.css?v<?=Html::getStaticFileVersion('videoblog.css', 'css')?>" rel="stylesheet">
-<style>
-<?php if (!empty(FSC::$app['config']['videoblog']['imageHeight'])) { ?>
-    .img-item img{height: <?php echo FSC::$app['config']['videoblog']['imageHeight']; ?>px;}
-<?php } ?>
-</style>
+<link href="/css/tajian.css?v<?=Html::getStaticFileVersion('tajian.css', 'css')?>" rel="stylesheet">
 </head>
 <body>
+<div class="app_recommend g_app_lay" id="app_recommend">
+    <header class="top_nav">
+        <a class="log_tn clearfix" href="/">
+            <span class="verMiddle">Ta荐</span>
+            <?php if (!empty($viewData['nickname'])) { ?>
+                - <strong><?=$viewData['nickname']?></strong>
+            <?php } ?>
+        </a>
+        <div class="search hide_movi_xs hide">
+            <form id="search_form" class="search_form" action="" method="GET">
+                <div class="input_sf">
+                    <input class="input_sf_JS" type="search" placeholder="搜索" />
+                </div>
+                <button class="input_sm jsbtn" aria-label="搜索"><img src="/img/search.svg" alt="图片" /></button>
+            </form>
+        </div>
+        <div class="right_class_tn">
+            <a class="search_move_tn search_mob_JS visible_movi_xs hide" href="javascript:;" title="搜索"><img src="/img/search.svg" alt="图片" /></a>
+            <a class="connect_me_tn connectmeJS" href="javascript:;" title="联系我们"><img src="/img/contactUs.svg" alt="联系我们" /></a>
+        </div>
+    </header>
 
-    <div class="header">
-        <a href="/" class="logo">
-            <img src="/content/machete_icon.png" alt="Logo of FileSite.io" height="34">
-            TaJian.tv - Ta荐
+    <div class="app_layout_side">
+        <div class="menu_ls g_ls_menus">
+            <a class="this_set" href="<?=$linkPrefix?>/" title="">
+                <img src="/img/choice.svg" alt="星星图标" />
+                <span>推荐</span>
+            </a>
+            <a href="<?=$linkPrefix?>/site/new" title="">
+                <img src="/img/addvideos.svg" alt="添加图标" />
+                <span>添加</span>
+            </a>
+            <a href="###" title="">
+                <img src="/img/PersonalCenter.svg" alt="用户图标" />
+                <span>我的</span>
+            </a>
+        </div>
+        <div class="g_ls_menus hide_movi_xs">
+            <div class="meuns_title">视频分类</div>
+<?php
+$selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';
+$breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
+if (!empty($viewData['tags'])) {        //显示tags分类
+    foreach($viewData['tags'] as $id => $item) {
+        $selected = $item['id'] == $selectedId || (!empty($breadcrumbs) && $item['id'] == $breadcrumbs[0]['id']) ? 'this_set' : '';
+        echo <<<eof
+        <a href="{$linkPrefix}/list/?id={$item['id']}" class="{$selected}">
+            <img src="/img/other.svg" alt="菜单图标" />
+            <span>{$item['name']}</span>
         </a>
-        <a href="#modal_about" role="button" class="about btn-open">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M191.1 224c0-17.72-14.34-32.04-32-32.04L144 192c-35.34 0-64 28.66-64 64.08v47.79C80 339.3 108.7 368 144 368H160c17.66 0 32-14.36 32-32.06L191.1 224zM256 0C112.9 0 4.583 119.1 .0208 256L0 296C0 309.3 10.75 320 23.1 320S48 309.3 48 296V256c0-114.7 93.34-207.8 208-207.8C370.7 48.2 464 141.3 464 256v144c0 22.09-17.91 40-40 40h-110.7C305 425.7 289.7 416 272 416H241.8c-23.21 0-44.5 15.69-48.87 38.49C187 485.2 210.4 512 239.1 512H272c17.72 0 33.03-9.711 41.34-24H424c48.6 0 88-39.4 88-88V256C507.4 119.1 399.1 0 256 0zM368 368c35.34 0 64-28.7 64-64.13V256.1C432 220.7 403.3 192 368 192l-16 0c-17.66 0-32 14.34-32 32.04L320 335.9C320 353.7 334.3 368 352 368H368z"/></svg>
-        </a>
+eof;
+    }
+}
+?>
+        </div>
     </div>
 
 <?php
@@ -40,77 +82,52 @@ if (!empty($viewFile) && file_exists($viewFile)) {
 }
 ?>
 
-    <div class="modal-mask" id="modal_about">
-        <div class="modal-about">
-            <div class="modal-head">
-                <h3>联系我</h3>
-                <span class="btn-close" role="button"><svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class=" NMm5M"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg></span>
-            </div>
-            <div class="hr"></div>
-            <div class="modal-body markdown-body">
-                <?php echo !empty($viewData['htmlReadme']) ? $viewData['htmlReadme'] : ''; ?>
-            </div>
+    <!-- 右侧弹出框 -->
+    <div class="blank_cover elementNone blank_coverJS rtcloseJS"></div>
+    <div class="right_sidebox right_sideboxJS elementNone">
+        <h5>
+            <span>联系我们</span>
+            <a class="rtcloseJS" href="javascript:;">
+                <img class="icon svgimg verMiddle" src="/img/clos.svg" alt="关闭" title="关闭" />
+            </a>
+        </h5>
+        <div class="modal-body markdown-body">
+            <?php echo !empty($viewData['htmlReadme']) ? $viewData['htmlReadme'] : ''; ?>
         </div>
     </div>
 
-    <div class="footer">
-        <?php if (!empty(FSC::$app['config']['theme'])) { ?>
-            Theme name <strong><?php echo FSC::$app['config']['theme']; ?></strong>
-            <br>
-        <?php } ?>
-        &copy;FSC 2022 - execute time: {page_time_cost} ms
-        <?php if (!empty(FSC::$app['config']['videoblog']['contact'])) {
-            $contactInfo = FSC::$app['config']['videoblog']['contact'];
-            echo <<<eof
-        <p>{$contactInfo}</p>
-eof;
-        } ?>
+    <!-- 移动端搜索框 -->
+    <div class="mobile_search elementNone mobile_search_JS" id="mobile_search">
+        <form id="mob_search_form" class="mob_search_form search_form" action="" method="get">
+            <a class="close ms_close_JS" href="javascript:;">
+                <img class="icon svgimg verMiddle" src="/img/clos.svg" alt="关闭" title="关闭" />
+            </a>
+            <div class="input_sf">
+                <input class="ms_input_js" type="search" placeholder="搜索" />
+            </div>
+            <button class="input_sm jsbtn" aria-label="搜索"><img src="/img/search.svg" alt="图片" /></button>
+        </form>
     </div>
 
-    <!-- The Gallery as lightbox dialog, should be a document body child element -->
-    <div
-      id="blueimp-gallery"
-      class="blueimp-gallery blueimp-gallery-controls"
-      aria-label="image gallery"
-      aria-modal="true"
-      role="dialog"
-    >
-      <div class="slides" aria-live="polite"></div>
-      <h3 class="title"></h3>
-      <a
-        class="prev"
-        aria-controls="blueimp-gallery"
-        aria-label="previous slide"
-        aria-keyshortcuts="ArrowLeft"
-      ></a>
-      <a
-        class="next"
-        aria-controls="blueimp-gallery"
-        aria-label="next slide"
-        aria-keyshortcuts="ArrowRight"
-      ></a>
-      <a
-        class="close"
-        aria-controls="blueimp-gallery"
-        aria-label="close"
-        aria-keyshortcuts="Escape"
-      ></a>
-      <a
-        class="play-pause"
-        aria-controls="blueimp-gallery"
-        aria-label="play slideshow"
-        aria-keyshortcuts="Space"
-        aria-pressed="false"
-        role="button"
-      ></a>
-      <ol class="indicator"></ol>
+    <div class="footer">
+        <div class="copyright">
+            <?php if (!empty(FSC::$app['config']['theme'])) { ?>
+                Theme name <strong><?php echo FSC::$app['config']['theme']; ?></strong>
+                <br>
+            <?php } ?>
+            <a href="https://filesite.io" target="_blank">&copy;FileSite.io</a> 2022 - execute time: {page_time_cost} ms
+            <br>
+            下<a href="https://github.com/filesite-io/machete" target="_blank">Machete源码</a>搭建私有网址导航、文档、图片、视频网站
+            <br>
+            数据采集由
+            <a href="https://herounion.filesite.io" target="_blank">HeroUnion英雄联盟</a>
+            提供技术支持
+        </div>
     </div>
+</div><!--app_recommend-->
 
     <script src="/js/jquery-3.6.0.min.js"></script>
-    <script src="/js/js.cookie.min.js"></script>
-    <script src="/js/main.js?v.1.0"></script>
-    <!--for theme tajian-->
-    <script src="/js/lazysizes.min.js"></script>
+    <script src="/js/lazyload.js"></script>
     <script src="/js/tajian.js?v<?=Html::getStaticFileVersion('tajian.js', 'js')?>"></script>
 </body>
 </html>
