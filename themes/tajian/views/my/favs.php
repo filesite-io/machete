@@ -9,43 +9,18 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
     $linkPrefix = '/' . FSC::$app['user_id'];
 }
 
-if (!empty($breadcrumbs)) {
-    echo <<<eof
-    <div class="breadcrumbs">
-        <a href="{$linkPrefix}/">首页</a> &gt;&gt;
-eof;
-
-    foreach($breadcrumbs as $bread) {
-        if ($bread['id'] != $selectedId) {
-            echo <<<eof
-        <a href="{$bread['url']}">{$bread['name']}</a> / 
-eof;
-        }else {
-            echo <<<eof
-        <strong>{$bread['name']}</strong>
-eof;
-        }
-    }
-
-    echo <<<eof
-    </div>
-eof;
-}
+$selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';
 ?>
 
 <main class="g_main_lay">
-<div class="videos_list clearfix">
+<p>勾选视频下方的分类，将该视频归类到对应的分类；取消勾选，则将视频从该分类中移除。</p>
+<div class="videos_list clearfix" id="favmg">
     <?php
         $imgExts = array('jpg', 'jpeg', 'png', 'gif');
         $videoExts = array('url');
         $category = $viewData['scanResults'][$selectedId];
 
-        //当前目录的描述介绍
-        if (!empty($category['description'])) {
-            echo <<<eof
-    <p class="catedesc">{$category['description']}</p>
-eof;
-        }
+        $allTags = Html::getTagNames($viewData['tags']);
 
         if (!empty($category['files'])) {        //一级目录支持，目录下直接存放视频文件
 
@@ -67,18 +42,37 @@ eof;
                 $imgAlt = $index < 4 ? " alt=\"{$title}\"" : '';
                 $imgCls = $index < 4 ? '' : 'lazy';
 
+                $myTags = Html::getFavsTags($file['filename'], $viewData['tags']);
+                $tagsHtml = '';
+
+                foreach ($allTags as $tagName) {
+                    $tagChecked = in_array($tagName, $myTags) ? ' checked="checked"' : '';
+                    $tagsHtml .= <<<eof
+    <label data-filename="{$file['filename']}" data-video-id="{$file['id']}" data-tag="{$tagName}"><input type="checkbox" value="{$tagName}"{$tagChecked}> {$tagName}</label>
+eof;
+                }
+
                 echo <<<eof
-    <div class="vl_list_main advideo-item">
+    <div class="vl_list_main advideo-item favmg-item">
         <div class="video_img_vl">
             <a href="{$file['shortcut']['url']}" target="_blank">
                 <img data-original="{$snapshot}" class="{$imgCls}"{$imgSrc}{$imgAlt}>
             </a>
+            <button type="button" class="btn-danger btn-del" data-video-id="{$file['id']}" data-filename="{$file['filename']}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"></path>
+                </svg>
+                删除
+            </button>
         </div>
         <div class="video_title_vl">
             <a href="{$file['shortcut']['url']}" target="_blank">
                 <span class="duration">{$platform}</span>
                 <strong>{$pubDate}，{$title}</strong>
             </a>
+        </div>
+        <div class="act_tags">
+            {$tagsHtml}
         </div>
     </div>
 eof;

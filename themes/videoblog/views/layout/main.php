@@ -74,5 +74,6 @@ eof;
     <script src="/js/lazysizes.min.js"></script>
     <script src="/js/video.min.js"></script>
     <script src="/js/videoblog.js?v<?=Html::getStaticFileVersion('videoblog.js', 'js')?>"></script>
+    <?php echo Html::getGACode(); ?>
 </body>
 </html>

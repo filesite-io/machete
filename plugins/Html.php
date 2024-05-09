@@ -73,4 +73,50 @@ Class Html {
         return $sorted;
     }
 
+    //生成GA统计代码
+    public static function getGACode() {
+        if (!empty(FSC::$app['config']['debug'])) {return '';}
+        $msid = !empty(FSC::$app['config']['GA_MEASUREMENT_ID']) ? FSC::$app['config']['GA_MEASUREMENT_ID'] : '';
+        if (empty($msid)) {return '';}
+
+        $gacode = <<<eof
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={$msid}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '{$msid}');
+</script>
+eof;
+
+        return $gacode;
+    }
+
+
+    //根据收藏和分类，获取单个收藏视频的所在分类
+    public static function getFavsTags($filename, $tags) {
+        $fileTags = array();
+
+        foreach($tags as $tag_id => $item) {
+            if (in_array($filename, $item['files'])) {
+                array_push($fileTags, $item['name']);
+            }
+        }
+
+        return $fileTags;
+    }
+
+    //获取只包含分类名的数组
+    public static function getTagNames($tags) {
+        $tmp_arr = array();
+
+        foreach ($tags as $id => $tag) {
+            array_push($tmp_arr, $tag['name']);
+        }
+
+        return $tmp_arr;
+    }
+
 }

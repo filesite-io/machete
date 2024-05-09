@@ -67,5 +67,6 @@ eof;
     <script src="/js/main.js?v.1.0"></script>
     <!--for theme webdirectory-->
     <script src="/js/webdirectory.js?v<?=Html::getStaticFileVersion('webdirectory.js', 'js')?>"></script>
+    <?php echo Html::getGACode(); ?>
 </body>
 </html>

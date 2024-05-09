@@ -10,7 +10,6 @@ Class ListController extends SiteController {
 
     public function actionIndex() {
         //获取数据
-        $menus = array();        //菜单，一级目录
         $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
         $htmlCateReadme = '';   //当前目录下的Readme.md 内容
         $menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
@@ -19,9 +18,6 @@ Class ListController extends SiteController {
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
         $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
         $scanResults = $scanner->getScanResults();
-
-        //获取目录
-        $menus = $scanner->getMenus();
 
         $titles = array();
         $readmeFile = $scanner->getDefaultReadme();
@@ -63,14 +59,14 @@ Class ListController extends SiteController {
 
         $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
         if (!empty($tagItem)) {
-            $pageTitle = "{$tagItem['name']}精选视频，来自{$defaultTitle}";
+            $pageTitle = "{$nickname}收藏的{$tagItem['name']}精选视频，来自{$defaultTitle}";
             if (!empty($tagItem['title'])) {
                 $pageTitle = "{$tagItem['title']}，来自{$defaultTitle}";
             }
         }
         $viewName = '//site/index';     //共享视图
         $params = compact(
-                'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme',
+                'cateId', 'dirTree', 'scanResults', 'htmlReadme',
                 'breadcrumbs', 'htmlCateReadme', 'tags', 'nickname'
         );
         return $this->render($viewName, $params, $pageTitle);
@@ -87,22 +83,6 @@ Class ListController extends SiteController {
         ]);
 
         return $breads;
-    }
-
-    //根据tag的filenames获取它们的files数据，数据结构保持跟原file一致
-    protected function getTagFiles($tag, $scanResults) {
-        $files = array();
-        if (empty($tag['files'])) {return $files;}
-
-        foreach($tag['files'] as $filename) {
-            foreach($scanResults as $id => $item) {
-                if (!empty($item['filename']) && $item['filename'] == $filename && $item['extension'] == 'url') {
-                    $files[$id] = $item;
-                }
-            }
-        }
-
-        return $files;
     }
 
 }

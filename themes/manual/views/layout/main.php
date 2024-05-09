@@ -42,5 +42,6 @@ include_once $viewFile;
     <script src="/js/main.js?v.1.0"></script>
     <!--for theme manual-->
     <script src="/js/manual.js?v<?=Html::getStaticFileVersion('manual.js', 'js')?>"></script>
+    <?php echo Html::getGACode(); ?>
 </body>
 </html>

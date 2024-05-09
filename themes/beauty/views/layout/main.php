@@ -91,5 +91,6 @@ eof;
     <script src="/js/lazyload.js"></script>
     <script src="/js/fubox.min.js"></script>
     <script src="/js/beauty.js?v<?= Html::getStaticFileVersion('beauty.js', 'js') ?>"></script>
+    <?php echo Html::getGACode(); ?>
 </body>
 </html>

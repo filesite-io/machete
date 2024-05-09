@@ -4,8 +4,8 @@
  */
 $configs = array(
     'version' => '0.1.0',
-    'default_timezone' => 'Asia/Shanghai',   //timezone
-    'site_name' => 'FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统',
+    'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
+    'site_name' => 'Machete from FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统',
 
     //多用户网址解析开关，默认为关闭状态
     //规则：当此开关打开的情况下，网址中域名后面第一个目录，如果是纯数字，则把它作为用户ID
@@ -14,7 +14,7 @@ $configs = array(
     //并自动把用户ID加入到数据目录content_directory路径后面
     'multipleUserUriParse' => false,
     //只有上面这个开关开启，此默认用户ID才会被使用
-    'defaultUserId' => '1000',
+    'defaultUserId' => '',
 
     //文档站皮肤
     //'content_directory' => 'content/',      //directory of contents in /www/
@@ -58,6 +58,7 @@ $configs = array(
     */
 
     //皮肤TaJian相关
+    'default_friends_code' => '888888',  //默认的注册邀请码
     'tajian' => array(
         'data_dir' => 'data/',    //数据目录
         'tag_dir' => 'tags/',     //tag分类目录
@@ -119,6 +120,15 @@ $configs = array(
             'B站' => 'bilibili',
         ),
     ),
+
+    //对接第三方API服务service_3rd
+    //源码下载：https://git.filesite.io/filesite/service-3rd
+    'service_3rd_api_domain' => 'https://service.filesite.io',
+    'service_3rd_api_key' => '你的密钥',
+    'sms_code_cache_time' => 600,           //短信验证码缓存时长，单位：秒
+
+    //Google Analytics MEASUREMENT ID
+    'GA_MEASUREMENT_ID' => 'G-09MWT3Z9R0',
 
 );
 

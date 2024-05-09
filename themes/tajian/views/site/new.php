@@ -1,11 +1,11 @@
-<main class="g_main_lay g_main_border">
+<main class="g_main_lay">
     <form class="add_video_form g_form_style" id="add_video_form" action="" method="get">
         <div class="">
-            <label for="text_input_link" class="form-label">分享网址/内容</label>
-            <textarea rows="5" id="text_input_link" name="share_content" placeholder="请粘贴分享网址/内容"></textarea>
+            <label for="text_input_link" class="form-label">视频分享网址/文字</label>
+            <textarea rows="5" id="text_input_link" name="share_content" placeholder="请粘贴从视频App或网站复制的分享网址/文字（例如在抖音App里，先点击视频的分享图标，再点：复制链接，然后在这里粘贴）"></textarea>
         </div>
         <div class="mb-3">
-            <label for="text_input_title" class="form-label">选分类（可选）</label>
+            <label class="form-label">视频分类</label>
             <select name="tag">
                 <option value="">选分类</option>
     <?php
@@ -32,12 +32,3 @@ eof;
         </div>
     </form>
 </main>
-<?php
-$user_id = '';
-if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['user_id'])) {
-    $user_id = FSC::$app['user_id'];
-}
-?>
-<script>
-    var current_user_id = '<?=$user_id?>';
-</script>

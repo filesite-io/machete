@@ -35,24 +35,30 @@ eof;
 
 <main class="g_main_lay">
 <div class="videos_list clearfix">
-    <?php
-        $imgExts = array('jpg', 'jpeg', 'png', 'gif');
-        $videoExts = array('url');
-        $category = $viewData['scanResults'][$selectedId];
+<?php
+$videoExts = array('url');
 
-        //当前目录的描述介绍
-        if (!empty($category['description'])) {
-            echo <<<eof
-    <p class="catedesc">{$category['description']}</p>
+if (!empty($viewData['tags'])) {        //显示tags分类
+    $tagIndex = 0;
+    foreach($viewData['tags'] as $id => $item) {
+
+        //输出分类名称
+        echo <<<eof
+        <div class="tgroup">
+            <a href="{$linkPrefix}/list/?id={$id}" class="morelink">更多&gt;&gt;</a>
+            <h3>{$item['name']}</h3>
+        </div>
+        <div class="clearfix">
 eof;
-        }
+
+        $category = $viewData['scanResults'][$item['id']];
 
         if (!empty($category['files'])) {        //一级目录支持，目录下直接存放视频文件
 
             $cate_files = Html::sortFilesByCreateTime($category['files'], 'desc');    //按创建时间排序
             foreach($cate_files as $index => $file) {
-                //跳过非.url文件
-                if (!in_array($file['extension'], $videoExts) || empty($file['shortcut'])) {
+                //跳过非.url文件，且最多显示 8 个
+                if (!in_array($file['extension'], $videoExts) || empty($file['shortcut']) || $index >= 8) {
                     continue;
                 }
 
@@ -63,12 +69,13 @@ eof;
                 
                 $pubDate = date('m/d', $file['fstat']['ctime']);
 
-                $imgSrc = $index < 4 ? " src=\"{$snapshot}\"" : '';
-                $imgAlt = $index < 4 ? " alt=\"{$title}\"" : '';
-                $imgCls = $index < 4 ? '' : 'lazy';
+                $imgSrc = $tagIndex == 0 && $index < 4 ? " src=\"{$snapshot}\"" : '';
+                $imgAlt = $tagIndex == 0 && $index < 4 ? " alt=\"{$title}\"" : '';
+                $imgCls = $tagIndex == 0 && $index < 4 ? '' : 'lazy';
+                $itemCls = $index < 4 ? '' : 'hidden-xs';
 
                 echo <<<eof
-    <div class="vl_list_main advideo-item">
+    <div class="vl_list_main advideo-item {$itemCls}">
         <div class="video_img_vl">
             <a href="{$file['shortcut']['url']}" target="_blank">
                 <img data-original="{$snapshot}" class="{$imgCls}"{$imgSrc}{$imgAlt}>
@@ -84,6 +91,14 @@ eof;
 eof;
             }
         }
-    ?>
+
+        echo <<<eof
+        </div>
+eof;
+
+        $tagIndex ++;
+    }
+}
+?>
 </div>
 </main>

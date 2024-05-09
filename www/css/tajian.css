@@ -13,15 +13,18 @@ a{color:#464c5c;}
 .elementNone{display:none !important;}
 .elementhidden{visibility:hidden !important;}
 .verMiddle{vertical-align:middle !important;}
+.verBottom{vertical-align:bottom !important;}
+.verBaseline{vertical-align:baseline !important;}
 .vercenter{text-align:center !important;}
 .verbold{font-weight:bold !important;}
 .opacityshow{opacity:1 !important;}
-a:hover{text-decoration:none;}
+a:hover{text-decoration:none;color:darkblue;}
 a:active{text-decoration:none;}
 a:visited{text-decoration:none;}
 a:link{text-decoration:none;}
 .breadcrumbs{padding-left:1em;padding-top:1em}
-.footer{margin:7em auto 6em auto;text-align:center}
+.footer{margin:7em auto 5.4em auto;text-align:center;border-top:1px solid #DDD;padding-top:20px}
+
 
 /* 首页  start*/
 .g_app_lay{padding:56px 0 0 200px;}
@@ -68,7 +71,7 @@ a:link{text-decoration:none;}
 
 
 /* 主内容 */
-.g_main_lay{padding:0 2% 0 3.4%;margin-top:18px;min-height:280px;position:relative;max-width:1700px;}
+.g_main_lay{padding:0 2% 0 3.4%;margin-top:18px;min-height:360px;position:relative;max-width:1700px;}
 .g_main_border{border-top:solid 1px #eeeeee;}
 .vl_list_main{float:left;width:25%;margin:10px 0 22px 0;position:relative}
 .video-menu-ow{border-bottom:1px solid rgba(0,0,0,.1)}
@@ -85,19 +88,21 @@ a:link{text-decoration:none;}
     -webkit-line-clamp: 2; /* 这里是超出几行省略 */
     overflow: hidden;
 }
-
+.tgroup{padding-right:5px;padding-top:10px}
+.morelink{float:right;font-size:13px;margin-top:3px}
 /* 首页  end*/
 
 /* 联系我们 */
 .svgimg{width:2em;height:2em;vertical-align:middle;fill: currentColor;overflow: hidden;}
 .blank_cover{transition: all 0.5s ease;position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0, 0, 0, .7);opacity:0;z-index: 1199}
-.right_sidebox{padding:15px 10px 15px 18px;opacity:0;transform:translateX(101%);background-color:#FFF;position:fixed;right:0;top:0;bottom:0;color:#333;width:396px;overflow-y:auto;max-width:100%;z-index:1200;}
+.right_sidebox{padding:15px 10px 15px 18px;opacity:0;transform:translateX(101%);background-color:#FFF;position:fixed;right:0;top:0;bottom:0;color:#333;width:396px;overflow-y:auto;max-width:92%;z-index:1200;}
 .right_sidebox>h5{display:flex;padding:15px 0 10px 0;border-bottom:solid 1px #e9e2e2;margin-bottom:20px;}
 .right_sidebox>h5 span{font-size:20px;font-weight:bold;flex: 1;}
 .right_sidebox .link{text-decoration: underline;color:#457fc1;}
 .right_sidebox .sort1{font-size:16px;font-weight:bold;margin-top:10px;}
 .right_sidebox p{margin:5px 0;}
 .right_sidebox .codeimg{width:48%;}
+.right_sidebox .g_ls_menus{width:100%}
 .sideboxShow{animation:bounceInRight 0.5s ease forwards;}
 
 /* 添加视频 */
@@ -219,6 +224,76 @@ a:link{text-decoration:none;}
     .menu_ls>a{flex:1;text-align:center;padding:10px 0;margin:0;}
     .menu_ls>a img{margin:0;}
     .g_form_style{padding:0 12% 0 10%;width:100%;}
+    .hidden-xs{display:none}
 }
 
 .hide{display:none}
+.markdown-body h3{margin-top: 24px}
+.markdown-body p{margin-bottom: 10px}
+.markdown-body pre{margin-bottom:16px;padding:0 .2em;font-family: monospace,monospace;font-size: 1em}
+.markdown-body code{padding: .2em .4em;margin: 0;font-size: 85%;background-color: rgba(175,184,193,0.2)}
+
+/*  TaJian首页 */
+.tajian_index{max-width:640px;margin:0 auto;padding:10px}
+.tajian_index .h1title{font-size:17px;color:#444}
+.tajian_index .h3title{margin-top:30px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #DDD}
+.tajian_index .ulist{margin-top:10px}
+.tajian_index .ulist li{list-style:circle;margin-left:26px;padding-left:8px;line-height:1.8}
+.tajian_index .btns{margin-top:30px;text-align:center}
+.tajian_index .btns img{width:90px;opacity:0.8}
+.tajian_index .btns .favbtn{float:left;width:50%}
+.tajian_index .btns .downbtn{float:right;width:50%}
+.tajian_index .btns a{color:#3e3edc}
+.tajian_index .btns a:hover{color:blue}
+.tajian_index .btns a:hover img{opacity:1}
+.tajian_index .kfwx{float:right;border-radius:6px}
+.btn-primary,.btn-danger,.tajian_index .loginbtn{border:1px solid #50509d;background-color:#50509d;color:#FFF;padding:3px 10px;border-radius:4px;cursor:pointer}
+.btn-danger{background-color:#d32d2d;border-color:#e96b5b}
+.btn-primary:hover,.btn-danger:hover{font-weight:500}
+.bi{width:1em;height:1em;display:inline-block;vertical-align:-.125em;fill:currentcolor}
+
+/* 注册/登录 */
+.twocol label{display:block}
+.twocol input{width:62%}
+.twocol button{margin-left:4px}
+
+/* 个人中心 */
+.nickname{font-size:20px}
+.mg_menus{margin-top:20px}
+.mg_menus li{display:inline-block;width:45%;margin:5px;border:1px solid #DDD;border-radius:5px;text-align:center;vertical-align:middle;}
+.mg_menus li a{display:block;padding:15px 10px}
+.mg_menus li a:hover{background-color:lightblue;color:#FFF;font-weight:bold}
+.mg_menus li img{vertical-align:middle}
+.tag-item .btn-danger{float:right}
+.tag-item img{cursor:pointer}
+
+/* 收藏管理 */
+.favmg-item .btn-del{position:absolute;right:5px;bottom:5px}
+.favmg-item .act_tags{min-height:40px;background-color:#EEE;padding:4px;margin-right:4px;margin-top:5px}
+.favmg-item .act_tags label{display:inline-block;cursor:pointer}
+.favmg-item .act_tags label input{cursor:pointer}
+
+/* layout index */
+body.layout_index{background-color:#e5f1f3}
+.layout_index .top_nav{padding-left:20%;padding-right:20%}
+.layout_index .mt65{margin-top:65px}
+.mt10,.layout_index .mt10{margin-top:10px}
+.ml20,.layout_index .ml20{margin-left:20px}
+.layout_index .pl20{padding-left:20px}
+.layout_index .pt20{padding-top:20px}
+.layout_index .lh18{line-height:1.8}
+.layout_index .smsbtn{border:1px solid #999;background-color:#e5f1f3;color:#333;padding:8px;border-radius:4px;cursor:pointer}
+.layout_index .smsbtn:hover{background-color:lightblue}
+.layout_index .smsbtn:disabled,.layout_index .smsbtn[disabled]{background-color:#CCC;cursor:not-allowed}
+.layout_index .g_main_lay{min-height:374px}
+
+.footimg{opacity:0.8;padding-bottom:30px}
+.footimg img{max-width:90%;box-shadow:10px 5px 5px #569ac8}
+
+@media screen and (max-width:480px) {
+    .layout_index .top_nav{padding-left:22px;padding-right:22px}
+    .tajian_index .h1title small{display:block}
+    .tajian_index .kfwx{float:none;width:130px;display:block;margin-left:1em}
+    .tajian_index .loginbtn{display:block;width:80%;margin-left:1em;text-align:center}
+    .tajian_index .hide{display:none !important}
+}

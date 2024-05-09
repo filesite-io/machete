@@ -131,7 +131,7 @@ Class Controller {
     }
 
     //get params by key
-    protected function get($key = '', $defaultValue = '') {   
+    protected function get($key = '', $defaultValue = '') {
         if (empty($key)) {
             return $_GET;
         }
@@ -139,7 +139,7 @@ Class Controller {
     }
 
     //post params by key
-    protected function post($key = '', $defaultValue = '') {   
+    protected function post($key = '', $defaultValue = '') {
         if (empty($key)) {
             return $_POST;
         }
@@ -147,7 +147,7 @@ Class Controller {
     }
 
     //debug log
-    protected function logTimeCost() {   
+    protected function logTimeCost() {
         if (!empty(FSC::$app['config']['debug'])) {
             $end_time = microtime(true);
             $timeCost = ceil( ($end_time - FSC::$app['start_time']) * 1000 );   //ms
@@ -162,8 +162,23 @@ Class Controller {
         }
     }
 
+    //error log
+    protected function logError($error_message) {
+        if (!empty(FSC::$app['config']['debug'])) {
+            $thisUrl = FSC::$app['requestUrl'];
+            $logTime = date('Y-m-d H:i:s');
+            $logDir = __DIR__ . '/../runtime/logs/';
+            $logFilename = 'error.log';
+            $logOk = @error_log("{$logTime}\t{$thisUrl}\tERROR: {$error_message}\n", 3, "{$logDir}{$logFilename}");
+            if (!$logOk) {      //try to mkdir
+                @mkdir($logDir, 0700, true);
+                @error_log("{$logTime}\t{$thisUrl}\tERROR: {$error_message}\n", 3, "{$logDir}{$logFilename}");
+            }
+        }
+    }
+
     //get user real ip
-    protected function getUserIp() {     
+    protected function getUserIp() {
         $ip = false;
 
         if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
@@ -230,7 +245,7 @@ Class Controller {
 
     //set cookie for message show
     //type: info, warning, danger, success
-    protected function sendMsgToClient($msg, $type = 'info') {   
+    protected function sendMsgToClient($msg, $type = 'info') {
         $cookieKey = "alert_msg_{$type}";
         $expires = time() + 15;
         $path = '/';

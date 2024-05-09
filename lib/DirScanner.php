@@ -285,10 +285,10 @@ Class DirScanner {
 
         //try to find the md file
         $targetFile = '';
-        $targetFile_md = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.md', $realpath);
-        $targetFile_mp4 = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.mp4', $realpath);
-        $targetFile_m3u8 = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.m3u8', $realpath);
-        $targetFile_url = preg_replace('/_?[a-z0-9]+\.txt$/iU', '.url', $realpath);
+        $targetFile_md = preg_replace('/_?[a-z0-9]+\.txt$/U', '.md', $realpath);
+        $targetFile_mp4 = preg_replace('/_?[a-z0-9]+\.txt$/U', '.mp4', $realpath);
+        $targetFile_m3u8 = preg_replace('/_?[a-z0-9]+\.txt$/U', '.m3u8', $realpath);
+        $targetFile_url = preg_replace('/_?[a-z0-9]+\.txt$/U', '.url', $realpath);
         if (file_exists($targetFile_md)) {
             $targetFile = $targetFile_md;
         }else if (file_exists($targetFile_mp4)) {
@@ -299,7 +299,7 @@ Class DirScanner {
             $targetFile = $targetFile_url;
         }
 
-        if (!empty($targetFile)) {
+        if (!empty($targetFile) && $targetFile != $realpath) {
             $fileId = $this->getId($targetFile);
             if (empty($this->scanResults[$fileId])) {
                 $ext['id'] = $fileId;
@@ -312,7 +312,7 @@ Class DirScanner {
             }
         }else {
             //try to merge to the parent directory
-            $targetDir = preg_replace('/\/[a-z0-9]+\.txt$/i', '', $realpath);
+            $targetDir = preg_replace('/\/[a-z0-9]+\.txt$/U', '', $realpath);
             if (is_dir($targetDir)) {
                 $dirId = $this->getId($targetDir);
                 if (empty($this->scanResults[$dirId])) {
@@ -323,6 +323,18 @@ Class DirScanner {
                     $data = $this->scanResults[$dirId];
                     $data = array_merge($data, $ext);
                     $this->scanResults[$dirId] = $data;
+                }
+            }else {
+                //keep it in files
+                $fileId = $this->getId($realpath);
+                if (empty($this->scanResults[$fileId])) {
+                    $ext['id'] = $fileId;
+                    $this->scanResults[$fileId] = $ext;
+                    $data = $ext;
+                }else {
+                    $data = $this->scanResults[$fileId];
+                    $data = array_merge($data, $ext);
+                    $this->scanResults[$fileId] = $data;
                 }
             }
         }

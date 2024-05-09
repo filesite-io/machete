@@ -1,8 +1,9 @@
 {
     "theme": "tajian",
     "content_directory": "tajian/",
+    "default_friends_code": "888888",
     "multipleUserUriParse": true,
-    "defaultUserId": "1000",
+    "defaultUserId": "",
     "heroUnionEnable": true,
     "heroUnion": {
         "server_url": "https://herounion.filesite.io",

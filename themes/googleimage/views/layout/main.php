@@ -113,5 +113,6 @@ eof;
     <script src="/js/lazysizes.min.js"></script>
     <script src="/js/blueimp-gallery.min.js"></script>
     <script src="/js/googleimage.js?v<?=Html::getStaticFileVersion('googleimage.js', 'js')?>"></script>
+    <?php echo Html::getGACode(); ?>
 </body>
 </html>

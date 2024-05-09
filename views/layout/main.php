@@ -1,4 +1,8 @@
-<!DocType html>
+<?php
+//常用方法
+require_once __DIR__ . '/../../plugins/Html.php';
+
+?><!DocType html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -22,5 +26,6 @@ include_once $viewFile;
 
     <script src="/js/js.cookie.min.js"></script>
     <script src="/js/main.js?v.1.0"></script>
+    <?php echo Html::getGACode(); ?>
 </body>
 </html>
