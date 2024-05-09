@@ -155,7 +155,10 @@ Class FrontApiController extends SiteController {
 
         $shareUrl = $this->getShareUrlFromContent($content);
         if (!empty($shareUrl)) {
-            $done = $done && $this->saveBotTask($shareUrl);
+            //如果没有对接HeroUnion则保存本地任务文件
+            if (empty(FSC::$app['config']['heroUnionEnable'])) {
+                $done = $done && $this->saveBotTask($shareUrl);
+            }
 
             if (!empty($tagName)) {
                 $video_id = $this->getVideoId($shareUrl);
