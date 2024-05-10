@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../lib/DirScanner.php';
 require_once __DIR__ . '/../../../plugins/Parsedown.php';
 require_once __DIR__ . '/../../../plugins/Html.php';
 require_once __DIR__ . '/../../../plugins/Common.php';
+require_once __DIR__ . '/../../../plugins/TajianStats.php';
 require_once __DIR__ . '/SiteController.php';
 
 Class FrontApiController extends SiteController {
@@ -128,7 +129,15 @@ Class FrontApiController extends SiteController {
         }
 
         if ($code == 1) {        //保存视频
-            $msg = $this->saveShareVideo($content, $title, $tagName) ? '视频保存完成，系统开始自动处理，1 - 3 分钟后刷新就能看到新添加的视频了。' : '视频保存失败，请稍后重试！';
+            $done = $this->saveShareVideo($content, $title, $tagName);
+            $msg = $done ? '视频保存完成，系统开始自动处理，1 - 3 分钟后刷新就能看到新添加的视频了。' : '视频保存失败，请稍后重试！';
+            
+            //更新统计数据
+            if ($done) {
+                $stats = TajianStats::init();
+                TajianStats::increase('video');
+                $saved = TajianStats::save();
+            }
         }
 
         return $this->renderJson(compact('code', 'msg', 'err'));
@@ -589,7 +598,7 @@ eof;
                 $params['sign'] = $this->sign($params, FSC::$app['config']['service_3rd_api_key']);
 
                 $api = FSC::$app['config']['service_3rd_api_domain'] . '/aliyun/sendverifycode/';
-                $timeout = 10;
+                $timeout = 30;      //api请求超时时长
                 $pc = false;
                 $headers = array("Content-Type: application/json");
                 //以json格式post数据
@@ -660,6 +669,11 @@ eof;
                     if (!empty($newUser)) {
                         Common::saveFriendsCode($cellphone);
                         Common::initUserData($cellphone, $friends_code);
+
+                        //更新统计数据
+                        $stats = TajianStats::init();
+                        TajianStats::increase('user');
+                        $saved = TajianStats::save();
 
                         $shareUrl = "/{$newUser['username']}/";
                         $msg = "注册完成，开始收藏你喜欢的视频吧，正在为你跳转到专属网址...";
@@ -924,6 +938,11 @@ eof;
                 //保存
                 $saved = $this->deleteTag($tag_to_delete);
                 if (!empty($saved)) {
+                    //更新统计数据
+                    $stats = TajianStats::init();
+                    TajianStats::decrease('tag');
+                    $saved = TajianStats::save();
+
                     $msg = "分类已删除";
                     $code = 1;
                 }else {
@@ -998,6 +1017,11 @@ eof;
                     //保存
                     $saved = $this->addTag(ucfirst($tag_to_add));
                     if (!empty($saved)) {
+                        //更新统计数据
+                        $stats = TajianStats::init();
+                        TajianStats::increase('tag');
+                        $saved = TajianStats::save();
+
                         $msg = "分类已添加";
                         $code = 1;
                     }else {
@@ -1070,6 +1094,12 @@ eof;
                 //删除此视频的所有文件
                 $saved = $this->deleteVideoFiles($video_filename);
                 if (!empty($saved)) {
+                    //更新统计数据
+                    $stats = TajianStats::init();
+                    TajianStats::decrease('video');
+                    $saved = TajianStats::save();
+
+
                     $msg = "视频已删除";
                     $code = 1;
                 }else {

@@ -35,7 +35,16 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
 
     <h3 class="h3title pl20">使用方法</h3>
     <div class="pl20 lh18">
-        1. 点上面“创建专属收藏夹”，
+        1. 点上面“创建专属收藏夹”
+        <?php
+        if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['config']['defaultUserId'])) {
+            $defaultUserId = FSC::$app['config']['defaultUserId'];
+            echo <<<eof
+        （<a href="/{$defaultUserId}/" target="_blank">点我体验</a>）
+eof;
+        }
+        ?>
+        ，
         <br>&nbsp;&nbsp;&nbsp;&nbsp;用手机号码 + 邀请码（朋友手机号码末6位）<a href="/site/register/" class="loginbtn">注册</a>
         <br class="hidden-xs">
         &nbsp;&nbsp;&nbsp;&nbsp;还可以加客服微信索要注册邀请码
@@ -59,5 +68,24 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
         <li>西瓜视频</li>
     </ul>
     <p class="pl20 pt20">其它App和网站将陆续增加。。。</p>
+
+    <h3 class="h3title pl20">Ta荐核心数据</h3>
+    <div class="stats pl20">
+        <span class="col success">
+            <strong><?=$viewData['stats']['video']?></strong>
+            <label>视频</label>
+        </span>
+        <span class="col info">
+            <strong><?=$viewData['stats']['user']?></strong>
+            <label>用户</label>
+        </span>
+        <span class="col">
+            <strong><?=$viewData['stats']['tag']?></strong>
+            <label>分类</label>
+        </span>
+    </div>
+    <div class="pl20 lh18">
+        因为有你，从此世界变得不一样，<a href="/site/register/">马上注册加入吧～</a>
+    </div>
 
 </main>

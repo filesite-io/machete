@@ -61,7 +61,7 @@ a:link{text-decoration:none;}
 
 /* 左侧菜单 */
 .app_layout_side{padding:3px 0 0 0;width:200px;height:100vh;position:fixed;top:56px;left:0;z-index: 1000;overflow-y:auto;background:#FFF;}
-.g_ls_menus{padding:9px 12px 6px 12px;border-bottom:solid 1px #eeeeee;}
+.g_ls_menus{padding:9px 12px 56px 12px;border-bottom:solid 1px #eeeeee;}
 .g_ls_menus .meuns_title{color:#686868;padding:10px 0 4px 8px;font-weight: bold;}
 .g_ls_menus>a{display:block;padding:12px 18px;margin-bottom:4px;color:#4c4c4c;}
 .g_ls_menus>a img{width:22px;vertical-align:middle;margin-right:8px;}
@@ -252,6 +252,15 @@ a:link{text-decoration:none;}
 .btn-primary:hover,.btn-danger:hover{font-weight:500}
 .bi{width:1em;height:1em;display:inline-block;vertical-align:-.125em;fill:currentcolor}
 
+.stats{background-color:#EEE;padding:10px 10px 4px 10px}
+.stats .col{display:inline-block;padding:13px 4px;width:30%;max-width:128px;background:#444;color:#FFF;margin-right:4px;margin-bottom:6px;text-align:center}
+.stats .col strong{font-size:28px}
+.stats .col label{display:block;font-size:15px}
+.stats .info{background-color:darkblue}
+.stats .success{background-color:green}
+.stats .warning{background-color:orange;color:#444}
+.stats .danger{background-color:red}
+
 /* 注册/登录 */
 .twocol label{display:block}
 .twocol input{width:62%}
@@ -278,7 +287,9 @@ body.layout_index{background-color:#e5f1f3}
 .layout_index .top_nav{padding-left:20%;padding-right:20%}
 .layout_index .mt65{margin-top:65px}
 .mt10,.layout_index .mt10{margin-top:10px}
+.mt20{margin-top:20px}
 .ml20,.layout_index .ml20{margin-left:20px}
+.pb30{padding-bottom:30px}
 .layout_index .pl20{padding-left:20px}
 .layout_index .pt20{padding-top:20px}
 .layout_index .lh18{line-height:1.8}

@@ -10,17 +10,30 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
 }
 
 $selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';
+
+$imgExts = array('jpg', 'jpeg', 'png', 'gif');
+$videoExts = array('url');
+$category = $viewData['scanResults'][$selectedId];
+$total_my_videos = 0;
+if (!empty($category['files'])) {
+    foreach ($category['files'] as $file) {
+        if (!in_array($file['extension'], $videoExts) || empty($file['shortcut'])) {
+            continue;
+        }
+
+        $total_my_videos ++;
+    }
+}
+
+$allTags = Html::getTagNames($viewData['tags']);
 ?>
 
 <main class="g_main_lay">
-<p>勾选视频下方的分类，将该视频归类到对应的分类；取消勾选，则将视频从该分类中移除。</p>
+<h3 class="mt20">你已收藏 <?=$total_my_videos?> 个视频</h3>
+<p class="mt10">勾选视频下方的分类，将该视频归类到对应的分类；取消勾选，则将视频从该分类中移除。</p>
 <div class="videos_list clearfix" id="favmg">
     <?php
-        $imgExts = array('jpg', 'jpeg', 'png', 'gif');
-        $videoExts = array('url');
-        $category = $viewData['scanResults'][$selectedId];
-
-        $allTags = Html::getTagNames($viewData['tags']);
+        
 
         if (!empty($category['files'])) {        //一级目录支持，目录下直接存放视频文件
 

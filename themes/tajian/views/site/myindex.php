@@ -34,6 +34,14 @@ eof;
 ?>
 
 <main class="g_main_lay">
+<?php
+//如果是打开的自己的首页
+if (!empty($viewData['loginedUser']) && FSC::$app['user_id'] == $viewData['loginedUser']['username']) {
+    echo <<<eof
+<p class="mt20 pb30">欢迎回来，把当前网址发给朋友，跟TA分享你的收藏吧。</p>
+eof;
+}
+?>
 <div class="videos_list clearfix">
 <?php
 $videoExts = array('url');
@@ -41,9 +49,11 @@ $videoExts = array('url');
 if (!empty($viewData['tags'])) {        //显示tags分类
     $tagIndex = 0;
     foreach($viewData['tags'] as $id => $item) {
+        $category = $viewData['scanResults'][$item['id']];
+        if (!empty($category['files'])) {        //一级目录支持，目录下直接存放视频文件
 
-        //输出分类名称
-        echo <<<eof
+            //输出分类名称
+            echo <<<eof
         <div class="tgroup">
             <a href="{$linkPrefix}/list/?id={$id}" class="morelink">更多&gt;&gt;</a>
             <h3>{$item['name']}</h3>
@@ -51,9 +61,7 @@ if (!empty($viewData['tags'])) {        //显示tags分类
         <div class="clearfix">
 eof;
 
-        $category = $viewData['scanResults'][$item['id']];
 
-        if (!empty($category['files'])) {        //一级目录支持，目录下直接存放视频文件
 
             $cate_files = Html::sortFilesByCreateTime($category['files'], 'desc');    //按创建时间排序
             foreach($cate_files as $index => $file) {

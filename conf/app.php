@@ -142,4 +142,14 @@ if (file_exists($customConfigFile)) {
     }catch(Exception $e) {}
 }
 
+//皮肤对应的自定义配置
+$customConfigFile = __DIR__ . "/../runtime/custom_config_{$configs['theme']}.json";
+if (file_exists($customConfigFile)) {
+    try {
+        $json = file_get_contents($customConfigFile);
+        $customConfigs = json_decode($json, true);
+        $configs = array_merge($configs, $customConfigs);
+    }catch(Exception $e) {}
+}
+
 return $configs;

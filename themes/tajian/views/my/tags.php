@@ -5,7 +5,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
     $linkPrefix = '/' . FSC::$app['user_id'];
 }
 ?><main class="g_main_lay">
-    <form class="g_form_style mt65" id="tags_form" action="" method="POST">
+    <form class="g_form_style mt65 pb30" id="tags_form" action="" method="POST">
         <?php if (!empty($viewData['tags'])) {
 
             $tagsTotal = 0;

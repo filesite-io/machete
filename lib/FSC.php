@@ -61,9 +61,6 @@ Class FSC {
                 }
             }else {
                 @list(, $controller, $action) = $pathArr;
-                if (!empty($config['defaultUserId'])) {
-                    $user_id = $config['defaultUserId'];
-                }
             }
         }else {
             @list(, $controller, $action) = explode('/', $path);

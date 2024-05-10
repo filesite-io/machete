@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../../../lib/DirScanner.php';
 require_once __DIR__ . '/../../../plugins/Parsedown.php';
 require_once __DIR__ . '/../../../plugins/Common.php';
+require_once __DIR__ . '/../../../plugins/TajianStats.php';
 
 Class SiteController extends Controller {
 
@@ -28,6 +29,8 @@ Class SiteController extends Controller {
 
     //显示当前用户收藏的视频
     protected function renderFavVideos() {
+        $loginedUser = Common::getUserFromSession();
+
         //获取数据
         $menus = array();        //菜单，一级目录
         $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
@@ -83,7 +86,7 @@ Class SiteController extends Controller {
         $viewName = 'myindex';
         $params = compact(
                 'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'tags',
-                'nickname'
+                'nickname', 'loginedUser'
             );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -92,10 +95,12 @@ Class SiteController extends Controller {
     protected function renderTajianIndex() {
         $pageTitle = "Ta荐：好用的视频收藏夹，帮你整理不同平台的好视频，轻松分享给朋友！";
 
+        $stats = TajianStats::init();
+
         $this->layout = 'index';
         $viewName = 'tajian';
         $params = compact(
-                'pageTitle'
+                'pageTitle', 'stats'
             );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -207,6 +212,11 @@ Class SiteController extends Controller {
                         rename($tagFile, $newTagFile);
                     }else {
                         unlink($tagFile);
+
+                        //更新统计数据
+                        $stats = TajianStats::init();
+                        TajianStats::decrease('tag');
+                        $saved = TajianStats::save();
                     }
                 }
             }
