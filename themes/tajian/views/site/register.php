@@ -40,7 +40,7 @@
         if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['config']['defaultUserId'])) {
             $defaultUserId = FSC::$app['config']['defaultUserId'];
             echo <<<eof
-        <a href="/{$defaultUserId}/" target="_blank">点我体验，先看看收藏夹长什么样？</a>
+        <a href="/{$defaultUserId}/" target="_blank">点我体验，先看看聚宝盆长什么样？</a>
 eof;
         }
         ?>

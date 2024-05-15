@@ -83,6 +83,19 @@ eof;
     </div>
 eof;
             }
+        }else {
+            echo <<<eof
+    <div class="vercenter mt20">
+        <h3>你还没有收藏视频到当前分类哦。</h3>
+        <p class="mt10">
+            <a href="{$linkPrefix}/site/new">
+                <img src="/img/addvideos.svg" alt="添加收藏图标" width="50">
+                <br>
+                现在添加
+            </a>
+        </p>
+    </div>
+eof;
         }
     ?>
 </div>

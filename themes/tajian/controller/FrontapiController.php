@@ -667,7 +667,7 @@ eof;
                 if (empty($userDataDir)) {
                     $newUser = Common::saveUserIntoSession($cellphone, $friends_code);
                     if (!empty($newUser)) {
-                        Common::saveFriendsCode($cellphone);
+                        Common::saveFriendsCode($cellphone, $friends_code);
                         Common::initUserData($cellphone, $friends_code);
 
                         //更新统计数据
@@ -734,7 +734,7 @@ eof;
             if (empty($err)) {      //如果数据检查通过，尝试登录
                 $newUser = Common::saveUserIntoSession($cellphone);
                 if (!empty($newUser)) {
-                    $shareUrl = "/{$newUser['username']}/";
+                    $shareUrl = "/{$newUser['username']}/my/";
 
                     $msg = "登录成功，开始收藏你喜欢的视频吧";
                     $code = 1;
@@ -1010,9 +1010,9 @@ eof;
                 //获取只包含分类名的数组
                 $allTags = Html::getTagNames($tags_current);
                 
-                //最多添加 20 个分类
-                if (count($allTags) >= 20) {
-                    $err = '最多添加 20 个分类，请合理规划视频分类哦';
+                //最多添加 50 个分类
+                if (count($allTags) >= 50) {
+                    $err = '最多添加 50 个分类，请合理规划视频分类哦';
                 }else {
                     //保存
                     $saved = $this->addTag(ucfirst($tag_to_add));

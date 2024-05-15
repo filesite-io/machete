@@ -14,8 +14,10 @@ a{color:#464c5c;}
 .elementhidden{visibility:hidden !important;}
 .verMiddle{vertical-align:middle !important;}
 .verBottom{vertical-align:bottom !important;}
+.verTop{vertical-align:top !important;}
 .verBaseline{vertical-align:baseline !important;}
 .vercenter{text-align:center !important;}
+.verright{text-align:right !important;}
 .verbold{font-weight:bold !important;}
 .opacityshow{opacity:1 !important;}
 a:hover{text-decoration:none;color:darkblue;}
@@ -61,13 +63,14 @@ a:link{text-decoration:none;}
 
 /* 左侧菜单 */
 .app_layout_side{padding:3px 0 0 0;width:200px;height:100vh;position:fixed;top:56px;left:0;z-index: 1000;overflow-y:auto;background:#FFF;}
-.g_ls_menus{padding:9px 12px 56px 12px;border-bottom:solid 1px #eeeeee;}
+.g_ls_menus{padding:9px 12px 6px 12px;border-bottom:solid 1px #eeeeee}
 .g_ls_menus .meuns_title{color:#686868;padding:10px 0 4px 8px;font-weight: bold;}
 .g_ls_menus>a{display:block;padding:12px 18px;margin-bottom:4px;color:#4c4c4c;}
 .g_ls_menus>a img{width:22px;vertical-align:middle;margin-right:8px;}
 .g_ls_menus>a span{vertical-align:middle;}
 .g_ls_menus>a:hover, .g_ls_menus .this_set{background-color: #f0f0f0;border-radius: 10px;}
 .g_ls_menus .this_set{color: #000;font-weight:bold;font-size:15px;}
+.g_ls_menus_items{padding-bottom:92px}
 
 
 /* 主内容 */
@@ -235,7 +238,8 @@ a:link{text-decoration:none;}
 
 /*  TaJian首页 */
 .tajian_index{max-width:640px;margin:0 auto;padding:10px}
-.tajian_index .h1title{font-size:17px;color:#444}
+.tajian_index .h1title{font-size:24px;color:#444}
+.tajian_index .h1title small{font-size:67%}
 .tajian_index .h3title{margin-top:30px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #DDD}
 .tajian_index .ulist{margin-top:10px}
 .tajian_index .ulist li{list-style:circle;margin-left:26px;padding-left:8px;line-height:1.8}

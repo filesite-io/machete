@@ -24,7 +24,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
             - TaJian.tv
         </a>
         <div class="right_class_tn">
-            <a class="connect_me_tn" href="https://github.com/filesite-io/machete" target="_blank" title="从GitHub下载Machete源码"><img src="/img/download.png" alt="下载Machete源码" class="verBottom">下载源码</a>
+            <a class="connect_me_tn" href="/site/login/"><img src="/img/PersonalCenter.svg" alt="用户登录" class="verBottom">登录</a>
         </div>
     </header>
 
@@ -37,11 +37,11 @@ if (!empty($viewFile) && file_exists($viewFile)) {
 
     <div class="footer">
         <div class="copyright">
-            从GitHub下 <a href="https://github.com/filesite-io/machete" target="_blank">Machete源码</a> 部署到本地
+            本站源代码GitHub网址 <a href="https://github.com/filesite-io/machete" target="_blank">Machete源码</a> 
             <br>
             数据采集由
             <a href="https://herounion.filesite.io" target="_blank">HeroUnion英雄联盟</a>
-            提供技术支持
+            提供支持
             <br>
             <a href="https://filesite.io" target="_blank">&copy;FileSite.io</a> 2022 - execute time: {page_time_cost} ms
         </div>

@@ -32,7 +32,7 @@ Class Common {
     }
 
     //用户注册成功后，保存他的手机号码 6 位尾号作为邀请码
-    public static function saveFriendsCode($cellphone) {
+    public static function saveFriendsCode($cellphone, $friends_code) {
         $logTime = date('Y-m-d H:i:s');
         $logDir = __DIR__ . '/../runtime/friendscode/';
         $logFilename = substr($cellphone, -6) . '.log';
@@ -41,6 +41,10 @@ Class Common {
             @mkdir($logDir, 0700, true);
             @error_log("{$logTime} created by {$cellphone}\n", 3, "{$logDir}{$logFilename}");
         }
+
+        //保存邀请记录
+        $friendsLogfile = "{$friends_code}.log";
+        $logOk = @error_log("{$logTime} invite {$cellphone}\n", 3, "{$logDir}{$friendsLogfile}");
     }
 
     //初始化用户数据目录

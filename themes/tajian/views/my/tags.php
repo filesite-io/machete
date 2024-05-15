@@ -54,9 +54,15 @@ eof;
             </span>
         </div>
         <?php }else { ?>
-        <div class="mb-3">
+        <div class="vercenter mt20">
             <h3>你还没添加任何分类哦</h3>
-            <p class="mt10"><a href="<?=$linkPrefix?>/my/addtag" class="btn-primary">添加分类</a></p>
+            <p class="mt10">
+                <a href="<?=$linkPrefix?>/my/addtag">
+                    <img src="/img/edit.svg" alt="添加分类图标" width="50">
+                    <br>
+                    添加分类
+                </a>
+            </p>
         </div>
         <?php } ?>
     </form>

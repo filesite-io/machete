@@ -14,7 +14,7 @@ Class MyController extends SiteController {
         if (empty($loginedUser['username'])) {
             return $this->redirect('/site/login/');
         }else if (!empty(FSC::$app['config']['multipleUserUriParse']) && FSC::$app['user_id'] != $loginedUser['username']) {
-            $shareUrl = "/{$loginedUser['username']}/my/";
+            $shareUrl = "/{$loginedUser['username']}/my/" . FSC::$app['action'];
             return $this->redirect($shareUrl);
         }
 
@@ -90,6 +90,13 @@ Class MyController extends SiteController {
     public function actionFavs() {
         $defaultTitle = "管理收藏";
         $viewName = 'favs';
+        return $this->actionIndex($viewName, $defaultTitle);
+    }
+
+    //分享收藏夹
+    public function actionShare() {
+        $defaultTitle = "分享聚宝盆";
+        $viewName = 'share';
         return $this->actionIndex($viewName, $defaultTitle);
     }
 

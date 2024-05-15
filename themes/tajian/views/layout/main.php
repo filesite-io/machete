@@ -57,7 +57,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
                 <span>我的</span>
             </a>
         </div>
-        <div class="g_ls_menus hide_movi_xs">
+        <div class="g_ls_menus hide_movi_xs g_ls_menus_items">
             <div class="meuns_title">视频分类</div>
 <?php
 $selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';

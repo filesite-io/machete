@@ -18,7 +18,7 @@ Class SiteController extends Controller {
         if (empty(FSC::$app['config']['multipleUserUriParse']) || !empty(FSC::$app['user_id'])) {
             if (!empty(FSC::$app['user_id']) && Common::existCurrentUser() == false) {
                 $user_id = FSC::$app['user_id'];
-                throw new Exception("你要访问的用户 {$user_id} 收藏夹不存在！", 404);
+                throw new Exception("你要访问的用户 {$user_id} 聚宝盆不存在！", 404);
             }
 
             return $this->renderFavVideos();
@@ -81,7 +81,7 @@ Class SiteController extends Controller {
         //昵称支持
         $nickname = $this->getNickname($readmeFile);
 
-        $pageTitle = $defaultTitle = "{$nickname}的视频收藏夹 | " . FSC::$app['config']['site_name'];
+        $pageTitle = $defaultTitle = "{$nickname}的聚宝盆 | " . FSC::$app['config']['site_name'];
 
         $viewName = 'myindex';
         $params = compact(
@@ -93,14 +93,16 @@ Class SiteController extends Controller {
 
     //显示TA荐首页
     protected function renderTajianIndex() {
-        $pageTitle = "Ta荐：好用的视频收藏夹，帮你整理不同平台的好视频，轻松分享给朋友！";
+        $loginedUser = Common::getUserFromSession();
+
+        $pageTitle = "Ta荐：你的聚宝盆，帮你收纳不同平台有价值的视频，轻松分享！";
 
         $stats = TajianStats::init();
 
         $this->layout = 'index';
         $viewName = 'tajian';
         $params = compact(
-                'pageTitle', 'stats'
+                'pageTitle', 'stats', 'loginedUser'
             );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -385,11 +387,11 @@ Class SiteController extends Controller {
         //判断是否已经登录
         $loginedUser = Common::getUserFromSession();
         if (!empty($loginedUser['username'])) {
-            $shareUrl = "/{$loginedUser['username']}/";
+            $shareUrl = "/{$loginedUser['username']}/my/";
             return $this->redirect($shareUrl);
         }
 
-        $pageTitle = "注册Ta荐：一个好用的视频收藏夹，帮你整理不同平台的好视频，还能分享给朋友！";
+        $pageTitle = "注册Ta荐 | TaJian.tv";
 
         $this->layout = 'index';
         $viewName = 'register';
@@ -404,11 +406,17 @@ Class SiteController extends Controller {
         //判断是否已经登录
         $loginedUser = Common::getUserFromSession();
         if (!empty($loginedUser['username'])) {
-            $shareUrl = "/{$loginedUser['username']}/";
+            $shareUrl = "/{$loginedUser['username']}/my/";
+
+            $goUrl = $this->get('go', '');
+            if (!empty($goUrl) && preg_match("/^\/.+$/", urldecode($goUrl))) {
+                $shareUrl = urldecode($goUrl);
+            }
+
             return $this->redirect($shareUrl);
         }
 
-        $pageTitle = "登录Ta荐：一个好用的视频收藏夹，帮你整理不同平台的好视频，还能分享给朋友！";
+        $pageTitle = "登录Ta荐 | TaJian.tv";
 
         $this->layout = 'index';
         $viewName = 'login';

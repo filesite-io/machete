@@ -501,7 +501,7 @@ if ($('#tags_form').get(0)) {
     });
 }
 
-// tag分类管理
+// 添加tag分类
 if ($('#tag_new_form').get(0)) {
     $('#tag_new_form .jsbtn').click(function(e) {
         e.preventDefault();
@@ -599,6 +599,26 @@ if ($('#favmg').get(0)) {
                 alert('网络请求失败，请重试。');
             });
         }
+    });
+}
+
+// 分享收藏夹
+if ($('#share_form').get(0)) {
+    var share_content = $('#share_form textarea').val();
+    $('#share_form textarea').val(location.protocol + '//' + location.host + (location.port ? ':' + location.port : '') + share_content);
+
+    var clipboard = new ClipboardJS('#share_form .jsbtn');
+
+    clipboard.on('success', function(e) {
+        e.clearSelection();
+        $('#share_form .jsbtn').text('已复制');
+        setTimeout(function() {
+            $('#share_form .jsbtn').text('复制');
+        }, 5000);
+    });
+
+    clipboard.on('error', function(e) {
+        alert('复制失败，请手动选择后复制。');
     });
 }
 
