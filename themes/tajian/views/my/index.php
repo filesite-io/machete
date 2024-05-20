@@ -20,11 +20,13 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
         </div>
         <hr>
         <ul class="mg_menus">
-            <li><a href="<?=$linkPrefix?>/site/new"><img src="/img/addvideos.svg" alt="add favorite" width="20"> 添加收藏</a></li>
-            <li><a href="<?=$linkPrefix?>/my/addtag"><img src="/img/edit.svg" alt="add tag" width="18"> 添加分类</a></li>
+            <li><a href="<?=$linkPrefix?>/site/new"><img src="/img/addvideos.svg" alt="add favorite" width="22"> 添加收藏</a></li>
+            <li><a href="<?=$linkPrefix?>/my/addtag"><img src="/img/edit.svg" alt="add tag" width="20"> 添加分类</a></li>
             <li><a href="<?=$linkPrefix?>/my/favs"><img src="/img/favorite.png" alt="favorite" width="20"> 管理收藏</a></li>
-            <li><a href="<?=$linkPrefix?>/my/tags"><img src="/img/collection.svg" alt="collection" width="18"> 管理分类</a></li>
+            <li><a href="<?=$linkPrefix?>/my/tags"><img src="/img/collection.svg" alt="collection" width="20"> 管理分类</a></li>
             <li><a href="<?=$linkPrefix?>/my/share"><img src="/img/share-fill.svg" alt="share favorite" width="18"> 分享收藏</a></li>
+            <li><a href="<?=$linkPrefix?>/my/dirs"><img src="/img/people.svg" alt="switch directory" width="20"> 切换账号</a></li>
+            <li><a href="<?=$linkPrefix?>/my/createdir"><img src="/img/person-add.svg" alt="add directory" width="20"> 添加账号</a></li>
         </ul>
     </div>
 </main>

@@ -70,7 +70,7 @@ a:link{text-decoration:none;}
 .g_ls_menus>a span{vertical-align:middle;}
 .g_ls_menus>a:hover, .g_ls_menus .this_set{background-color: #f0f0f0;border-radius: 10px;}
 .g_ls_menus .this_set{color: #000;font-weight:bold;font-size:15px;}
-.g_ls_menus_items{padding-bottom:92px}
+.g_ls_menus_items{padding-bottom:150px}
 
 
 /* 主内容 */
@@ -237,7 +237,7 @@ a:link{text-decoration:none;}
 .markdown-body code{padding: .2em .4em;margin: 0;font-size: 85%;background-color: rgba(175,184,193,0.2)}
 
 /*  TaJian首页 */
-.tajian_index{max-width:640px;margin:0 auto;padding:10px}
+.tajian_index{max-width:698px;margin:0 auto;padding:10px}
 .tajian_index .h1title{font-size:24px;color:#444}
 .tajian_index .h1title small{font-size:67%}
 .tajian_index .h3title{margin-top:30px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #DDD}
@@ -251,10 +251,11 @@ a:link{text-decoration:none;}
 .tajian_index .btns a:hover{color:blue}
 .tajian_index .btns a:hover img{opacity:1}
 .tajian_index .kfwx{float:right;border-radius:6px}
-.btn-primary,.btn-danger,.tajian_index .loginbtn{border:1px solid #50509d;background-color:#50509d;color:#FFF;padding:3px 10px;border-radius:4px;cursor:pointer}
+.btn-primary,.btn-danger,.tajian_index .loginbtn{border:1px solid #712cf9;background-color:#712cf9;color:#FFF;padding:3px 10px;border-radius:4px;cursor:pointer}
 .btn-danger{background-color:#d32d2d;border-color:#e96b5b}
 .btn-primary:hover,.btn-danger:hover{font-weight:500}
 .bi{width:1em;height:1em;display:inline-block;vertical-align:-.125em;fill:currentcolor}
+.tajian_index .pfav{float:left;width:50%;min-height:60px;font-size:16px}
 
 .stats{background-color:#EEE;padding:10px 10px 4px 10px}
 .stats .col{display:inline-block;padding:13px 4px;width:30%;max-width:128px;background:#444;color:#FFF;margin-right:4px;margin-bottom:6px;text-align:center}
@@ -311,4 +312,5 @@ body.layout_index{background-color:#e5f1f3}
     .tajian_index .kfwx{float:none;width:130px;display:block;margin-left:1em}
     .tajian_index .loginbtn{display:block;width:80%;margin-left:1em;text-align:center}
     .tajian_index .hide{display:none !important}
+    .tajian_index .pfav{float:none;width:100%;min-height:1em}
 }

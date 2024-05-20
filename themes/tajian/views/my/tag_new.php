@@ -5,6 +5,9 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
     $linkPrefix = '/' . FSC::$app['user_id'];
 }
 ?><main class="g_main_lay">
+    <div class="breadcrumbs">
+        <a href="<?=$linkPrefix?>/my/">&lt;&lt;返回</a>
+    </div>
     <form class="g_form_style mt65" id="tag_new_form" action="" method="POST">
         <div class="mb-3 pt20">
             <label for="text_input_tag" class="form-label">分类名</label>
@@ -21,10 +24,6 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
                 <span class="bt_text_JS">保存</span>
                 <div class="bt_loading_cover bt_class_JS elementNone"></div>
             </button>
-
-            <span class="ml20">
-                <a href="<?=$linkPrefix?>/my/">返回</a>
-            </span>
         </div>
     </form>
 </main>

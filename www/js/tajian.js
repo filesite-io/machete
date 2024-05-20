@@ -13,6 +13,7 @@ var taJian = {
         addTag: '/frontapi/addtag',             //添加分类
         updateFavsTag: '/frontapi/updatefavstag',               //修改视频的分类
         deleteFav: '/frontapi/deletefav',                       //删除收藏的视频
+        createNewFav: '/frontapi/createdir',                    //创建新的收藏夹
         sendSmsCode: '/frontapi/sendsmscode',   //发送短信验证码
         register: '/frontapi/createuser',       //注册
         login: '/frontapi/loginuser'            //登入
@@ -130,9 +131,6 @@ if ($('#add_video_form').get(0)) {
         if (!inputList[0].value) {
             alert('请填写分享内容或网址！');
             return false;
-        }else if (/https:\/\/[\w\.]+\/[\w]+/ig.test(inputList[0].value) == false) {
-            alert('目前只支持抖音、快手、西瓜视频和Bilibili的分享网址哦！');
-            return false;
         }else if (!selectedTag) {
             alert('请先选择分类！');
             return false;
@@ -154,8 +152,12 @@ if ($('#add_video_form').get(0)) {
             btText.text('提交');
             btLoading.addClass('elementNone');
             if (data.code == 1) {
-                $(inputList[0]).val('');
-                alert(data.msg || data.err);
+                if (data.err) {
+                    alert(data.err);
+                }else {
+                    $(inputList[0]).val('');
+                }
+                //alert(data.msg || data.err);
             } else {
                 alert(data.err);
             }
@@ -170,9 +172,7 @@ if ($('#add_video_form').get(0)) {
 
 // form表单 
 if ($('.g_form_js').get(0)) {
-
     $('.g_form_js .jsbtn').click(function (e) {
-
         e.preventDefault();
 
         let inputList = $('.g_form_js input');
@@ -189,8 +189,6 @@ if ($('.g_form_js').get(0)) {
         btLoading.removeClass('elementNone');
         bt.prop('disabled', true);
         btText.text('请求中...');
-
-        
     });
 }
 
@@ -294,7 +292,7 @@ if ($('#register_form').get(0)) {
             btLoading.addClass('elementNone');
             if (data.code == 1 && data.shareUrl) {
                 btText.text('完成');
-                alert(data.msg);
+                //alert(data.msg);
                 setTimeout(function() {
                     location.href = data.shareUrl;
                 }, 100);
@@ -344,7 +342,7 @@ if ($('#login_form').get(0)) {
             btLoading.addClass('elementNone');
             if (data.code == 1 && data.shareUrl) {
                 btText.text('完成');
-                alert(data.msg);
+                //alert(data.msg);
                 setTimeout(function() {
                     location.href = data.shareUrl;
                 }, 100);
@@ -388,7 +386,8 @@ if ($('#nickname_form').get(0)) {
             bt.prop('disabled', false);
             btText.text('保存');
             if (data.code == 1) {
-                alert(data.msg);
+                //alert(data.msg);
+                location.reload();
             } else {
                 alert(data.err);
             }
@@ -487,7 +486,7 @@ if ($('#tags_form').get(0)) {
             bt.prop('disabled', false);
             btText.text('保存');
             if (data.code == 1) {
-                alert(data.msg);
+                //alert(data.msg);
                 location.reload();
             } else {
                 alert(data.err);
@@ -526,7 +525,7 @@ if ($('#tag_new_form').get(0)) {
             bt.prop('disabled', false);
             btText.text('保存');
             if (data.code == 1) {
-                alert(data.msg);
+                //alert(data.msg);
                 location.reload();
             } else {
                 alert(data.err);
@@ -619,6 +618,45 @@ if ($('#share_form').get(0)) {
 
     clipboard.on('error', function(e) {
         alert('复制失败，请手动选择后复制。');
+    });
+}
+
+// 创建新收藏夹账号
+if ($('#dir_new_form').get(0)) {
+    $('#dir_new_form .jsbtn').click(function(e) {
+        e.preventDefault();
+
+        var nickname = $('input[name=nickname]').val();
+
+        if (!nickname) {
+            alert('请填写 2 - 5 个汉字的昵称！');
+            return false;
+        }
+
+        var bt = $(this), btLoading = bt.children('.bt_class_JS'), btText = bt.children('.bt_text_JS');
+        btLoading.removeClass('elementNone');
+        bt.prop('disabled', true);
+        btText.text('提交中...');
+
+        var datas = {
+            'nickname': nickname
+        };
+        publicAjax(taJian.apis.createNewFav, 'POST', datas, function (data) {
+            btLoading.addClass('elementNone');
+            bt.prop('disabled', false);
+            btText.text('保存');
+            if (data.code == 1) {
+                //alert(data.msg);
+                location.href = '/' + current_user_id + '/my/dirs';
+            } else {
+                alert(data.err);
+            }
+        }, function (jqXHR, textStatus, errorThrown) {
+            bt.prop('disabled', false);
+            btText.text('保存');
+            btLoading.addClass('elementNone');
+            alert('网络请求失败，请重试。');
+        });
     });
 }
 

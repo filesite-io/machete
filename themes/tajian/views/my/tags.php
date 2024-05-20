@@ -5,6 +5,9 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
     $linkPrefix = '/' . FSC::$app['user_id'];
 }
 ?><main class="g_main_lay">
+    <div class="breadcrumbs">
+        <a href="<?=$linkPrefix?>/my/">&lt;&lt;返回</a>
+    </div>
     <form class="g_form_style mt65 pb30" id="tags_form" action="" method="POST">
         <?php if (!empty($viewData['tags'])) {
 

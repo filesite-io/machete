@@ -7,6 +7,9 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
 
 $shareUrl = "{$linkPrefix}/";
 ?><main class="g_main_lay">
+    <div class="breadcrumbs">
+        <a href="<?=$linkPrefix?>/my/">&lt;&lt;返回</a>
+    </div>
     <form class="g_form_style mt65" id="share_form" action="" method="POST">
         <div class="mb-3 pt20">
             <label for="text_share_content" class="form-label">分享链接</label>
@@ -23,10 +26,6 @@ $shareUrl = "{$linkPrefix}/";
                 <span class="bt_text_JS">复制</span>
                 <div class="bt_loading_cover bt_class_JS elementNone"></div>
             </button>
-
-            <span class="ml20">
-                <a href="<?=$linkPrefix?>/my/">返回</a>
-            </span>
         </div>
     </form>
 </main>

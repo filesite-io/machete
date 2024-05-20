@@ -8,7 +8,7 @@ require_once __DIR__ . '/SiteController.php';
 
 Class MyController extends SiteController {
 
-    public function actionIndex($viewName = 'index', $defaultTitle = '个人中心') {
+    public function actionIndex($viewName = 'index', $defaultTitle = '个人中心', $viewData = array()) {
         //判断是否已经登录，自动跳转到自己的添加视频网址
         $loginedUser = Common::getUserFromSession();
         if (empty($loginedUser['username'])) {
@@ -18,6 +18,15 @@ Class MyController extends SiteController {
             return $this->redirect($shareUrl);
         }
 
+        //账号切换支持
+        $goDir = $this->get('dir', '');
+        if (!empty($goDir) && !empty($loginedUser['cellphone'])) {
+            $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+            if (in_array($goDir, $myDirs)) {
+                Common::switchUserDir($goDir);
+                return $this->redirect("/{$goDir}/my/");
+            }
+        }
 
         //获取数据
         $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
@@ -62,6 +71,11 @@ Class MyController extends SiteController {
                 'cateId', 'dirTree', 'scanResults',
                 'htmlReadme', 'tags', 'nickname'
         );
+
+        if (!empty($viewData)) {
+            $params = array_merge($params, $viewData);
+        }
+
         return $this->render($viewName, $params, $pageTitle);
     }
 
@@ -97,6 +111,40 @@ Class MyController extends SiteController {
     public function actionShare() {
         $defaultTitle = "分享聚宝盆";
         $viewName = 'share';
+        return $this->actionIndex($viewName, $defaultTitle);
+    }
+
+    //切换收藏夹
+    public function actionDirs() {
+        $myDirs = $myNicks = array();
+
+        $loginedUser = Common::getUserFromSession();
+        if (!empty($loginedUser['cellphone'])) {
+            $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+            if (!empty($myDirs)) {
+                foreach($myDirs as $dir) {
+                    $myNicks[$dir] = Common::getNicknameByDir($dir, $loginedUser['username']);
+                }
+            }
+        }
+
+        $defaultTitle = "切换账号";
+        $viewName = 'switchdir';
+        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks'));
+    }
+
+    //添加收藏夹
+    public function actionCreatedir() {
+        $myDirs = $myNicks = array();
+
+        //VIP身份判断
+        $loginedUser = Common::getUserFromSession();
+        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
+            throw new Exception('Oops，你还不是VIP，请联系首页底部客服邮箱开通。');
+        }
+
+        $defaultTitle = "添加账号";
+        $viewName = 'createdir';
         return $this->actionIndex($viewName, $defaultTitle);
     }
 

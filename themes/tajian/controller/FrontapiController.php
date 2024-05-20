@@ -47,6 +47,7 @@ Class FrontApiController extends SiteController {
      * tag: 分类名称
      * tagid: 分类id
      * 其中title、tag和tagid为可选值。
+     * 针对任意网址增加权限控制，只允许特殊用户可以使用。
      */
     public function actionAddfav() {
         $ip = $this->getUserIp();
@@ -87,11 +88,17 @@ Class FrontApiController extends SiteController {
         }
 
         //分享内容来源平台检查
-        $shareUrl = $this->getShareUrlFromContent($content);
+        $shareUrl = Common::getShareUrlFromContent($content);
         $platform = Html::getShareVideosPlatform($shareUrl);
         if (!in_array($platform, FSC::$app['config']['tajian']['supportedPlatforms'])) {
             $code = 0;
             $err = '目前只支持抖音、快手、西瓜视频和Bilibili的分享网址哦！';
+        }
+
+        //支持平台之外的网址分享权限控制
+        if ($platform == '其它' && Common::isVipUser($loginedUser) == false) {
+            $code = 0;
+            $err = '你还不是VIP哦，不能分享支持平台之外的网址哦！如需开通特权，请联系客服邮箱。';
         }
 
         $tagName = '';
@@ -129,11 +136,15 @@ Class FrontApiController extends SiteController {
         }
 
         if ($code == 1) {        //保存视频
-            $done = $this->saveShareVideo($content, $title, $tagName);
-            $msg = $done ? '视频保存完成，系统开始自动处理，1 - 3 分钟后刷新就能看到新添加的视频了。' : '视频保存失败，请稍后重试！';
-            
-            //更新统计数据
-            if ($done) {
+            $done = $this->saveShareVideo($shareUrl, $title, $tagName);
+            $msg = '保存完成，系统开始自动处理，1 - 3 分钟后刷新就能看到新添加的收藏了。';
+
+            if (!$done) {
+                $msg = '';
+                $err = '收藏保存失败，请确认分享网址格式正确并稍后重试！';
+                $code = 0;
+            }else {
+                //更新统计数据
                 $stats = TajianStats::init();
                 TajianStats::increase('video');
                 $saved = TajianStats::save();
@@ -147,30 +158,23 @@ Class FrontApiController extends SiteController {
         return md5($url);
     }
 
-    protected function getShareUrlFromContent($content) {
-        $url = '';
-
-        preg_match("/https:\/\/[\w\.]+(\/\w+){1,}\/?/i", $content, $matches);
-        if (!empty($matches)) {
-            $url = $matches[0];
-        }
-
-        return $url;
-    }
-
     //保存分享视频
-    protected function saveShareVideo($content, $title, $tagName) {
+    protected function saveShareVideo($shareUrl, $title, $tagName) {
         $done = true;
 
-        $shareUrl = $this->getShareUrlFromContent($content);
         if (!empty($shareUrl)) {
+            $video_id = $this->getVideoId($shareUrl);
+
+            //保存url文件以及标题
+            $saveUrlRes = $this->saveUrlShortCut($video_id, $shareUrl);
+            $saveDescRes = $this->saveDescriptionFiles($video_id, array('title' => '处理中，请稍后刷新...'));
+
             //如果没有对接HeroUnion则保存本地任务文件
             if (empty(FSC::$app['config']['heroUnionEnable'])) {
                 $done = $done && $this->saveBotTask($shareUrl);
             }
 
             if (!empty($tagName)) {
-                $video_id = $this->getVideoId($shareUrl);
                 $done = $done && $this->saveVideoToTag($video_id, $tagName);
             }
 
@@ -181,7 +185,10 @@ Class FrontApiController extends SiteController {
             if (!empty(FSC::$app['config']['heroUnionEnable'])) {
                 $platformName = Html::getShareVideosPlatform($shareUrl);
                 $heroUnionConfig = FSC::$app['config']['heroUnion'];
-                $this->addHeroUnionTask($shareUrl, $heroUnionConfig['supportedPlatforms'][$platformName]);
+                $addTaskRes = $this->addHeroUnionTask($shareUrl, $heroUnionConfig['supportedPlatforms'][$platformName]);
+                if (empty($addTaskRes) || empty($addTaskRes['code'])) {
+                    $done = false;
+                }
             }
         }
 
@@ -317,7 +324,7 @@ Class FrontApiController extends SiteController {
         //以json格式post数据
         $res = $this->request($api, json_encode($params), $timeout, $pc, $headers);
 
-        return !empty($res) && $res['status'] == 200 ? $res['result'] : false;
+        return !empty($res) && $res['status'] == 200 ? json_decode($res['result'], true) : false;
     }
 
     //保存快捷方式
@@ -1169,6 +1176,75 @@ eof;
                     $code = 1;
                 }else {
                     $err = '操作失败，请稍后重试';
+                }
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg', 'err'));
+    }
+
+    //创建收藏夹
+    public function actionCreatedir() {
+        $ip = $this->getUserIp();
+        $check_time = 120;          //2 分钟内
+        $max_time_in_minutes = 30;   //最多 30 次
+
+        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        if ($isUserGotRequestLimit) {
+            $this->logError("Request limit got, ip: {$ip}");
+            throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
+        }
+
+        //只允许修改自己的数据
+        $loginedUser = Common::getUserFromSession();
+        if (empty($loginedUser['username'])) {
+            throw new Exception('Oops，你还没登录哦');
+        }else if (
+            !empty(FSC::$app['config']['multipleUserUriParse'])
+            && (empty(FSC::$app['user_id']) || FSC::$app['user_id'] != $loginedUser['username'])
+        ) {
+            throw new Exception('Oops，请求地址有误');
+        }
+
+        //VIP身份判断
+        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
+            throw new Exception('Oops，你还不是VIP，请联系首页底部客服邮箱开通。');
+        }
+
+
+        //返回给视图的变量
+        $code = 0;
+        $msg = '';
+        $err = '';
+
+        //用户提交的数据检查
+        $postParams = $this->post();
+        if (!empty($postParams)) {
+            $new_nickname = $this->post('nickname', '');
+
+            if (empty($new_nickname)) {
+                $err = "请填写新账号的昵称";
+            }else {
+                $new_nickname = Common::cleanSpecialChars($new_nickname);
+            }
+
+            if (empty($err)) {      //如果数据检查通过，尝试保存
+                //已经创建的收藏夹数量检查
+                //每个手机号最多创建 20 个收藏夹
+                $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['config']['tajian']['max_dir_num'] : 10;
+                $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+                if (count($myDirs) >= $max_num) {
+                    $err = "你已经创建了 {$max_num} 个账号，已达到最大数量";
+                }else {
+                    $new_dir = Common::getNewFavDir($loginedUser['cellphone']);
+                    $saved = Common::createNewFavDir($loginedUser['cellphone'], $loginedUser['username'], $new_dir, $new_nickname);
+
+                    if ($saved !== false) {
+                        $msg = "新账号创建完成";
+                        $code = 1;
+                    }else {
+                        $err = "{$new_dir} 创建失败，请稍后重试";
+                    }
                 }
             }
         }

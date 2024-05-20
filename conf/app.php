@@ -64,11 +64,13 @@ $configs = array(
         'tag_dir' => 'tags/',     //tag分类目录
         'task_dir' => 'task/',    //分享视频下载任务文件保存目录
         'task_log' => 'tasks.log',    //分享视频下载任务文件日志文件
+        'max_dir_num' => 20,          //一个手机可创建的最大收藏夹数量
         'supportedPlatforms' => array(
+            'B站',
             '抖音',
             '快手',
             '西瓜视频',
-            'B站',
+            '其它',
         ),
     ),
 
@@ -118,6 +120,7 @@ $configs = array(
             '快手' => 'kuaishou',
             '西瓜视频' => 'xigua',
             'B站' => 'bilibili',
+            '其它' => 'website',
         ),
     ),
 
@@ -144,6 +147,27 @@ if (file_exists($customConfigFile)) {
 
 //皮肤对应的自定义配置
 $customConfigFile = __DIR__ . "/../runtime/custom_config_{$configs['theme']}.json";
+if (file_exists($customConfigFile)) {
+    try {
+        $json = file_get_contents($customConfigFile);
+        $customConfigs = json_decode($json, true);
+        $configs = array_merge($configs, $customConfigs);
+    }catch(Exception $e) {}
+}
+
+
+//用户管理多账号自定义配置
+$customConfigFile = __DIR__ . "/../runtime/custom_config_usermap.json";
+if (file_exists($customConfigFile)) {
+    try {
+        $json = file_get_contents($customConfigFile);
+        $customConfigs = json_decode($json, true);
+        $configs = array_merge($configs, $customConfigs);
+    }catch(Exception $e) {}
+}
+
+//VIP用户自定义配置
+$customConfigFile = __DIR__ . "/../runtime/custom_config_vip.json";
 if (file_exists($customConfigFile)) {
     try {
         $json = file_get_contents($customConfigFile);

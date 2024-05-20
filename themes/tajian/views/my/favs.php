@@ -29,6 +29,9 @@ $allTags = Html::getTagNames($viewData['tags']);
 ?>
 
 <main class="g_main_lay">
+    <div class="breadcrumbs">
+        <a href="<?=$linkPrefix?>/my/">&lt;&lt;返回</a>
+    </div>
 <h3 class="mt20">你已收藏 <?=$total_my_videos?> 个视频</h3>
 <p class="mt10">勾选视频下方的分类，将该视频归类到对应的分类；取消勾选，则将视频从该分类中移除。</p>
 <div class="videos_list clearfix" id="favmg">

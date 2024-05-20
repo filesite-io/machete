@@ -35,8 +35,9 @@ Class Html {
         return mb_substr($string, $start, $length, 'utf-8') . "...";
     }
 
+    //默认支持所有网站
     public static function getShareVideosPlatform($url) {
-        $platform = '-';
+        $platform = '其它';
 
         if (preg_match("/douyin\.com/i", $url)) {
             $platform = '抖音';

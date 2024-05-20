@@ -66,7 +66,7 @@ if (!empty($viewData['tags'])) {        //显示tags分类
     foreach($viewData['tags'] as $id => $item) {
         $selected = $item['id'] == $selectedId || (!empty($breadcrumbs) && $item['id'] == $breadcrumbs[0]['id']) ? 'this_set' : '';
         echo <<<eof
-        <a href="{$linkPrefix}/list/?id={$item['id']}" class="{$selected}">
+        <a href="{$linkPrefix}/list/?id={$item['id']}#tag_{$item['id']}" class="{$selected}" id="tag_{$item['id']}">
             <img src="/img/collection-fill.svg" alt="菜单图标" />
             <span>{$item['name']}</span>
         </a>

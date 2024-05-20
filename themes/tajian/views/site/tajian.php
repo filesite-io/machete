@@ -35,6 +35,23 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
         <li>有收藏、整理知识库习惯的朋友</li>
     </ul>
 
+    <h3 class="h3title pl20">他们的聚宝盆</h3>
+    <div class="pl20 clearfix">
+        <div class="pfav mt10">
+            <a href="/1003/" target="_blank">
+                <h4>秒懂AI</h4>
+                <small>人工智能相关的，统统帮你整理到位。</small>
+            </a>
+        </div>
+        <div class="pfav mt10">
+            <a href="/1000/" target="_blank">
+                <h4>一灯大师</h4>
+                <small>帮你整理“非主流”的、“非专家”的不一样的观点。</small>
+            </a>
+        </div>
+
+    </div>
+
     <h3 class="h3title pl20">使用步骤</h3>
     <div class="pl20 lh18">
         <p>
@@ -71,13 +88,10 @@ eof;
         <li>快手</li>
         <li>西瓜视频</li>
     </ul>
-    <p class="pl20 pt20">更多App和网站将陆续增加。。。</p>
-
-    <h3 class="h3title pl20">聚宝盆推荐</h3>
-    <ul class="ulist pl20">
-        <li><a href="/1000/" target="_blank">一灯大师</a></li>
-        <li><a href="/1003/" target="_blank">秒懂AI</a></li>
-    </ul>
+    <p class="pl20 pt20">
+        更多视频App和网站将陆续增加；
+        <br><strong>任意网站</strong>收藏限VIP用户使用，如需开通请联系客服邮箱（machete#filesite.io，替换#为@）。
+    </p>
 
     <h3 class="h3title pl20">Ta荐核心数据</h3>
     <div class="stats pl20">
@@ -96,6 +110,12 @@ eof;
     </div>
     <div class="pl20 lh18">
         因为有你，从此世界变得不一样，<a href="/site/register/">马上注册加入吧～</a>
+    </div>
+
+    <h3 class="h3title pl20">搭建视频分享网站</h3>
+    <div class="pl20 lh18">
+        付费协助搭建<strong>视频分享网站</strong>，请发Email给我们吧：
+        <strong>machete#filesite.io</strong>，替换#为@。
     </div>
 
 </main>
