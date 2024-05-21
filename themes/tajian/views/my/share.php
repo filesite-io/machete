@@ -13,7 +13,10 @@ $shareUrl = "{$linkPrefix}/";
     <form class="g_form_style mt65" id="share_form" action="" method="POST">
         <div class="mb-3 pt20">
             <label for="text_share_content" class="form-label">分享链接</label>
-            <textarea id="text_share_content" name="share_content" rows="5" data-share-url="<?=$shareUrl?>"><?=$shareUrl?> “<?=$viewData['nickname']?>”的聚宝盆，我整理的很不错的视频，复制链接到浏览器粘贴打开</textarea>
+            <textarea id="text_share_content" name="share_content" rows="5" data-share-url="<?=$shareUrl?>"><?=$shareUrl?> 
+“<?=$viewData['nickname']?>”的聚宝盆，整理了各大平台很不错的视频/直播，复制链接到浏览器粘贴打开。
+QQ和微信里点开会提示“不安全”，原因都懂的：Ta荐的内容全部来自“B站”、“抖音”、“快手”、“西瓜视频”等，就是说上述各大平台“不安全”，你觉得呢？...
+Ta荐不生产内容，只做视频/直播整理、分享。</textarea>
             <p class="mt10">点下面按钮复制分享内容，在微信、QQ等App里粘贴发给朋友。</p>
         </div>
         <div class="avform_bt vercenter">

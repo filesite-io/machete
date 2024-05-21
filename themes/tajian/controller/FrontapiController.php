@@ -187,6 +187,7 @@ Class FrontApiController extends SiteController {
                 $heroUnionConfig = FSC::$app['config']['heroUnion'];
                 $addTaskRes = $this->addHeroUnionTask($shareUrl, $heroUnionConfig['supportedPlatforms'][$platformName]);
                 if (empty($addTaskRes) || empty($addTaskRes['code'])) {
+                    $this->logError("Add herounion task failed: " . json_encode($addTaskRes));
                     $done = false;
                 }
             }
