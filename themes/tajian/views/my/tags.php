@@ -24,10 +24,12 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
                 $index ++;
                 echo <<<eof
         <div class="mb-3 tag-item">
-            <button class="btn-danger" type="button">删除</button>
-            <label class="form-label">分类 {$index}</label>
-            <img src="/img/arrow-up.svg" alt="向上移动" width="18" data-action="up" class="verMiddle ml20 {$upIconCls}">
-            <img src="/img/arrow-down.svg" alt="向下移动" width="18" data-action="down" class="verMiddle ml20 {$downIconCls}">
+            <div class="clearfix">
+                <button class="btn-danger" type="button">删除</button>
+                <label class="form-label">分类 {$index}</label>
+                <img src="/img/arrow-up.svg" title="向上移动" width="20" data-action="up" class="verBaseline ml20 {$upIconCls}">
+                <img src="/img/arrow-down.svg" title="向下移动" width="20" data-action="down" class="verBaseline ml20 {$downIconCls}">
+            </div>
             <input name="tags[]" placeholder="请填写 2 - 5 个汉字" value="{$tag['name']}">
         </div>
 eof;

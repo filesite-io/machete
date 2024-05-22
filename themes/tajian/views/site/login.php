@@ -7,7 +7,7 @@
         <div class="mb-3 twocol">
             <label for="text_input_sm" class="form-label">验证码</label>
             <input id="text_input_sm" name="smscode" placeholder="输入收到的短信验证码" type="number">
-            <button class="smsbtn bt_sms_JS">发送验证码</button>
+            <button class="smsbtn bt_sms_JS button button-sm button-shadow">发送验证码</button>
         </div>
         <div class="avform_bt vercenter">
             <button class="jsbtn" aria-label="登录" type="button">
