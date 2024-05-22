@@ -109,18 +109,21 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                         </svg>
                         <div class="hero-footer">你看到的，也许只是冰山一角...</div>
                         <div class="pfav">
-                            <a href="/1003/" target="_blank">
-                                <h4>秒懂AI</h4>
+                            <a href="/2001/" target="_blank">
+                                <img src="/img/avatar/women.svg" alt="AI svg logo" width="80">
+                                <h4>阅人无数</h4>
                             </a>
                         </div>
                         <div class="pfav pfav-item-2">
-                            <a href="/1000/" target="_blank">
-                                <h4>一灯大师</h4>
+                            <a href="/1003/" target="_blank">
+                                <img src="/img/avatar/ai-bot.svg" alt="AI svg logo" width="80">
+                                <h4>秒懂AI</h4>
                             </a>
                         </div>
                         <div class="pfav pfav-item-3">
-                            <a href="/2001/" target="_blank">
-                                <h4>阅人无数</h4>
+                            <a href="/1000/" target="_blank">
+                                <img src="/img/avatar/master.svg" alt="AI svg logo" width="80">
+                                <h4>一灯大师</h4>
                             </a>
                         </div>
                         <div class="pfav pfav-item-4">

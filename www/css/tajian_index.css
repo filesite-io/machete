@@ -266,9 +266,10 @@ main{flex:1 0 auto}
 .site-footer .log_tn span{color:#FFF}
 .connect_me_tn{display:block;text-decoration:none;padding:4px 10px}
 .btn_icon{height:24px !important;margin-top:-4px;margin-right:3px}
-.pfav{position:absolute;top:25%;width:25%;left:10px}
+.pfav{position:absolute;top:17%;width:25%;left:10px;text-align:center}
 .pfav a{text-decoration:none}
-.pfav h4{color:#666}
+.pfav h4{color:#666;margin-top:0}
+.pfav img{display:inline;width:76px}
 .pfav-item-2{left:19%}
 .pfav-item-3{left:38%}
 .pfav-item-4{left:55%}
@@ -303,6 +304,8 @@ main{flex:1 0 auto}
 
 @media (max-width:640px){
 .hero-title small{display:block}
-.pfav{display:none}
+.pfav{top:53%}
+.pfav img{width:40px}
+.pfav h4{font-size:13px}
 .hidden-xs{display:none}
 }
