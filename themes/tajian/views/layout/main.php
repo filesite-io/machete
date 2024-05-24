@@ -16,7 +16,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
 <title><?php echo $pageTitle;?></title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-<link rel="icon" type="image/x-icon" href="/favicon.ico?v1.0">
+<link rel="icon" type="image/x-icon" href="/tajian/favicon.ico">
 <link href="/css/tajian.css?v<?=Html::getStaticFileVersion('tajian.css', 'css')?>" rel="stylesheet">
 </head>
 <body class="g_app_lay">

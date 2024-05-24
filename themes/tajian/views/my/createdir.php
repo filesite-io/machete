@@ -17,7 +17,7 @@ $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['con
             <p class="mt10">说明：<br>一个手机号码最多添加 <strong><?=$max_num?></strong> 个账号，此功能限VIP用户使用。</p>
         </div>
         <div class="avform_bt vercenter">
-            <button class="jsbtn" aria-label="保存" type="button">
+            <button class="jsbtn" aria-label="保存" type="submit">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">
                     <svg viewBox="25 25 50 50">
                         <circle cx="50" cy="50" r="20"></circle>

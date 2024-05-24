@@ -17,8 +17,7 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                     可添加B站、抖音、快手等平台的视频、直播链接，Ta荐是你的视频收纳盒，分类整理你喜欢的内容，随时快速找到它们！
                 </p>
                 <div class="hero-form newsletter-form field field-grouped is-revealing">
-                    <div class="control control-expanded_">
-                        <?php /*<input class="input" type="email" name="email" placeholder="Your best email…">*/ ?>
+                    <div class="control">
                         <a class="button button-primary button-block button-shadow" href="/site/register">
                             <img class="btn_icon" src="/img/favorite.png" alt="Create your favorite tajian link.">
                             创建聚宝盆
@@ -28,6 +27,12 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                         <a class="button button-block button-shadow" href="/site/login/?go=<?=$loginBackUrl?>">
                             <img class="btn_icon" src="/img/share.png" alt="分享给朋友">
                             分享给朋友
+                        </a>
+                    </div>
+                    <div class="control">
+                        <a class="button button-block button-shadow button-cool" href="#contact">
+                            <img class="btn_icon" src="/img/video-play.svg" alt="搭建视频网站">
+                            搭建视频站
                         </a>
                     </div>
                 </div>
@@ -107,27 +112,8 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                                 </g>
                             </g>
                         </svg>
-                        <div class="hero-footer">你看到的，也许只是冰山一角...</div>
-                        <div class="pfav">
-                            <a href="/2001/" target="_blank">
-                                <img src="/img/avatar/women.svg" alt="AI svg logo" width="80">
-                                <h4>阅人无数</h4>
-                            </a>
-                        </div>
-                        <div class="pfav pfav-item-2">
-                            <a href="/1003/" target="_blank">
-                                <img src="/img/avatar/ai-bot.svg" alt="AI svg logo" width="80">
-                                <h4>秒懂AI</h4>
-                            </a>
-                        </div>
-                        <div class="pfav pfav-item-3">
-                            <a href="/1000/" target="_blank">
-                                <img src="/img/avatar/master.svg" alt="AI svg logo" width="80">
-                                <h4>一灯大师</h4>
-                            </a>
-                        </div>
-                        <div class="pfav pfav-item-4">
-                            <h4>......</h4>
+                        <div class="hero-footer">
+                            <iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1754762795&bvid=BV1Tt421u7dF&cid=1556103473&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%;height:100%"></iframe>
                         </div>
                     </div>
                     <div class="bubble-1 is-revealing">
@@ -221,7 +207,7 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                             <p class="text-sm">B站（bilibili）、抖音、快手、西瓜视频，其它<strong>任何网址</strong>（限VIP使用）</p>
                         </div>
                     </div>
-                    <div class="feature is-revealing">
+                    <div class="feature is-revealing" id="contact">
                         <div class="feature-inner">
                             <div class="feature-icon">
                                 <svg width="80" height="80" xmlns="https://www.w3.org/2000/svg">
@@ -245,13 +231,41 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
 
     <section class="newsletter section">
         <div class="container-sm">
+            <div class="newsletter-header text-center is-revealing">
+                <h2 class="section-title">案例展示</h2>
+            </div>
+            <div class="hero-form newsletter-form field field-grouped is-revealing">
+                <div class="control" style="min-width:33.33%">
+                    <a class="button button-block button-shadow" href="/2001" target="_blank">
+                        <img class="btn_icon" src="/img/avatar/women.svg" alt="women svg">
+                        阅人无数
+                    </a>
+                </div>
+                <div class="control" style="min-width:33.33%">
+                    <a class="button button-block button-shadow" href="/1003" target="_blank">
+                        <img class="btn_icon" src="/img/avatar/ai-bot.svg" alt="ai-bot svg">
+                        秒懂AI
+                    </a>
+                </div>
+                <div class="control" style="min-width:33.33%">
+                    <a class="button button-block button-shadow" href="/1000" target="_blank">
+                        <img class="btn_icon" src="/img/avatar/master.svg" alt="master svg">
+                        一灯大师
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter section">
+        <div class="container-sm">
             <div class="newsletter-inner section-inner">
                 <div class="newsletter-header text-center is-revealing">
                     <h2 class="section-title mt-0">Ta荐核心数据</h2>
                     <div class="stats">
                         <span class="col success">
                             <strong><?=$viewData['stats']['video']?></strong>
-                            <label>视频</label>
+                            <label>收藏</label>
                         </span>
                         <span class="col info">
                             <strong><?=$viewData['stats']['user']?></strong>

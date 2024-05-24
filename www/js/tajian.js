@@ -84,9 +84,10 @@ if ($('.connectmeJS').get(0)) {
     });
 }
 
+/*
+//TODO: 待实现
 // 打开移动端搜索框
 if ($('.search_mob_JS').get(0)) {
-    
     $('.search_mob_JS').click(function () {
         $('.blank_coverJS, .mobile_search_JS').removeClass('elementNone');
         window.setTimeout(function () {
@@ -98,7 +99,6 @@ if ($('.search_mob_JS').get(0)) {
 
     });
 
-    
     $('.ms_close_JS').click(function () {
         $('.blank_coverJS').removeClass('opacityshow');
         $('.mobile_search_JS').removeClass('sideboxShow');
@@ -114,17 +114,16 @@ if ($('.search_mob_JS').get(0)) {
 $('#search_form .jsbtn').click(function (e) {
     e.preventDefault();
     if (!$('#search_form .input_sf_JS').val()) {
-        
+        //TODO: do something
         return;
     }
     $('#search_form').submit();
 });
+*/
 
 // 添加视频
 if ($('#add_video_form').get(0)) {
-
-    // 添加视频表单处理
-    $('#add_video_form .jsbtn').click(function (e) {
+    var handle_add_fav = function (e) {
         e.preventDefault();
         var inputList = $('#add_video_form textarea');
         var selectedTag = $('#add_video_form select').val();
@@ -167,29 +166,10 @@ if ($('#add_video_form').get(0)) {
             btLoading.addClass('elementNone');
             alert('网络请求失败，请重试。');
         });
-    });
-}
+    };
 
-// form表单 
-if ($('.g_form_js').get(0)) {
-    $('.g_form_js .jsbtn').click(function (e) {
-        e.preventDefault();
-
-        let inputList = $('.g_form_js input');
-        for (let i = 0; i < inputList.length; i++) {
-            if (!inputList[i].value) {
-                alert($(inputList[i]).attr('Warning'));
-                return false;
-                
-            }
-        }
-        
-
-        let bt = $(this), btLoading = bt.children('.bt_class_JS'), btText = bt.children('.bt_text_JS');
-        btLoading.removeClass('elementNone');
-        bt.prop('disabled', true);
-        btText.text('请求中...');
-    });
+    $('#add_video_form .jsbtn').click(handle_add_fav);
+    $('#add_video_form').submit(handle_add_fav);
 }
 
 // 注册/登录等页面展示客服微信二维码切换按钮
@@ -257,7 +237,7 @@ if ($('.bt_sms_JS').get(0)) {
 
 // 注册
 if ($('#register_form').get(0)) {
-    $('#register_form .jsbtn').click(function(e) {
+    var handle_register = function(e) {
         e.preventDefault();
 
         var friends_code = $('input[name=friendscode]').val(),
@@ -307,12 +287,15 @@ if ($('#register_form').get(0)) {
             btLoading.addClass('elementNone');
             alert('网络请求失败，请重试。');
         });
-    });
+    };
+
+    $('#register_form .jsbtn').click(handle_register);
+    $('#register_form').submit(handle_register);
 }
 
 // 登录
 if ($('#login_form').get(0)) {
-    $('#login_form .jsbtn').click(function(e) {
+    var handle_login = function(e) {
         e.preventDefault();
 
         var cellphone = $('input[name=username]').val(),
@@ -357,13 +340,16 @@ if ($('#login_form').get(0)) {
             btLoading.addClass('elementNone');
             alert('网络请求失败，请重试。');
         });
-    });
+    };
+
+    $('#login_form .jsbtn').click(handle_login);
+    $('#login_form').submit(handle_login);
 }
 
 
 // 设置昵称
 if ($('#nickname_form').get(0)) {
-    $('#nickname_form .jsbtn').click(function(e) {
+    var handle_save_nickname = function(e) {
         e.preventDefault();
 
         var nickname = $('input[name=nickname]').val();
@@ -397,7 +383,10 @@ if ($('#nickname_form').get(0)) {
             btLoading.addClass('elementNone');
             alert('网络请求失败，请重试。');
         });
-    });
+    };
+
+    $('#nickname_form .jsbtn').click(handle_save_nickname);
+    $('#nickname_form').submit(handle_save_nickname);
 }
 
 // tag分类管理
@@ -446,7 +435,7 @@ if ($('#tags_form').get(0)) {
         }
     });
 
-    $('#tags_form .jsbtn').click(function(e) {
+    var handle_save_tags = function(e) {
         e.preventDefault();
 
         var tag_els = $('#tags_form input'),
@@ -497,12 +486,15 @@ if ($('#tags_form').get(0)) {
             btLoading.addClass('elementNone');
             alert('网络请求失败，请重试。');
         });
-    });
+    };
+
+    $('#tags_form .jsbtn').click(handle_save_tags);
+    $('#tags_form').submit(handle_save_tags);
 }
 
 // 添加tag分类
 if ($('#tag_new_form').get(0)) {
-    $('#tag_new_form .jsbtn').click(function(e) {
+    var handle_new_tag = function(e) {
         e.preventDefault();
 
         var tag = $('#tag_new_form input[name=tag]').val();
@@ -536,7 +528,10 @@ if ($('#tag_new_form').get(0)) {
             btLoading.addClass('elementNone');
             alert('网络请求失败，请重试。');
         });
-    });
+    };
+
+    $('#tag_new_form .jsbtn').click(handle_new_tag);
+    $('#tag_new_form').submit(handle_new_tag);
 }
 
 // 视频管理
@@ -623,7 +618,7 @@ if ($('#share_form').get(0)) {
 
 // 创建新收藏夹账号
 if ($('#dir_new_form').get(0)) {
-    $('#dir_new_form .jsbtn').click(function(e) {
+    var handle_new_dir = function(e) {
         e.preventDefault();
 
         var nickname = $('input[name=nickname]').val();
@@ -657,7 +652,10 @@ if ($('#dir_new_form').get(0)) {
             btLoading.addClass('elementNone');
             alert('网络请求失败，请重试。');
         });
-    });
+    };
+
+    $('#dir_new_form .jsbtn').click(handle_new_dir);
+    $('#dir_new_form').submit(handle_new_dir);
 }
 
 })();

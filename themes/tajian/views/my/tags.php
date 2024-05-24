@@ -44,7 +44,7 @@ eof;
             点击上下箭头图标改变分类顺序，删除某个分类并不会删除这个分类里的视频。
         </p>
         <div class="avform_bt vercenter">
-            <button class="jsbtn" aria-label="保存" type="button">
+            <button class="jsbtn" aria-label="保存" type="submit">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">
                     <svg viewBox="25 25 50 50">
                         <circle cx="50" cy="50" r="20"></circle>

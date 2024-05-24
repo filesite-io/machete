@@ -15,7 +15,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
             <p class="mt10">请填写 2 - 5 个汉字</p>
         </div>
         <div class="avform_bt vercenter">
-            <button class="jsbtn" aria-label="保存" type="button">
+            <button class="jsbtn" aria-label="保存" type="submit">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">
                     <svg viewBox="25 25 50 50">
                         <circle cx="50" cy="50" r="20"></circle>
