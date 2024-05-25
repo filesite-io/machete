@@ -26,7 +26,7 @@ FileSite.io希望帮助到他们：
 * 视频网站经营者、播客、摄影师、航拍爱好者、运动爱好者、潜水爱好者
 
 
-## 视频教程
+## Docker使用视频教程
 
 在Docker中如何用filesite/machete源码快速搭建支持文件共享方式管理内容的图片网站、视频网站、导航网站和文档站的视频教程。
 
@@ -37,6 +37,8 @@ FileSite.io希望帮助到他们：
 4. 在docker容器中升级最新版
 5. 如何在macos中挂载远程磁盘来管理图片等内容
 
+视频教程：
+
 <div style="max-width:1024px">
   <video width="100%" preload="metadata" playsinline controls poster="https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png">
     <source src="https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4" type="video/mp4">
@@ -46,9 +48,12 @@ FileSite.io希望帮助到他们：
 
 ## 使用流程
 
-filesite使用非常简单，一旦部署好之后，以后只需将本地最新内容上传覆盖即可。
+Machete使用非常简单，一旦部署好之后，以后只需将本地最新内容上传覆盖即可。
 
-1. 下载filesite源码，并参考[Nginx配置示例](./Nginx.conf.md)部署到你的服务器上；
+1. 下载Machete源码，并参考[Nginx配置示例](./Nginx.conf.md)部署到你的服务器上；
+
+  说明：
+  Machete不支持子目录方式访问，需要为nginx配置根目录指向代码目录下的www/。
   
   用git下载：
 ```
@@ -73,10 +78,12 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 
 4. 打开网址浏览最新内容；
 
-有了filesite，你可以保留现有的本地内容创作习惯，并非常容易地把它们制作成一个网站分享给他人。
+有了Machete，你可以保留现有的本地内容创作习惯，并非常容易地把它们制作成一个网站分享给他人。
 
 
 ## 在线体验
+
+Machete是单入口模式PHP源码，**不支持子目录方式访问**，以下示例都是以子域名或根域名配置nginx根目录指向代码目录下的www/index.php。
 
 1. 文档站
 
@@ -91,22 +98,25 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory.FileSite.io</a> |
 | Web3速查手册 | <a href="https://web3.filesite.io" target="_blank">Web3.FileSite.io</a> |
 
-3. 小说站
 
-  -
-
-4. 图片站
+3. 图片站
 
   | 名称 | 网址 |
 | ---- | ---- |
 | 看美女 | <a href="https://googleimage.filesite.io" target="_blank">GoogleImage.Filesite.io</a> |
 | 在线演示 | <a href="https://demo.jialuoma.cn" target="_blank">带后台版Machete在线演示</a> |
 
-5. 视频站
+4. 视频站
 
   | 名称 | 网址 |
 | ---- | ---- |
 | 在线学 | <a href="https://duan.filesite.io" target="_blank">Duan.Filesite.io</a> |
+
+5. 视频收藏/分享站
+
+  | 名称 | 网址 |
+| ---- | ---- |
+| Ta荐 | <a href="https://tajian.tv" target="_blank">TaJian.tv</a> |
 
 
 ## 源码下载
