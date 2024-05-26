@@ -113,7 +113,8 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                             </g>
                         </svg>
                         <div class="hero-footer">
-                            <iframe src="//player.bilibili.com/player.html?isOutside=true&aid=1754762795&bvid=BV1Tt421u7dF&cid=1556103473&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width:100%;height:100%"></iframe>
+                            <video src="https://static.jialuoma.cn/mp4/machete/add_video_share_url.mp4" style="width:100%;height:100%" controls>
+                            </video>
                         </div>
                     </div>
                     <div class="bubble-1 is-revealing">

@@ -50,9 +50,14 @@ Machete是单入口模式PHP源码，**不支持子目录方式访问**，以下
 
 ## 手动部署
 
+视频教程：
+
+[![手动配置Nginx部署machete](https://static.jialuoma.cn/img/machete/setup_nginx_conf.jpg)](https://static.jialuoma.cn/mp4/machete/setup_nginx_conf.mp4)
+
+
 Machete使用非常简单，一旦部署好之后，以后只需将本地最新内容上传覆盖即可。
 
-1. 下载Machete源码，并参考[Nginx配置示例](./Nginx.conf.md)部署到你的服务器上；
+1. 下载Machete源码，并参考[Nginx配置示例](./conf/nginx_machete.conf)部署到你的服务器上；
 
   说明：
 
@@ -101,7 +106,7 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 
 视频教程：
 
-[![IMAGE ALT TEXT HERE](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
+[![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
 
 
 ## Docker使用

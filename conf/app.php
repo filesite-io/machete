@@ -22,13 +22,13 @@ $configs = array(
     //'theme' => 'manual',                    //name of theme which is enabled
 
     //导航站皮肤
-    //'content_directory' => 'navs/',      //directory of contents in /www/
-    //'theme' => 'webdirectory', 
+    'content_directory' => 'navs/',      //directory of contents in /www/
+    'theme' => 'webdirectory', 
 
     //图片站皮肤
-    'content_directory' => 'girls/',           //directory of contents in /www/
+    //'content_directory' => 'girls/',           //directory of contents in /www/
     //'theme' => 'googleimage',                 //name of theme which is enabled
-    'theme' => 'beauty',                        //皮肤美图
+    //'theme' => 'beauty',                        //皮肤美图
 
     //视频站皮肤
     //'content_directory' => 'videos/',           //directory of contents in /www/

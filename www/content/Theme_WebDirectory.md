@@ -18,3 +18,21 @@
 'content_directory' => 'navs/',         //内容存放目录
 'theme' => 'webdirectory',              //皮肤名称
 ```
+
+
+## 添加导航网址
+
+进入目录：www/navs/，按照你需要的分类，创建子目录。
+
+例如：**filesite**
+
+
+再进入子目录filesite，添加导航网址。
+
+导航网址文件.url格式如下：
+```
+[InternetShortcut]
+URL=https://filesite.io/
+```
+
+导航网址文件名就是导航链接的名称。
