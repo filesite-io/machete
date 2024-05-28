@@ -256,6 +256,7 @@ a:link{text-decoration:none}
 .btn-primary:hover,.btn-danger:hover{font-weight:500}
 .bi{width:1em;height:1em;display:inline-block;vertical-align:-.125em;fill:currentcolor}
 .tajian_index .pfav{float:left;width:50%;min-height:60px;font-size:16px}
+select,.ipt{padding:4px;max-width:150px}
 
 .stats{background-color:#EEE;padding:10px 10px 4px 10px}
 .stats .col{display:inline-block;padding:13px 4px;width:30%;max-width:128px;background:#444;color:#FFF;margin-right:4px;margin-bottom:6px;text-align:center}

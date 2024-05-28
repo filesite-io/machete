@@ -56,7 +56,7 @@ eof;
                     continue;
                 }
 
-                $snapshot = !empty($file['cover']) ? $imgPreffix . $file['cover'] : '/img/default.png';
+                $snapshot = !empty($file['cover']) ? Html::getCDNImageUrl($imgPreffix . $file['cover']) : '/img/default.png';
                 $title = !empty($file['title']) ? Html::mb_substr($file['title'], 0, 33, 'utf-8') : $file['filename'];
 
                 $platform = Html::getShareVideosPlatform($file['shortcut']['url']);

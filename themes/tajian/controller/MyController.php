@@ -102,9 +102,16 @@ Class MyController extends SiteController {
 
     //管理收藏
     public function actionFavs() {
+        //分类筛选支持
+        $selectTag = $this->get('tag', '');
+        $searchKeyword = $this->get('keyword', '');
+        if (!empty($searchKeyword)) {
+            $searchKeyword = Common::cleanSpecialChars($searchKeyword);
+        }
+
         $defaultTitle = "管理收藏";
         $viewName = 'favs';
-        return $this->actionIndex($viewName, $defaultTitle);
+        return $this->actionIndex($viewName, $defaultTitle, compact('selectTag', 'searchKeyword'));
     }
 
     //分享收藏夹

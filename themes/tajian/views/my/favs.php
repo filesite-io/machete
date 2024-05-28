@@ -34,6 +34,23 @@ $allTags = Html::getTagNames($viewData['tags']);
     </div>
 <h3 class="mt20">你已收藏 <?=$total_my_videos?> 个视频</h3>
 <p class="mt10">勾选视频下方的分类，将该视频归类到对应的分类；取消勾选，则将视频从该分类中移除。</p>
+
+<form action="" metho="GET">
+    <select name="tag">
+        <option value="">选择分类</option>
+        <?php
+        foreach($allTags as $tagName) {
+            $selected = !empty($viewData['selectTag']) && $viewData['selectTag'] == $tagName ? ' selected' : '';
+            echo <<<eof
+        <option value="{$tagName}"{$selected}>{$tagName}</option>
+eof;
+        }
+        ?>
+    </select>
+    <input type="text" name="keyword" class="ipt" placeholder="输入关键词" value="<?=htmlspecialchars($viewData['searchKeyword'])?>">
+    <button type="submit" class="btn-primary">筛选</button>
+</form>
+
 <div class="videos_list clearfix" id="favmg">
     <?php
         
@@ -47,7 +64,19 @@ $allTags = Html::getTagNames($viewData['tags']);
                     continue;
                 }
 
-                $snapshot = !empty($file['cover']) ? $imgPreffix . $file['cover'] : '/img/default.png';
+                $myTags = Html::getFavsTags($file['filename'], $viewData['tags']);
+
+                //分类筛选支持
+                if (!empty($viewData['selectTag']) && !in_array($viewData['selectTag'], $myTags)) {
+                    continue;
+                }
+
+                //关键词搜索支持
+                if (!empty($viewData['searchKeyword']) && strpos($file['title'], $viewData['searchKeyword']) === false) {
+                    continue;
+                }
+
+                $snapshot = !empty($file['cover']) ? Html::getCDNImageUrl($imgPreffix . $file['cover']) : '/img/default.png';
                 $title = !empty($file['title']) ? Html::mb_substr($file['title'], 0, 33, 'utf-8') : $file['filename'];
 
                 $platform = Html::getShareVideosPlatform($file['shortcut']['url']);
@@ -58,7 +87,6 @@ $allTags = Html::getTagNames($viewData['tags']);
                 $imgAlt = $index < 4 ? " alt=\"{$title}\"" : '';
                 $imgCls = $index < 4 ? '' : 'lazy';
 
-                $myTags = Html::getFavsTags($file['filename'], $viewData['tags']);
                 $tagsHtml = '';
 
                 foreach ($allTags as $tagName) {

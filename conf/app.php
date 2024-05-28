@@ -130,6 +130,9 @@ $configs = array(
     'service_3rd_api_key' => '你的密钥',
     'sms_code_cache_time' => 600,           //短信验证码缓存时长，单位：秒
 
+    //图片cdn加速域名配置
+    'img_cdn_budget_url' => '',
+
     //Google Analytics MEASUREMENT ID
     'GA_MEASUREMENT_ID' => 'G-09MWT3Z9R0',
 

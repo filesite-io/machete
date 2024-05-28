@@ -120,4 +120,14 @@ eof;
         return $tmp_arr;
     }
 
+    //获取用户图片的cdn地址
+    public static function getCDNImageUrl($localImgUrl) {
+        if (!empty(FSC::$app['config']['debug'])) {return $localImgUrl;}
+
+        $cdn = FSC::$app['config']['img_cdn_budget_url'];
+        if (empty($cdn)) {return $localImgUrl;}
+
+        return "{$cdn}{$localImgUrl}";
+    }
+
 }
