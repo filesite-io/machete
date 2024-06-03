@@ -1316,7 +1316,7 @@ eof;
             }
 
             if (empty($err)) {      //如果数据检查通过，尝试保存
-                $saved = Common::saveUserDirMap($friends_cellphone, $share_dir);
+                $saved = Common::saveUserDirMap($friends_cellphone, $loginedUser['username'], $share_dir);
 
                 if ($saved !== false) {
                     $msg = "账号共享完成";

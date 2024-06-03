@@ -49,16 +49,25 @@ Class Common {
     }
 
     //保存用户多收藏夹目录映射配置
-    public static function saveUserDirMap($cellphone, $new_dir) {
+    public static function saveUserDirMap($cellphone, $username, $new_dir) {
         $tajian_user_map = FSC::$app['config']['tajian_user_map'];
         if (empty($tajian_user_map)) {
             $tajian_user_map = array();
             $tajian_user_map[$cellphone] = array($new_dir);
         }else {
             $map = $tajian_user_map[$cellphone];
-            if (empty($map)) {
-                $map = array($new_dir);
-            }else if (is_string($map)) {
+            if (empty($map)) {              //如果之前没有配置过
+                $map = array();
+
+                $defaultDir = self::getUserId($cellphone);    //先获取用户自己的目录
+                if (self::existUserDataDir($defaultDir, $username)) {
+                    array_push($map, $defaultDir);
+                }
+
+                if ($new_dir != $defaultDir) {
+                    array_push($map, $new_dir);
+                }
+            }else if (is_string($map)) {    //如果有配置过字符串格式的单个目录
                 $old = $map;
                 $map = array($old, $new_dir);
             }else if (is_array($map) && !in_array($new_dir, $map)) {
@@ -75,8 +84,7 @@ Class Common {
     }
 
     //获取新收藏夹目录名
-    public static function getNewFavDir($cellphone)
-    {
+    public static function getNewFavDir($cellphone) {
         $new_dir = 2000;       //默认从编号2000开始
 
         $cache_filename = __DIR__ . '/../runtime/userCustomFavDirs.json';
@@ -132,7 +140,7 @@ Class Common {
             file_put_contents($cache_filename, json_encode($data, JSON_PRETTY_PRINT));
 
             //保存用户手机和收藏夹映射关系
-            self::saveUserDirMap($cellphone, $new_dir);
+            self::saveUserDirMap($cellphone, $username, $new_dir);
         }catch(Exception $e) {
             return false;
         }
@@ -259,7 +267,7 @@ Class Common {
         return $nickname;
     }
 
-    //判断用户数据目录是否存在
+    //获取用户数据目录
     public static function getUserDataDir($cellphone, $currentUsername = '') {
         $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
 
@@ -271,6 +279,19 @@ Class Common {
         }
 
         return is_dir($userDir) ? $userDir : false;
+    }
+
+    //判断用户数据目录是否存在
+    public static function existUserDataDir($dir, $currentUsername = '') {
+        $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+
+        if (!empty($currentUsername)) {
+            $userDir = str_replace("/{$currentUsername}", "/{$dir}", $rootDir);
+        }else {
+            $userDir = "{$rootDir}{$dir}";
+        }
+
+        return is_dir($userDir) ? true : false;
     }
 
     //判断当前用户数据目录是否存在
