@@ -139,15 +139,9 @@ Class MyController extends SiteController {
             }
         }
 
-        //VIP身份判断
-        $isVipUser = true;
-        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
-            $isVipUser = false;
-        }
-
         $defaultTitle = "切换账号";
         $viewName = 'switchdir';
-        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine', 'isVipUser'));
+        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine'));
     }
 
     //添加收藏夹

@@ -15,10 +15,6 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
     </div>
     <div class="g_form_style">
 
-        <?php if (empty($viewData['isVipUser'])) { ?>
-        <div class="alert warning">此功能限VIP使用，限时免费开通请联系客服哦</div>
-        <?php } ?>
-
         <div>
             点击昵称切换：
         </div>
