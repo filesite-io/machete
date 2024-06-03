@@ -69,7 +69,9 @@ Class Common {
         }
 
         $cache_filename = __DIR__ . '/../runtime/custom_config_usermap.json';
-        file_put_contents($cache_filename, json_encode(compact('tajian_user_map'), JSON_PRETTY_PRINT));
+        $saved = file_put_contents($cache_filename, json_encode(compact('tajian_user_map'), JSON_PRETTY_PRINT));
+
+        return $saved === false ? false : true;
     }
 
     //获取新收藏夹目录名
@@ -171,6 +173,29 @@ Class Common {
         return true;
     }
 
+    //判断某个收藏夹是否属于当前用户
+    public static function isMyFavDir($cellphone, $username, $fav_dir) {
+        try {
+            $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+            $rootDir = str_replace("/{$username}", '', $rootDir);   //获取当前收藏夹的上一级目录
+
+            $userDir = "{$rootDir}/{$fav_dir}";     //目标收藏夹目录
+            if (!is_dir($userDir)) {     //如果不存在
+                return false;
+            }
+
+            $filepath = "{$userDir}/README_cellphone.txt";
+            $content = file_get_contents($filepath);
+            if (!empty($content) && strpos($content, $cellphone) !== false) {
+                return true;
+            }
+        }catch(Exception $e) {
+            return false;
+        }
+
+        return false;
+    }
+
     //根据手机号码获取用户名ID
     //规则：前6位对 97 求余数，再拼接后5位
     public static function getUserId($cellphone){
@@ -235,11 +260,16 @@ Class Common {
     }
 
     //判断用户数据目录是否存在
-    public static function getUserDataDir($cellphone) {
+    public static function getUserDataDir($cellphone, $currentUsername = '') {
         $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
 
         $username = self::getMappedUsername($cellphone);
-        $userDir = "{$rootDir}{$username}";
+        if (!empty($currentUsername)) {
+            $userDir = str_replace("/{$currentUsername}", "/{$username}", $rootDir);
+        }else {
+            $userDir = "{$rootDir}{$username}";
+        }
+
         return is_dir($userDir) ? $userDir : false;
     }
 

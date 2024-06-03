@@ -10,7 +10,7 @@
             <button class="smsbtn bt_sms_JS button button-sm button-shadow">发送验证码</button>
         </div>
         <div class="avform_bt vercenter">
-            <button class="jsbtn" aria-label="登录" type="button">
+            <button class="jsbtn" aria-label="登录" type="submit">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">
                     <svg viewBox="25 25 50 50">
                         <circle cx="50" cy="50" r="20"></circle>

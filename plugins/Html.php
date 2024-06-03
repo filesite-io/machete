@@ -80,6 +80,8 @@ Class Html {
         $msid = !empty(FSC::$app['config']['GA_MEASUREMENT_ID']) ? FSC::$app['config']['GA_MEASUREMENT_ID'] : '';
         if (empty($msid)) {return '';}
 
+        $adwords_id = !empty(FSC::$app['config']['GAD_MEASUREMENT_ID']) ? FSC::$app['config']['GAD_MEASUREMENT_ID'] : '';
+
         $gacode = <<<eof
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id={$msid}"></script>
@@ -89,6 +91,16 @@ Class Html {
   gtag('js', new Date());
 
   gtag('config', '{$msid}');
+eof;
+
+        if (!empty($adwords_id)) {
+            $gacode .= <<<eof
+
+  gtag('config', '{$adwords_id}');
+eof;
+        }
+
+        $gacode .= <<<eof
 </script>
 eof;
 

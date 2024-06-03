@@ -14,7 +14,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
             <input id="text_input_tag" name="tag" placeholder="请填写 2 - 15 个汉字、数字、英文" value="">
             <p class="mt10">说明：<br>最多添加 <strong>50</strong> 个分类；<br>如果以英文开头，首字母请大写。</p>
         </div>
-        <div class="avform_bt vercenter">
+        <div class="avform_bt">
             <button class="jsbtn" aria-label="保存" type="submit">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">
                     <svg viewBox="25 25 50 50">

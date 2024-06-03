@@ -136,6 +136,9 @@ $configs = array(
     //Google Analytics MEASUREMENT ID
     'GA_MEASUREMENT_ID' => 'G-09MWT3Z9R0',
 
+    //Google Adwords目标跟踪ID
+    'GAD_MEASUREMENT_ID' => '',
+
 );
 
 //自定义配置支持

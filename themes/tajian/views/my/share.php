@@ -19,7 +19,7 @@ QQ和微信里点开会提示“不安全”，原因都懂的：Ta荐的内容�
 Ta荐不生产内容，只做视频/直播整理、分享。</textarea>
             <p class="mt10">点下面按钮复制分享内容，在微信、QQ等App里粘贴发给朋友。</p>
         </div>
-        <div class="avform_bt vercenter">
+        <div class="avform_bt">
             <button class="jsbtn" aria-label="复制" type="button" data-clipboard-target="#text_share_content">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">
                     <svg viewBox="25 25 50 50">

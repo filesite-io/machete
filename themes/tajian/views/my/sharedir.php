@@ -10,16 +10,33 @@ $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['con
     <div class="breadcrumbs">
         <a href="<?=$linkPrefix?>/my/">&lt;&lt;返回</a>
     </div>
-    <form class="g_form_style mt65" id="dir_new_form" action="" method="POST">
+    <form class="g_form_style mt65" id="share_dir_form" action="" method="POST">
         <?php if (empty($viewData['isVipUser'])) { ?>
         <div class="alert warning">此功能限VIP使用，限时免费开通请联系客服哦</div>
         <?php } ?>
 
         <div class="mb-3 pt20">
-            <label for="text_input_dir" class="form-label">账号昵称</label>
-            <input id="text_input_dir" name="nickname" placeholder="请填写 2 - 5 个汉字" value="">
-            <p class="mt10">说明：<br>一个手机号码最多添加 <strong><?=$max_num?></strong> 个账号。</p>
+            <label for="text_input_phone" class="form-label">朋友手机号码</label>
+            <input id="text_input_phone" name="cellphone" placeholder="请填写朋友的手机号码" value="">
         </div>
+
+        <div class="mb-3 pt20">
+            <select name="dir">
+                <option value="">选择账号</option>
+                <?php if (!empty($viewData['myNicks'])) {
+                foreach($viewData['myNicks'] as $dir => $nickname) {
+                    //忽略不属于自己的账号
+                    if (!empty($viewData['isMine']) && empty($viewData['isMine'][$dir])) {continue;}
+
+                    echo <<<eof
+                <option value="{$dir}">{$nickname}</option>
+eof;
+                    }
+                } ?>
+            </select>
+        </div>
+        <p class="mt10">说明：<br>把聚宝盆共享给朋友之后，你们可以共同维护里面的内容。</p>
+
         <div class="avform_bt">
             <button class="jsbtn" aria-label="保存" type="submit">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">

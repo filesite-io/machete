@@ -13,8 +13,7 @@
             </p>
         </div>
         <div class="mb-3 mt20">
-            <label class="form-label">视频分类</label>
-            <select name="tag">
+            <select name="tag" class="tagselect">
                 <option value="">选分类</option>
     <?php
     if (!empty($viewData['tags'])) {        //显示tags分类
@@ -27,7 +26,7 @@ eof;
     ?>
             </select>
         </div>
-        <div class="avform_bt vercenter">
+        <div class="avform_bt">
             <button class="jsbtn" aria-label="提交" type="button">
                 <div class="loading_bt bt_class_JS elementNone verMiddle">
                     <svg viewBox="25 25 50 50">

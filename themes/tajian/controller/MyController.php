@@ -66,10 +66,13 @@ Class MyController extends SiteController {
         //昵称支持
         $nickname = $this->getNickname($readmeFile);
 
+        //显示手机号码
+        $cellphone_hide = preg_replace("/^(.{3,})\d{4}(.{4})$/i", '$1****$2', $loginedUser['cellphone']);
+
         $pageTitle = "{$defaultTitle} | " . FSC::$app['config']['site_name'];
         $params = compact(
                 'cateId', 'dirTree', 'scanResults',
-                'htmlReadme', 'tags', 'nickname'
+                'htmlReadme', 'tags', 'nickname', 'cellphone_hide'
         );
 
         if (!empty($viewData)) {
@@ -123,7 +126,7 @@ Class MyController extends SiteController {
 
     //切换收藏夹
     public function actionDirs() {
-        $myDirs = $myNicks = array();
+        $myDirs = $myNicks = $isMine = array();
 
         $loginedUser = Common::getUserFromSession();
         if (!empty($loginedUser['cellphone'])) {
@@ -131,28 +134,60 @@ Class MyController extends SiteController {
             if (!empty($myDirs)) {
                 foreach($myDirs as $dir) {
                     $myNicks[$dir] = Common::getNicknameByDir($dir, $loginedUser['username']);
+                    $isMine[$dir] = Common::isMyFavDir($loginedUser['cellphone'], $loginedUser['username'], $dir);
                 }
             }
         }
 
+        //VIP身份判断
+        $isVipUser = true;
+        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
+            $isVipUser = false;
+        }
+
         $defaultTitle = "切换账号";
         $viewName = 'switchdir';
-        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks'));
+        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine', 'isVipUser'));
     }
 
     //添加收藏夹
     public function actionCreatedir() {
-        $myDirs = $myNicks = array();
-
         //VIP身份判断
         $loginedUser = Common::getUserFromSession();
+        $isVipUser = true;
         if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
-            throw new Exception('Oops，你还不是VIP，请联系首页底部客服邮箱开通。');
+            $isVipUser = false;
         }
 
         $defaultTitle = "添加账号";
         $viewName = 'createdir';
-        return $this->actionIndex($viewName, $defaultTitle);
+        return $this->actionIndex($viewName, $defaultTitle, compact('isVipUser'));
+    }
+
+    //共享收藏夹
+    public function actionSharedir() {
+        $myDirs = $myNicks = $isMine = array();
+
+        $loginedUser = Common::getUserFromSession();
+        if (!empty($loginedUser['cellphone'])) {
+            $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+            if (!empty($myDirs)) {
+                foreach($myDirs as $dir) {
+                    $myNicks[$dir] = Common::getNicknameByDir($dir, $loginedUser['username']);
+                    $isMine[$dir] = Common::isMyFavDir($loginedUser['cellphone'], $loginedUser['username'], $dir);
+                }
+            }
+        }
+
+        //VIP身份判断
+        $isVipUser = true;
+        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
+            $isVipUser = false;
+        }
+
+        $defaultTitle = "共享账号";
+        $viewName = 'sharedir';
+        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine', 'isVipUser'));
     }
 
 }

@@ -12,6 +12,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
 ?><main class="g_main_lay">
     <div class="g_form_style">
         <div class="vercenter">
+            <span><?=htmlspecialchars($viewData['cellphone_hide'], ENT_QUOTES)?></span>
             <strong class="nickname"><?=htmlspecialchars($viewData['nickname'], ENT_QUOTES)?></strong>
             (<a href="<?=$linkPrefix?>/my/setnickname">修改</a>)
             <p class="mt10 verright">
@@ -25,8 +26,9 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
             <li><a href="<?=$linkPrefix?>/my/favs"><img src="/img/favorite.png" alt="favorite" width="20"> 管理收藏</a></li>
             <li><a href="<?=$linkPrefix?>/my/tags"><img src="/img/collection.svg" alt="collection" width="20"> 管理分类</a></li>
             <li><a href="<?=$linkPrefix?>/my/share"><img src="/img/share-fill.svg" alt="share favorite" width="18"> 分享收藏</a></li>
-            <li><a href="<?=$linkPrefix?>/my/dirs"><img src="/img/people.svg" alt="switch directory" width="20"> 切换账号</a></li>
             <li><a href="<?=$linkPrefix?>/my/createdir"><img src="/img/person-add.svg" alt="add directory" width="20"> 添加账号</a></li>
+            <li><a href="<?=$linkPrefix?>/my/dirs"><img src="/img/people.svg" alt="switch directory" width="20"> 切换账号</a></li>
+            <li><a href="<?=$linkPrefix?>/my/sharedir"><img src="/img/person-check.svg" alt="share directory to someone" width="20"> 共享账号</a></li>
         </ul>
     </div>
 </main>

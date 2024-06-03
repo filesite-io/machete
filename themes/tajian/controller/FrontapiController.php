@@ -1253,5 +1253,82 @@ eof;
         return $this->renderJson(compact('code', 'msg', 'err'));
     }
 
+    //账号共享接口
+    public function actionSharedir() {
+        $ip = $this->getUserIp();
+        $check_time = 120;          //2 分钟内
+        $max_time_in_minutes = 10;   //最多 10 次
+
+        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        if ($isUserGotRequestLimit) {
+            $this->logError("Request limit got, ip: {$ip}");
+            throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
+        }
+
+        //只允许修改自己的数据
+        $loginedUser = Common::getUserFromSession();
+        if (empty($loginedUser['username'])) {
+            throw new Exception('Oops，你还没登录哦');
+        }else if (
+            !empty(FSC::$app['config']['multipleUserUriParse'])
+            && (empty(FSC::$app['user_id']) || FSC::$app['user_id'] != $loginedUser['username'])
+        ) {
+            throw new Exception('Oops，请求地址有误');
+        }
+
+        //VIP身份判断
+        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
+            throw new Exception('Oops，你还不是VIP，请联系首页底部客服邮箱开通。');
+        }
+
+
+        //返回给视图的变量
+        $code = 0;
+        $msg = '';
+        $err = '';
+
+        //用户提交的数据检查
+        $postParams = $this->post();
+        if (!empty($postParams)) {
+            $friends_cellphone = $this->post('cellphone', '');
+            $share_dir = $this->post('dir', '');
+
+            if (empty($friends_cellphone) || Common::isCellphoneNumber($friends_cellphone) == false) {
+                $err = "请填写正确的手机号码";
+            }else if (empty($share_dir)) {
+                $err = "请选择要共享的账号";
+            }else if ($friends_cellphone == $loginedUser['cellphone']) {
+                $err = "只能共享给朋友，不能共享给自己哦";
+            }
+
+            //只能共享属于自己的账号
+            if (empty($err)) {
+                $isMine = Common::isMyFavDir($loginedUser['cellphone'], $loginedUser['username'], $share_dir);
+                if (empty($isMine)) {
+                    $err = '只能共享自己的账号，朋友共享给你的账号不能再共享给他人';
+                }else {
+                    //检查朋友的账号是否存在
+                    $friend_exist = Common::getUserDataDir($friends_cellphone, $loginedUser['username']);
+                    if (empty($friend_exist)) {
+                        $err = "{$friends_cellphone} 还没注册哦，请朋友先注册吧";
+                    }
+                }
+            }
+
+            if (empty($err)) {      //如果数据检查通过，尝试保存
+                $saved = Common::saveUserDirMap($friends_cellphone, $share_dir);
+
+                if ($saved !== false) {
+                    $msg = "账号共享完成";
+                    $code = 1;
+                }else {
+                    $err = "账号共享失败，请稍后重试";
+                }
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg', 'err'));
+    }
+
 
 }

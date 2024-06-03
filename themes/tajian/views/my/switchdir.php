@@ -15,6 +15,10 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
     </div>
     <div class="g_form_style">
 
+        <?php if (empty($viewData['isVipUser'])) { ?>
+        <div class="alert warning">此功能限VIP使用，限时免费开通请联系客服哦</div>
+        <?php } ?>
+
         <div>
             点击昵称切换：
         </div>
@@ -22,8 +26,12 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
             <?php
             if (!empty($viewData['myNicks'])) {
                 foreach($viewData['myNicks'] as $dir => $nickname) {
+                    $icon = !empty($viewData['isMine'][$dir]) ? 'person-fill.svg' : 'person-check.svg';
                     echo <<<eof
-            <li><a href="{$linkPrefix}/my/index?dir={$dir}">{$dir} {$nickname}</a></li>
+            <li><a href="{$linkPrefix}/my/index?dir={$dir}">
+                <img src="/img/{$icon}" alt="icon of {$dir}" width="16"> 
+                {$nickname}
+            </a></li>
 eof;
                 }
             }else {
@@ -33,6 +41,11 @@ eof;
             }
             ?>
         </ul>
-        <p class="mt20">你可以拥有多个“聚宝盆”，每个聚宝盆可以设定不同的主题。</p>
+        <p class="mt20">
+            <img src="/img/person-fill.svg" alt="icon" width="20" class="verBottom"> 为你创建的，
+            <img src="/img/person-check.svg" alt="icon" width="20" class="verBottom"> 为朋友共享给你的；
+            <br>
+            你可以拥有多个“聚宝盆”，为每个聚宝盆设定不同的主题。
+        </p>
     </div>
 </main>

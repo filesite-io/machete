@@ -112,7 +112,7 @@ a:link{text-decoration:none}
 .g_form_style{width:406px;margin:8% auto 0 auto}
 .g_form_style input,.g_form_style select{width:100%;font-size:15px;padding:12px 10px;border-radius:5px;border:solid 1px #9b9b9b;margin:6px 0 0 0}
 .g_form_style>div{margin-bottom:11px}
-.avform_bt{margin-top:18px}
+.g_form_style .avform_bt{margin-top:30px !important}
 .avform_bt button{position: relative;font-size:15px;min-width:100px;border-radius:6px;padding:10px 3px;border:none;background-color:#0d6efd;color:#FFF;cursor: pointer}
 .loading_bt{display:inline-block}
 .bt_loading_cover{z-index:100;position:absolute;left:-1px;right:-1px;top:-1px;bottom:-1px;background:rgba(225,225,225,.5)}
@@ -257,15 +257,18 @@ a:link{text-decoration:none}
 .bi{width:1em;height:1em;display:inline-block;vertical-align:-.125em;fill:currentcolor}
 .tajian_index .pfav{float:left;width:50%;min-height:60px;font-size:16px}
 select,.ipt{padding:4px;max-width:150px}
+select.tagselect{max-width:100%}
 
 .stats{background-color:#EEE;padding:10px 10px 4px 10px}
 .stats .col{display:inline-block;padding:13px 4px;width:30%;max-width:128px;background:#444;color:#FFF;margin-right:4px;margin-bottom:6px;text-align:center}
 .stats .col strong{font-size:28px}
 .stats .col label{display:block;font-size:15px}
-.stats .info{background-color:darkblue}
-.stats .success{background-color:green}
-.stats .warning{background-color:orange;color:#444}
-.stats .danger{background-color:red}
+.info{background-color:darkblue}
+.success{background-color:green}
+.warning{background-color:#332701;border-color:#997404}
+.danger{background-color:red}
+.alert{padding: 1em;border:1px solid;border-radius:5px}
+.alert.warning{color:#ffda6a}
 
 /* 注册/登录 */
 .twocol label{display:block}
@@ -295,7 +298,7 @@ body.layout_index{background-color:#e5f1f3}
 .layout_index .top_nav{padding-left:20%;padding-right:20%}
 .layout_index .mt65{margin-top:65px}
 .mt10,.layout_index .mt10{margin-top:10px}
-.mt20{margin-top:20px}
+.mt20{margin-top:20px !important}
 .ml20,.layout_index .ml20{margin-left:20px}
 .pb30{padding-bottom:30px}
 .layout_index .pl20{padding-left:20px}

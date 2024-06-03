@@ -14,6 +14,8 @@ var taJian = {
         updateFavsTag: '/frontapi/updatefavstag',               //修改视频的分类
         deleteFav: '/frontapi/deletefav',                       //删除收藏的视频
         createNewFav: '/frontapi/createdir',                    //创建新的收藏夹
+        shareFav2Friend: '/frontapi/sharedir',                  //共享收藏夹给朋友
+
         sendSmsCode: '/frontapi/sendsmscode',   //发送短信验证码
         register: '/frontapi/createuser',       //注册
         login: '/frontapi/loginuser'            //登入
@@ -656,6 +658,52 @@ if ($('#dir_new_form').get(0)) {
 
     $('#dir_new_form .jsbtn').click(handle_new_dir);
     $('#dir_new_form').submit(handle_new_dir);
+}
+
+// 共享收藏夹账号
+if ($('#share_dir_form').get(0)) {
+    var handle_share_dir = function(e) {
+        e.preventDefault();
+
+        var cellphone = $('input[name=cellphone]').val(),
+            favName = $('select[name=dir]').val();
+
+        if (!cellphone) {
+            alert('请填写需要共享的朋友手机号码！');
+            return false;
+        }else if (!favName) {
+            alert('请选择需要共享的账号！');
+            return false;
+        }
+
+        var bt = $(this), btLoading = bt.children('.bt_class_JS'), btText = bt.children('.bt_text_JS');
+        btLoading.removeClass('elementNone');
+        bt.prop('disabled', true);
+        btText.text('提交中...');
+
+        var datas = {
+            'cellphone': cellphone,
+            'dir': favName
+        };
+        publicAjax(taJian.apis.shareFav2Friend, 'POST', datas, function (data) {
+            btLoading.addClass('elementNone');
+            bt.prop('disabled', false);
+            btText.text('保存');
+            if (data.code == 1) {
+                location.href = '/' + current_user_id + '/my/';
+            } else {
+                alert(data.err);
+            }
+        }, function (jqXHR, textStatus, errorThrown) {
+            bt.prop('disabled', false);
+            btText.text('保存');
+            btLoading.addClass('elementNone');
+            alert('网络请求失败，请重试。');
+        });
+    };
+
+    $('#share_dir_form .jsbtn').click(handle_share_dir);
+    $('#share_dir_form').submit(handle_share_dir);
 }
 
 })();
