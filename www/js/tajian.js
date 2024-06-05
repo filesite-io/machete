@@ -15,6 +15,7 @@ var taJian = {
         deleteFav: '/frontapi/deletefav',                       //删除收藏的视频
         createNewFav: '/frontapi/createdir',                    //创建新的收藏夹
         shareFav2Friend: '/frontapi/sharedir',                  //共享收藏夹给朋友
+        deleteSharedFav: '/frontapi/delsharedir',               //取消共享收藏夹给朋友
 
         sendSmsCode: '/frontapi/sendsmscode',   //发送短信验证码
         register: '/frontapi/createuser',       //注册
@@ -690,7 +691,7 @@ if ($('#share_dir_form').get(0)) {
             bt.prop('disabled', false);
             btText.text('保存');
             if (data.code == 1) {
-                location.href = '/' + current_user_id + '/my/';
+                location.reload();
             } else {
                 alert(data.err);
             }
@@ -704,6 +705,42 @@ if ($('#share_dir_form').get(0)) {
 
     $('#share_dir_form .jsbtn').click(handle_share_dir);
     $('#share_dir_form').submit(handle_share_dir);
+
+    //取消共享
+    var handle_delete_share = function(e) {
+        var btn = $(e.target);
+        if (e.target.tagName.toLowerCase() != 'button') {
+            btn = btn.parents('button');
+        }
+        var cellphone = btn.attr('data-cellphone'),
+            dir = btn.attr('data-dir'),
+            favName = btn.text().replace(/\s/g, '');
+
+        if (!cellphone || !dir) {
+            alert('系统异常，请刷新网页！');
+            return false;
+        }
+
+        if (confirm('确定取消账号共享【' + favName + '】吗？')) {
+            btn.prop('disabled', true);
+            var datas = {
+                'cellphone': cellphone,
+                'dir': dir
+            };
+            publicAjax(taJian.apis.deleteSharedFav, 'POST', datas, function (data) {
+                btn.prop('disabled', false);
+                if (data.code == 1) {
+                    location.reload();
+                } else {
+                    alert(data.err);
+                }
+            }, function (jqXHR, textStatus, errorThrown) {
+                btn.prop('disabled', false);
+                alert('网络请求失败，请重试。');
+            });
+        }
+    };
+    $('.my_share_dirs .btn-del').click(handle_delete_share);
 }
 
 })();

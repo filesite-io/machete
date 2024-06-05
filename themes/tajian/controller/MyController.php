@@ -21,7 +21,7 @@ Class MyController extends SiteController {
         //账号切换支持
         $goDir = $this->get('dir', '');
         if (!empty($goDir) && !empty($loginedUser['cellphone'])) {
-            $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+            $myDirs = Common::getMyDirs($loginedUser['cellphone'], $loginedUser['username']);
             if (in_array($goDir, $myDirs)) {
                 Common::switchUserDir($goDir);
                 return $this->redirect("/{$goDir}/my/");
@@ -67,7 +67,7 @@ Class MyController extends SiteController {
         $nickname = $this->getNickname($readmeFile);
 
         //显示手机号码
-        $cellphone_hide = preg_replace("/^(.{3,})\d{4}(.{4})$/i", '$1****$2', $loginedUser['cellphone']);
+        $cellphone_hide = Common::maskCellphone($loginedUser['cellphone']);
 
         $pageTitle = "{$defaultTitle} | " . FSC::$app['config']['site_name'];
         $params = compact(
@@ -130,7 +130,7 @@ Class MyController extends SiteController {
 
         $loginedUser = Common::getUserFromSession();
         if (!empty($loginedUser['cellphone'])) {
-            $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+            $myDirs = Common::getMyDirs($loginedUser['cellphone'], $loginedUser['username']);
             if (!empty($myDirs)) {
                 foreach($myDirs as $dir) {
                     $myNicks[$dir] = Common::getNicknameByDir($dir, $loginedUser['username']);
@@ -164,7 +164,7 @@ Class MyController extends SiteController {
 
         $loginedUser = Common::getUserFromSession();
         if (!empty($loginedUser['cellphone'])) {
-            $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+            $myDirs = Common::getMyDirs($loginedUser['cellphone'], $loginedUser['username']);
             if (!empty($myDirs)) {
                 foreach($myDirs as $dir) {
                     $myNicks[$dir] = Common::getNicknameByDir($dir, $loginedUser['username']);
@@ -172,6 +172,8 @@ Class MyController extends SiteController {
                 }
             }
         }
+
+        $myShareDirs = Common::getMyShareDirs($loginedUser['cellphone'], $loginedUser['username']);
 
         //VIP身份判断
         $isVipUser = true;
@@ -181,7 +183,7 @@ Class MyController extends SiteController {
 
         $defaultTitle = "共享账号";
         $viewName = 'sharedir';
-        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine', 'isVipUser'));
+        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine', 'myShareDirs', 'isVipUser'));
     }
 
 }

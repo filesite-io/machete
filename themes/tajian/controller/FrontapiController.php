@@ -1233,7 +1233,7 @@ eof;
                 //已经创建的收藏夹数量检查
                 //每个手机号最多创建 20 个收藏夹
                 $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['config']['tajian']['max_dir_num'] : 10;
-                $myDirs = Common::getMyDirs($loginedUser['cellphone']);
+                $myDirs = Common::getMyDirs($loginedUser['cellphone'], $loginedUser['username']);
                 if (count($myDirs) >= $max_num) {
                     $err = "你已经创建了 {$max_num} 个账号，已达到最大数量";
                 }else {
@@ -1319,10 +1319,88 @@ eof;
                 $saved = Common::saveUserDirMap($friends_cellphone, $loginedUser['username'], $share_dir);
 
                 if ($saved !== false) {
+                    //保存共享记录
+                    Common::saveMyShareDirs($loginedUser['cellphone'], $loginedUser['username'], $friends_cellphone, $share_dir);
+
                     $msg = "账号共享完成";
                     $code = 1;
                 }else {
                     $err = "账号共享失败，请稍后重试";
+                }
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg', 'err'));
+    }
+
+    //删除一个账号共享
+    public function actionDelsharedir() {
+        $ip = $this->getUserIp();
+        $check_time = 120;          //2 分钟内
+        $max_time_in_minutes = 10;   //最多 10 次
+
+        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        if ($isUserGotRequestLimit) {
+            $this->logError("Request limit got, ip: {$ip}");
+            throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
+        }
+
+        //只允许修改自己的数据
+        $loginedUser = Common::getUserFromSession();
+        if (empty($loginedUser['username'])) {
+            throw new Exception('Oops，你还没登录哦');
+        }else if (
+            !empty(FSC::$app['config']['multipleUserUriParse'])
+            && (empty(FSC::$app['user_id']) || FSC::$app['user_id'] != $loginedUser['username'])
+        ) {
+            throw new Exception('Oops，请求地址有误');
+        }
+
+
+        //返回给视图的变量
+        $code = 0;
+        $msg = '';
+        $err = '';
+
+        //用户提交的数据检查
+        $postParams = $this->post();
+        if (!empty($postParams)) {
+            $friends_cellphone = $this->post('cellphone', '');
+            $share_dir = $this->post('dir', '');
+
+            if (empty($friends_cellphone) || Common::isCellphoneNumber($friends_cellphone) == false) {
+                $err = "请填写正确的手机号码";
+            }else if (empty($share_dir)) {
+                $err = "请选择要取消共享的账号";
+            }else if ($friends_cellphone == $loginedUser['cellphone']) {
+                $err = "不能取消自己的账号哦";
+            }
+
+            //只能取消属于自己的账号
+            if (empty($err)) {
+                $isMine = Common::isMyFavDir($loginedUser['cellphone'], $loginedUser['username'], $share_dir);
+                if (empty($isMine)) {
+                    $err = '只能取消共享自己的账号';
+                }else {
+                    //检查朋友的账号是否存在
+                    $friend_exist = Common::getUserDataDir($friends_cellphone, $loginedUser['username']);
+                    if (empty($friend_exist)) {
+                        $err = "{$friends_cellphone} 还没注册哦，请朋友先注册吧";
+                    }
+                }
+            }
+
+            if (empty($err)) {      //如果数据检查通过，尝试保存
+                $saved = Common::deleteFromMyShareDirs($loginedUser['cellphone'], $loginedUser['username'], $friends_cellphone, $share_dir);
+
+                if ($saved !== false) {
+                    //删除共享给朋友的，修改朋友的账号映射关系
+                    Common::deleteSharedFavDir($friends_cellphone, $loginedUser['username'], $share_dir);
+
+                    $msg = "取消账号共享完成";
+                    $code = 1;
+                }else {
+                    $err = "取消账号共享失败，请稍后重试";
                 }
             }
         }

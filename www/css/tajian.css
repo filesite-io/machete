@@ -292,6 +292,7 @@ select.tagselect{max-width:100%}
 .favmg-item .act_tags{min-height:40px;background-color:#EEE;padding:4px;margin-right:4px;margin-top:5px}
 .favmg-item .act_tags label{display:inline-block;cursor:pointer}
 .favmg-item .act_tags label input{cursor:pointer}
+.fav-group{background:#EEE;padding:5px;margin-bottom:10px}
 
 /* layout index */
 body.layout_index{background-color:#e5f1f3}

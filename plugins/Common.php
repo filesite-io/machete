@@ -23,7 +23,7 @@ Class Common {
         return str_replace($findChars, '', $str);
     }
 
-	public static function isCellphoneNumber($number) {
+    public static function isCellphoneNumber($number) {
         return preg_match("/^1[3456789][0-9]{9}$/", $number);
     }
 
@@ -48,37 +48,103 @@ Class Common {
         $logOk = @error_log("{$logTime} invite {$cellphone}\n", 3, "{$logDir}{$friendsLogfile}");
     }
 
-    //保存用户多收藏夹目录映射配置
+    //保存用户多收藏夹目录映射关系
     public static function saveUserDirMap($cellphone, $username, $new_dir) {
-        $tajian_user_map = FSC::$app['config']['tajian_user_map'];
-        if (empty($tajian_user_map)) {
-            $tajian_user_map = array();
-            $tajian_user_map[$cellphone] = array($new_dir);
+        $my_user_map = self::getMyDirs($cellphone, $username);
+        if (!in_array($new_dir, $my_user_map)) {
+            array_push($my_user_map, $new_dir);
         }else {
-            $map = $tajian_user_map[$cellphone];
-            if (empty($map)) {              //如果之前没有配置过
-                $map = array();
-
-                $defaultDir = self::getUserId($cellphone);    //先获取用户自己的目录
-                if (self::existUserDataDir($defaultDir, $username)) {
-                    array_push($map, $defaultDir);
-                }
-
-                if ($new_dir != $defaultDir) {
-                    array_push($map, $new_dir);
-                }
-            }else if (is_string($map)) {    //如果有配置过字符串格式的单个目录
-                $old = $map;
-                $map = array($old, $new_dir);
-            }else if (is_array($map) && !in_array($new_dir, $map)) {
-                array_push($map, $new_dir);
-            }
-
-            $tajian_user_map[$cellphone] = $map;
+            return true;
         }
 
-        $cache_filename = __DIR__ . '/../runtime/custom_config_usermap.json';
-        $saved = file_put_contents($cache_filename, json_encode(compact('tajian_user_map'), JSON_PRETTY_PRINT));
+        $my_id = self::getUserId($cellphone);
+        $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+        $rootDir = str_replace("/{$username}", "/{$my_id}", $rootDir);          //获取自己的目录
+        if (!is_dir($rootDir)) {
+            $my_first_id = self::getMappedUsername($cellphone);
+            $rootDir = str_replace("/{$my_id}", "/{$my_first_id}", $rootDir);   //获取自己的目录
+        }
+
+        $saved = false;
+        if (is_dir($rootDir)) {
+            $cache_filename = "{$rootDir}/custom_config_usermap.json";
+            $saved = file_put_contents($cache_filename, json_encode($my_user_map, JSON_PRETTY_PRINT));
+        }
+
+        return $saved === false ? false : true;
+    }
+
+    //获取用户共享目录记录
+    public static function getMyShareDirs($cellphone, $username) {
+        $my_id = self::getUserId($cellphone);
+        $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+        $rootDir = str_replace("/{$username}", "/{$my_id}", $rootDir);          //获取自己的目录
+        if (!is_dir($rootDir)) {
+            $my_first_id = self::getMappedUsername($cellphone);
+            $rootDir = str_replace("/{$my_id}", "/{$my_first_id}", $rootDir);   //获取自己的目录
+        }
+
+        $map = array();
+        if (is_dir($rootDir)) {
+            $cache_filename = "{$rootDir}/share_dirs.json";
+            if (file_exists($cache_filename)) {
+                $json = file_get_contents($cache_filename);
+                $map = json_decode($json, true);
+            }
+        }
+
+        return $map;
+    }
+
+    //保存用户共享目录记录
+    public static function saveMyShareDirs($cellphone, $username, $friends_cellphone, $share_dir) {
+        $shareDirs = self::getMyShareDirs($cellphone, $username);
+        if (empty($shareDirs) || empty($shareDirs[$friends_cellphone])) {
+            $shareDirs[$friends_cellphone] = array($share_dir);
+        }else if(!in_array($share_dir, $shareDirs[$friends_cellphone])) {
+            array_push($shareDirs[$friends_cellphone], $share_dir);
+        }
+
+        $my_id = self::getUserId($cellphone);
+        $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+        $rootDir = str_replace("/{$username}", "/{$my_id}", $rootDir);          //获取自己的目录
+        if (!is_dir($rootDir)) {
+            $my_first_id = self::getMappedUsername($cellphone);
+            $rootDir = str_replace("/{$my_id}", "/{$my_first_id}", $rootDir);   //获取自己的目录
+        }
+
+        $saved = false;
+        if (is_dir($rootDir)) {
+            $cache_filename = "{$rootDir}/share_dirs.json";
+            $saved = file_put_contents($cache_filename, json_encode($shareDirs, JSON_PRETTY_PRINT));
+        }
+
+        return $saved === false ? false : true;
+    }
+
+    //从用户共享目录记录里删除一个共享
+    public static function deleteFromMyShareDirs($cellphone, $username, $friends_cellphone, $share_dir) {
+        $shareDirs = self::getMyShareDirs($cellphone, $username);
+        if(!empty($shareDirs[$friends_cellphone]) && in_array($share_dir, $shareDirs[$friends_cellphone])) {
+            $shareDirs[$friends_cellphone] = array_diff($shareDirs[$friends_cellphone], array($share_dir));
+            $shareDirs[$friends_cellphone] = array_values($shareDirs[$friends_cellphone]);
+        }else {
+            return true;
+        }
+
+        $my_id = self::getUserId($cellphone);
+        $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+        $rootDir = str_replace("/{$username}", "/{$my_id}", $rootDir);          //获取自己的目录
+        if (!is_dir($rootDir)) {
+            $my_first_id = self::getMappedUsername($cellphone);
+            $rootDir = str_replace("/{$my_id}", "/{$my_first_id}", $rootDir);   //获取自己的目录
+        }
+
+        $saved = false;
+        if (is_dir($rootDir)) {
+            $cache_filename = "{$rootDir}/share_dirs.json";
+            $saved = file_put_contents($cache_filename, json_encode($shareDirs, JSON_PRETTY_PRINT));
+        }
 
         return $saved === false ? false : true;
     }
@@ -141,6 +207,38 @@ Class Common {
 
             //保存用户手机和收藏夹映射关系
             self::saveUserDirMap($cellphone, $username, $new_dir);
+        }catch(Exception $e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    //删除被共享的收藏夹
+    public static function deleteSharedFavDir($friends_cellphone, $current_username, $share_dir) {
+        //不能删除朋友自己的收藏夹
+        if (self::isMyFavDir($friends_cellphone, $current_username, $share_dir)) {return false;}
+
+        $friends_dirs = self::getMyDirs($friends_cellphone, $current_username);
+        $dirs_after_delete = $friends_dirs;
+        if (in_array($share_dir, $friends_dirs)) {
+            $dirs_after_delete = array_diff($friends_dirs, array($share_dir));
+            $dirs_after_delete = array_values($dirs_after_delete);
+        }else {
+            return true;
+        }
+
+        try {
+            $my_id = self::getUserId($friends_cellphone);
+            $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+            $rootDir = str_replace("/{$current_username}", "/{$my_id}", $rootDir);          //获取自己的目录
+            if (!is_dir($rootDir)) {
+                $my_first_id = self::getMappedUsername($friends_cellphone);
+                $rootDir = str_replace("/{$my_id}", "/{$my_first_id}", $rootDir);   //获取自己的目录
+            }
+
+            $cache_filename = "{$rootDir}/custom_config_usermap.json";
+            file_put_contents($cache_filename, json_encode($dirs_after_delete, JSON_PRETTY_PRINT));
         }catch(Exception $e) {
             return false;
         }
@@ -236,19 +334,48 @@ Class Common {
         return $username;
     }
 
-    public static function getMyDirs($cellphone){
-        $userDirs = array();
+    public static function dictToArray($dict) {
+        $arr = array();
 
-        $user_map = FSC::$app['config']['tajian_user_map'];
-        if (!empty($user_map[$cellphone])) {
-            if (is_string($user_map[$cellphone])) {
-                array_push($userDirs, $user_map[$cellphone]);
-            }else if (is_array($user_map[$cellphone])) {
-                $userDirs = $user_map[$cellphone];
+        foreach($dict as $key => $value) {
+            array_push($arr, $value);
+        }
+
+        return $arr;
+    }
+
+    //从自己的目录里获取收藏夹映射关系
+    //返回：数组
+    public static function getMyDirs($cellphone, $username){
+        $map = array();
+
+        $my_id = self::getUserId($cellphone);
+        $rootDir = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'];
+        $rootDir = str_replace("/{$username}", "/{$my_id}", $rootDir);          //获取自己的目录
+        if (!is_dir($rootDir)) {
+            $my_first_id = self::getMappedUsername($cellphone);
+            $rootDir = str_replace("/{$my_id}", "/{$my_first_id}", $rootDir);   //获取自己的目录
+        }
+
+        if (is_dir($rootDir)) {
+            $cache_filename = "{$rootDir}/custom_config_usermap.json";
+            if (file_exists($cache_filename)) {
+                $mapContent = file_get_contents($cache_filename);
+                $map = json_decode($mapContent);
+                if (is_object($map)) {
+                    $map = self::dictToArray($map);
+                }
             }
         }
 
-        return $userDirs;
+        //跟公用配置合并
+        $tajian_user_map = FSC::$app['config']['tajian_user_map'];
+        if (!empty($tajian_user_map[$cellphone])) {
+            $map = is_array($tajian_user_map[$cellphone]) ?
+                    array_merge($map, $tajian_user_map[$cellphone]) : array_push($map, $tajian_user_map[$cellphone]);
+        }
+
+        return array_values(array_unique($map));
     }
 
     public static function getNicknameByDir($dir, $username){
@@ -398,6 +525,10 @@ Class Common {
         }
 
         return $url;
+    }
+
+    public static function maskCellphone($cellphone) {
+        return preg_replace("/^(.{3,})\d{4}(.{4})$/i", '$1****$2', $cellphone);
     }
 
 }
