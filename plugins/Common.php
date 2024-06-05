@@ -361,10 +361,7 @@ Class Common {
             $cache_filename = "{$rootDir}/custom_config_usermap.json";
             if (file_exists($cache_filename)) {
                 $mapContent = file_get_contents($cache_filename);
-                $map = json_decode($mapContent);
-                if (is_object($map)) {
-                    $map = self::dictToArray($map);
-                }
+                $map = json_decode($mapContent, true);
             }
         }
 
