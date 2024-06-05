@@ -52,7 +52,7 @@ eof;
         </form>
 
         <hr class="mt20">
-        <h3 class="mt20">共享记录<small>（点击删除）</small></h3>
+        <h3 class="mt20">已共享账号<small>（点击取消）</small></h3>
         <div class="mt10 my_share_dirs">
             <?php
             foreach($viewData['myShareDirs'] as $friends_cellphone => $dirs) {
