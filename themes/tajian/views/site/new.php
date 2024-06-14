@@ -9,7 +9,9 @@
                 $supportPlatforms = FSC::$app['config']['tajian']['supportedPlatforms'];
                 echo implode('，', array_slice($supportPlatforms, 0, -1));
                 ?>
-                ，如需支持其它平台或<strong>任意网址</strong>，以及<strong>搭建视频分享网站</strong>，请 <a href="mailto://machete@filesite.io">Email联系</a>。
+                <br>
+                VIP可收藏<strong>任意网址</strong>，开通VIP、<strong>搭建视频网站</strong>
+                <a href="mailto://machete@filesite.io">👉Email联系</a>。
             </p>
         </div>
         <div class="mb-3 mt20">

@@ -64,7 +64,8 @@ $configs = array(
         'tag_dir' => 'tags/',     //tag分类目录
         'task_dir' => 'task/',    //分享视频下载任务文件保存目录
         'task_log' => 'tasks.log',    //分享视频下载任务文件日志文件
-        'max_dir_num' => 20,          //一个手机可创建的最大收藏夹数量
+        'max_dir_num' => 3,           //普通用户：一个手机可创建的最大收藏夹数量
+        'max_dir_num_vip' => 50,      //VIP用户：一个手机可创建的最大收藏夹数量
         'supportedPlatforms' => array(
             'B站',
             '抖音',

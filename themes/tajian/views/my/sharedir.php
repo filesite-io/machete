@@ -12,10 +12,6 @@ $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['con
     </div>
     <div class="g_form_style mt65">
         <form id="share_dir_form" action="" method="POST">
-            <?php if (empty($viewData['isVipUser'])) { ?>
-            <div class="alert warning">此功能限VIP使用，限时免费开通请联系客服哦</div>
-            <?php } ?>
-
             <div class="mb-3 pt20">
                 <label for="text_input_phone" class="form-label">朋友手机号码</label>
                 <input id="text_input_phone" name="cellphone" placeholder="请填写朋友的手机号码" value="">

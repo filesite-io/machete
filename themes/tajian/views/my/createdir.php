@@ -5,20 +5,20 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
     $linkPrefix = '/' . FSC::$app['user_id'];
 }
 
-$max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['config']['tajian']['max_dir_num'] : 10;
 ?><main class="g_main_lay">
     <div class="breadcrumbs">
         <a href="<?=$linkPrefix?>/my/">&lt;&lt;返回</a>
     </div>
     <form class="g_form_style mt65" id="dir_new_form" action="" method="POST">
-        <?php if (empty($viewData['isVipUser'])) { ?>
-        <div class="alert warning">此功能限VIP使用，限时免费开通请联系客服哦</div>
-        <?php } ?>
-
         <div class="mb-3 pt20">
             <label for="text_input_dir" class="form-label">账号昵称</label>
             <input id="text_input_dir" name="nickname" placeholder="请填写 2 - 5 个汉字" value="">
-            <p class="mt10">说明：<br>一个手机号码最多添加 <strong><?=$max_num?></strong> 个账号。</p>
+            <p class="mt10">
+                <strong>说明：</strong>
+                <br>
+                VIP可以添加 <strong><?=$viewData['max_num_vip']?></strong> 个账号，
+                当前可添加 <strong><?=$viewData['max_num']?></strong> 个账号。
+            </p>
         </div>
         <div class="avform_bt">
             <button class="jsbtn" aria-label="保存" type="submit">

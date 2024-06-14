@@ -148,14 +148,19 @@ Class MyController extends SiteController {
     public function actionCreatedir() {
         //VIP身份判断
         $loginedUser = Common::getUserFromSession();
-        $isVipUser = true;
-        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
-            $isVipUser = false;
+        $isVipUser = Common::isVipUser($loginedUser);
+
+        //普通用户：每个手机号最多创建 3 个收藏夹
+        $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['config']['tajian']['max_dir_num'] : 3;
+        $max_num_vip = 20;
+        //VIP用户：每个手机号最多创建 20 个收藏夹
+        if ($isVipUser) {   //vip用户判断
+            $max_num = $max_num_vip = !empty(FSC::$app['config']['tajian']['max_dir_num_vip']) ? FSC::$app['config']['tajian']['max_dir_num_vip'] : 20;
         }
 
         $defaultTitle = "添加账号";
         $viewName = 'createdir';
-        return $this->actionIndex($viewName, $defaultTitle, compact('isVipUser'));
+        return $this->actionIndex($viewName, $defaultTitle, compact('isVipUser', 'max_num', 'max_num_vip'));
     }
 
     //共享收藏夹
@@ -175,15 +180,9 @@ Class MyController extends SiteController {
 
         $myShareDirs = Common::getMyShareDirs($loginedUser['cellphone'], $loginedUser['username']);
 
-        //VIP身份判断
-        $isVipUser = true;
-        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
-            $isVipUser = false;
-        }
-
         $defaultTitle = "共享账号";
         $viewName = 'sharedir';
-        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine', 'myShareDirs', 'isVipUser'));
+        return $this->actionIndex($viewName, $defaultTitle, compact('myDirs', 'myNicks', 'isMine', 'myShareDirs'));
     }
 
 }

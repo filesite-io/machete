@@ -51,10 +51,11 @@ Class FrontApiController extends SiteController {
      */
     public function actionAddfav() {
         $ip = $this->getUserIp();
+        $check_key = "addfav_{$ip}";
         $check_time = 60;            //1 分钟内
         $max_time_in_minutes = 10;   //最多 10 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -564,10 +565,11 @@ eof;
     //获取短信验证码
     public function actionSendsmscode() {
         $ip = $this->getUserIp();
+        $check_key = "sendsmscode_{$ip}";
         $check_time = 300;          //5 分钟内
         $max_time_in_minutes = 3;   //最多 3 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -632,10 +634,11 @@ eof;
     //新用户注册
     public function actionCreateuser() {
         $ip = $this->getUserIp();
+        $check_key = "createuser_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 5;   //最多 5 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -704,10 +707,11 @@ eof;
     //用户登录
     public function actionLoginuser() {
         $ip = $this->getUserIp();
+        $check_key = "login_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 5;   //最多 5 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -758,10 +762,11 @@ eof;
     //昵称设置
     public function actionSetnickname() {
         $ip = $this->getUserIp();
+        $check_key = "setnickname_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 5;   //最多 5 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -816,10 +821,11 @@ eof;
     //分类管理
     public function actionSavetags() {
         $ip = $this->getUserIp();
+        $check_key = "savetags_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 10;   //最多 10 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -905,10 +911,11 @@ eof;
     //删除分类
     public function actionDeletetag() {
         $ip = $this->getUserIp();
+        $check_key = "deltag_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 10;   //最多 10 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -965,10 +972,11 @@ eof;
     //添加分类
     public function actionAddtag() {
         $ip = $this->getUserIp();
+        $check_key = "addtag_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 15;   //最多 15 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -1045,10 +1053,11 @@ eof;
     //视频管理：把视频从分类中删除、添加视频到某个分类、删除视频
     public function actionDeletefav() {
         $ip = $this->getUserIp();
+        $check_key = "delfav_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 60;   //最多 60 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -1121,10 +1130,11 @@ eof;
 
     public function actionUpdatefavstag() {
         $ip = $this->getUserIp();
+        $check_key = "updatefavtag_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 60;   //最多 60 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -1187,10 +1197,11 @@ eof;
     //创建收藏夹
     public function actionCreatedir() {
         $ip = $this->getUserIp();
+        $check_key = "createdir_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 30;   //最多 30 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -1208,9 +1219,7 @@ eof;
         }
 
         //VIP身份判断
-        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
-            throw new Exception('Oops，你还不是VIP，请联系首页底部客服邮箱开通。');
-        }
+        $isVipUser = Common::isVipUser($loginedUser);
 
 
         //返回给视图的变量
@@ -1231,8 +1240,13 @@ eof;
 
             if (empty($err)) {      //如果数据检查通过，尝试保存
                 //已经创建的收藏夹数量检查
-                //每个手机号最多创建 20 个收藏夹
-                $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['config']['tajian']['max_dir_num'] : 10;
+                //普通用户：每个手机号最多创建 3 个收藏夹
+                $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num']) ? FSC::$app['config']['tajian']['max_dir_num'] : 3;
+                //VIP用户：每个手机号最多创建 20 个收藏夹
+                if ($isVipUser) {   //vip用户判断
+                    $max_num = !empty(FSC::$app['config']['tajian']['max_dir_num_vip']) ? FSC::$app['config']['tajian']['max_dir_num_vip'] : 20;
+                }
+
                 $myDirs = Common::getMyDirs($loginedUser['cellphone'], $loginedUser['username']);
                 if (count($myDirs) >= $max_num) {
                     $err = "你已经创建了 {$max_num} 个账号，已达到最大数量";
@@ -1256,10 +1270,11 @@ eof;
     //账号共享接口
     public function actionSharedir() {
         $ip = $this->getUserIp();
+        $check_key = "sharedir_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 10;   //最多 10 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
@@ -1274,11 +1289,6 @@ eof;
             && (empty(FSC::$app['user_id']) || FSC::$app['user_id'] != $loginedUser['username'])
         ) {
             throw new Exception('Oops，请求地址有误');
-        }
-
-        //VIP身份判断
-        if (empty($loginedUser['cellphone']) || !in_array($loginedUser['cellphone'], FSC::$app['config']['tajian_vip_user'])) {
-            throw new Exception('Oops，你还不是VIP，请联系首页底部客服邮箱开通。');
         }
 
 
@@ -1336,10 +1346,11 @@ eof;
     //删除一个账号共享
     public function actionDelsharedir() {
         $ip = $this->getUserIp();
+        $check_key = "delsharedir_{$ip}";
         $check_time = 120;          //2 分钟内
         $max_time_in_minutes = 10;   //最多 10 次
 
-        $isUserGotRequestLimit = $this->requestLimit($ip, $max_time_in_minutes, $check_time);
+        $isUserGotRequestLimit = $this->requestLimit($check_key, $max_time_in_minutes, $check_time);
         if ($isUserGotRequestLimit) {
             $this->logError("Request limit got, ip: {$ip}");
             throw new Exception('Oops，操作太快了，请喝杯咖啡休息会吧...');
