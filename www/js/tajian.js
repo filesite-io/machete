@@ -175,24 +175,12 @@ if ($('#add_video_form').get(0)) {
     $('#add_video_form').submit(handle_add_fav);
 }
 
-// 注册/登录等页面展示客服微信二维码切换按钮
+// 注册帮用户填默认邀请码
 if ($('.bt_kf_JS').get(0)) {
-    var kf_hide_text = $('.bt_kf_JS').attr('data-hide'),
-        kf_text = $('.bt_kf_JS').text();
+    var kf_default_code = $('.bt_kf_JS').attr('data-default-code');
     $('.bt_kf_JS').click(function(e) {
-        if ($('.kf_wx_JS').hasClass('hide')) {
-            $('.kf_wx_JS').removeClass('hide');
-            $('.bt_kf_JS').text(kf_hide_text);
-        }else {
-            $('.kf_wx_JS').addClass('hide');
-            $('.bt_kf_JS').text(kf_text);
-        }
+        $('input[name=friendscode]').val(kf_default_code);
     });
-
-    var win_width = $(window).width();
-    if (win_width > 768 && $('.tajian_index').get(0)) {
-        $('.bt_kf_JS').click().addClass('hide');
-    }
 }
 
 //验证码发送
@@ -601,9 +589,6 @@ if ($('#favmg').get(0)) {
 
 // 分享收藏夹
 if ($('#share_form').get(0)) {
-    var share_content = $('#share_form textarea').val();
-    $('#share_form textarea').val(location.protocol + '//' + location.host + (location.port ? ':' + location.port : '') + share_content);
-
     var clipboard = new ClipboardJS('#share_form .jsbtn');
 
     clipboard.on('success', function(e) {

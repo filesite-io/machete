@@ -164,16 +164,14 @@ Class Controller {
 
     //error log
     protected function logError($error_message) {
-        if (!empty(FSC::$app['config']['debug'])) {
-            $thisUrl = FSC::$app['requestUrl'];
-            $logTime = date('Y-m-d H:i:s');
-            $logDir = __DIR__ . '/../runtime/logs/';
-            $logFilename = 'error.log';
-            $logOk = @error_log("{$logTime}\t{$thisUrl}\tERROR: {$error_message}\n", 3, "{$logDir}{$logFilename}");
-            if (!$logOk) {      //try to mkdir
-                @mkdir($logDir, 0700, true);
-                @error_log("{$logTime}\t{$thisUrl}\tERROR: {$error_message}\n", 3, "{$logDir}{$logFilename}");
-            }
+        $thisUrl = FSC::$app['requestUrl'];
+        $logTime = date('Y-m-d H:i:s');
+        $logDir = __DIR__ . '/../runtime/logs/';
+        $logFilename = 'error.log';
+        $logOk = @error_log("{$logTime}\t{$thisUrl}\tERROR: {$error_message}\n", 3, "{$logDir}{$logFilename}");
+        if (!$logOk) {      //try to mkdir
+            @mkdir($logDir, 0700, true);
+            @error_log("{$logTime}\t{$thisUrl}\tERROR: {$error_message}\n", 3, "{$logDir}{$logFilename}");
         }
     }
 

@@ -249,9 +249,9 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                     </a>
                 </div>
                 <div class="control" style="min-width:33.33%">
-                    <a class="button button-block button-shadow" href="/1000" target="_blank">
+                    <a class="button button-block button-shadow" href="/2000" target="_blank">
                         <img class="btn_icon" src="/img/avatar/master.svg" alt="master svg">
-                        一灯大师
+                        扫地僧
                     </a>
                 </div>
             </div>
