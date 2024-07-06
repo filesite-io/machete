@@ -142,4 +142,95 @@ eof;
         return "{$cdn}{$localImgUrl}";
     }
 
+    //参数：page、limit
+    public static function getPaginationLink($url, $page, $pageSize = 24) {
+        $arr = explode('?', $url);
+        if (count($arr) == 1) {     //不含问号
+            return "{$url}?page={$page}&limit={$pageSize}";
+        }
+
+        $paginationParams = array('page', 'limit');
+        $newParms = array();
+        $baseUrl = $arr[0];
+        $queryString = $arr[1];
+        $params = explode('&', $queryString);
+        if (count($params) > 0) {
+            foreach ($params as $item) {
+                list($name, $val) = explode('=', $item);
+                if (!in_array($name, $paginationParams)) {
+                    array_push($newParms, $item);
+                }
+            }
+        }
+
+        return $baseUrl . "?page={$page}&limit={$pageSize}" . (!empty($newParms) ? '&'.implode('&', $newParms) : '');
+    }
+
+    //输出翻页组件，page从1开始
+    public static function getPaginationHtmlCode($page, $limit, $total) {
+        $currentUrl = FSC::$app['requestUrl'];
+        $maxPage = ceil($total / $limit);
+
+        //上一页
+        $previousLink = <<<eof
+        <li class="page-item disabled">
+            <span class="page-link">上一页</span>
+        </li>
+eof;
+        if ($page > 1) {
+            $url = self::getPaginationLink($currentUrl, $page-1, $limit);
+            $previousLink = <<<eof
+        <li class="page-item">
+            <a class="page-link" href="{$url}">上一页</a>
+        </li>
+eof;
+        }
+
+        //下一页
+        $nextLink = <<<eof
+        <li class="page-item disabled">
+            <span class="page-link">下一页</span>
+        </li>
+eof;
+        if ($page < $maxPage) {
+            $url = self::getPaginationLink($currentUrl, $page+1, $limit);
+            $nextLink = <<<eof
+        <li class="page-item">
+            <a class="page-link" href="{$url}">下一页</a>
+        </li>
+eof;
+        }
+
+        //中间显示 10 页
+        $otherLinks = '';
+        $startPage = $page > 5 ? $page - 5 : 1;
+        $endPage = $startPage + 10 < $maxPage ? $startPage + 10 : $maxPage;
+        for ($i = $startPage; $i <= $endPage; $i ++) {
+            $url = self::getPaginationLink($currentUrl, $i, $limit);
+            if ($i != $page) {
+                $otherLinks .= <<<eof
+        <li class="page-item"><a class="page-link" href="{$url}">{$i}</a></li>
+eof;
+            }else {
+                $otherLinks .= <<<eof
+        <li class="page-item active" aria-current="page">
+            <span class="page-link">{$i}</span>
+        </li>
+eof;
+            }
+        }
+
+        $html = <<<eof
+<nav aria-label="翻页">
+    <ul class="pagination">
+        {$previousLink}
+        {$otherLinks}
+        {$nextLink}
+    </ul>
+</nav>
+eof;
+
+        return $html;
+    }
+
 }

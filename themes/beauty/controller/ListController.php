@@ -49,6 +49,13 @@ Class ListController extends Controller {
         $subcate = $scanResults[$cateId];
         $breadcrumbs = $this->getBreadcrumbs($menus, $subcate);
 
+/*
+header('Content-type: text/html; charset=utf-8');
+print_r($subcate);
+print_r($breadcrumbs);
+print_r($menus);exit;
+*/
+
         //获取当前目录下的readme
         $cateReadmeFile = $scanner->getDefaultReadme($cateId);
         if (!empty($cateReadmeFile)) {
@@ -99,6 +106,24 @@ Class ListController extends Controller {
         return $out;
     }
 
+    //根据pid在目录数组里找出对应的父目录数据
+    protected function getParentCateByPid($pid, $cates) {
+        $parent = array();
+
+        foreach ($cates as $index => $item) {
+            if ($item['id'] == $pid) {
+                $parent = $item;
+                break;
+            }else if (!empty($item['directories'])) {
+                $parent = $this->getParentCateByPid($pid, $item['directories']);
+                if (!empty($parent)) {break;}
+            }
+        }
+
+
+        return $parent;
+    }
+
     //根据目录结构以及当前目录获取面包屑
     protected function getBreadcrumbs($menus, $subcate) {
         $breads = array();
@@ -109,13 +134,17 @@ Class ListController extends Controller {
             'url' => $subcate['path'],
         ]);
 
-        $foundKey = array_search($subcate['pid'], $this->array_column($menus, 'id'));
-        if ($foundKey !== false) {
+        $pid = $subcate['pid'];
+        $parentCate = $this->getParentCateByPid($pid, $menus);
+        while (!empty($parentCate)) {
             array_unshift($breads, [
-                'id' => $menus[$foundKey]['id'],
-                'name' => $menus[$foundKey]['directory'],
-                'url' => $menus[$foundKey]['path'],
+                'id' => $parentCate['id'],
+                'name' => $parentCate['directory'],
+                'url' => $parentCate['path'],
             ]);
+
+            $pid = $parentCate['pid'];
+            $parentCate = $this->getParentCateByPid($pid, $menus);
         }
 
         return $breads;

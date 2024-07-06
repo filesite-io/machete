@@ -160,7 +160,7 @@ eof;
 
             //分割目录和文件
             echo '</div>';
-            if (!empty($category['files'])) {
+            if (!empty($category['files']) && count($category['files']) > 3) {
                 echo '<hr>';
             }
             echo '<div class="im_mainl row">';
@@ -168,13 +168,20 @@ eof;
 
         if (!empty($category['files'])) {        //一级目录支持
             $total = count($category['files']);     //翻页支持
+            $pageStartIndex = ($viewData['page']-1) * $viewData['pageSize'];
             $index = 0;
             foreach ($category['files'] as $file) {
                 if (!in_array($file['extension'], $imgExts)) {
                     continue;
                 }
 
-                if ($index >= $viewData['pageSize']) {break;}       //翻页支持
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $viewData['pageSize']) {
+                    break;
+                }
 
                 $title = !empty($file['title']) ? $file['title'] : $file['filename'];
 
@@ -214,4 +221,11 @@ eof;
         ?>
 
     </div>
+</div>
+
+<div class="text-center">
+<?php
+$pagination = Html::getPaginationHtmlCode($viewData['page'], $viewData['pageSize'], $total);
+echo $pagination;
+?>
 </div>
