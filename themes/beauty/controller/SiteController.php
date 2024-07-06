@@ -62,6 +62,10 @@ Class SiteController extends Controller {
             $mp3File = $scanner->getDefaultFile('mp3');
         }
 
+        //翻页支持
+        $page = $this->get('page', 1);
+        $pageSize = $this->get('limit', 24);
+
         $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
         if (!empty($readmeFile['title'])) {
             $pageTitle = $readmeFile['title'];
@@ -72,7 +76,7 @@ Class SiteController extends Controller {
         $viewName = 'index';
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme',
-            'mp3File'
+            'mp3File', 'page', 'pageSize'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

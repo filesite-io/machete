@@ -68,9 +68,11 @@ eof;
                 <li class="scroll_top scroll_topJS">
                     <img class="icon svg" src="/img/beauty/huojian.svg" alt="回到顶部" title="点击回到顶部" />
                 </li>
+                <?php if (!empty($viewData['mp3File'])) { ?>
                 <li class="music_switch musicJS">
                     <img class="icon svg verMiddle" src="/img/beauty/music.svg" alt="音乐" title="开启关闭音乐" />
                 </li>
+                <?php } ?>
                 <li class="connectmeJS">
                     <img class="icon3 svg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
                 </li>

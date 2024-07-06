@@ -13,8 +13,8 @@
             </div>
 
             <a class="navbar-brand" href="/">
-                <img class="verMiddle" src="/content/machete_icon.png" alt="logo图片">
-                <span class="verMiddle">FileSite图片站</span>
+                <!--img class="verMiddle" src="/content/machete_icon.png" alt="logo图片"-->
+                <span class="verMiddle">家庭相册</span>
             </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -36,15 +36,14 @@ eof;
             <?php /*
             <form class="navbar-form navbar-left">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Search">
+                    <input type="text" class="form-control" placeholder="搜索图片名称">
                 </div>
-                <button type="submit" class="btn btn-default">Submit</button>
+                <button type="submit" class="btn btn-default">搜索</button>
             </form>
             */ ?>
-            <div class="nb_right nav navbar-nav navbar-right">
+            <div class="nb_right nav navbar-nav navbar-right hidden-xs">
                 <img class="svg icon1 svgimg lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
-
             </div>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -81,6 +80,7 @@ eof;
         <?php
         $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
         $category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
+        $total = 0;     //翻页支持
 
         //当前目录的描述介绍
         if (!empty($category['description'])) {
@@ -97,6 +97,7 @@ eof;
         }
 
         if (!empty($category['directories'])) {        //两级目录支持
+            $total = count($category['directories']);     //翻页支持
             $index = 0;
             foreach ($category['directories'] as $dir) {
                 echo <<<eof
@@ -145,37 +146,63 @@ eof;
                 $title = !empty($dir['title']) ? $dir['title'] : $dir['directory'];
                 echo <<<eof
                 <div class="im_img_title">
-                    <span>{$title}</span>
+                    <span>
+                        <img src="/img/beauty/folder.svg" alt="folder" width="24">
+                        {$title}
+                    </span>
                 </div>
             </a>
         </div>
 eof;
                 $index++;
             }
+
+
+            //分割目录和文件
+            echo '</div>';
+            if (!empty($category['files'])) {
+                echo '<hr>';
+            }
+            echo '<div class="im_mainl row">';
         }
 
         if (!empty($category['files'])) {        //一级目录支持
+            $total = count($category['files']);     //翻页支持
             $index = 0;
             foreach ($category['files'] as $file) {
                 if (!in_array($file['extension'], $imgExts)) {
                     continue;
                 }
 
+                if ($index >= $viewData['pageSize']) {break;}       //翻页支持
+
                 $title = !empty($file['title']) ? $file['title'] : $file['filename'];
 
                 if ($index > 0) {
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="图片{$title}">
+    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title}" title="{$title}">
         <img src="/img/beauty/lazy.svg" data-original="{$file['path']}" class="bor_radius im_img lazy" alt="{$file['filename']}">
+        <div class="im_img_title">
+            <span>
+                <img src="/img/beauty/image.svg" alt="image" width="20">
+                {$title}
+            </span>
+        </div>
     </a>
 </div>
 eof;
                 } else {
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="图片{$title}">
+    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title}" title="{$title}">
         <img src="{$file['path']}" class="bor_radius im_img" alt="{$file['filename']}">
+        <div class="im_img_title">
+            <span>
+                <img src="/img/beauty/image.svg" alt="image" width="20">
+                {$title}
+            </span>
+        </div>
     </a>
 </div>
 eof;

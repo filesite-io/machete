@@ -87,7 +87,7 @@ Class DirScanner {
     //不允许包含斜杠/，反斜杠\，单引号'，双引号"，空格字符
     //忽略.开头的隐藏文件
     private function isValid($name) {
-        return str_replace(['/', '\\', "'", '"', ' '], '', $name) == $name && !preg_match('/^\..+/', $name);
+        return str_replace(['/', '\\', "'", '"'], '', $name) == $name && !preg_match('/^\..+/', $name);
     }
 
     //解析描述文件内容

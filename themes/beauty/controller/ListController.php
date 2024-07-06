@@ -65,6 +65,10 @@ Class ListController extends Controller {
             $mp3File = $scanner->getDefaultFile('mp3');
         }
 
+        //翻页支持
+        $page = $this->get('page', 1);
+        $pageSize = $this->get('limit', 24);
+
         $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
         if (!empty($subcate)) {
             $pageTitle = "{$subcate['directory']}的照片，来自{$pageTitle}";
@@ -75,9 +79,24 @@ Class ListController extends Controller {
         $viewName = '//site/index';     //共享视图
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
-            'mp3File'
+            'mp3File', 'page', 'pageSize'
         );
         return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //实现php 5.5开始支持的array_column方法
+    protected function array_column($arr, $col) {
+        $out = array();
+
+        if (!empty($arr) && is_array($arr) && !empty($col)) {
+            foreach ($arr as $index => $item) {
+                if (!empty($item[$col])) {
+                    array_push($out, $item[$col]);
+                }
+            }
+        }
+
+        return $out;
     }
 
     //根据目录结构以及当前目录获取面包屑
@@ -90,7 +109,7 @@ Class ListController extends Controller {
             'url' => $subcate['path'],
         ]);
 
-        $foundKey = array_search($subcate['pid'], array_column($menus, 'id'));
+        $foundKey = array_search($subcate['pid'], $this->array_column($menus, 'id'));
         if ($foundKey !== false) {
             array_unshift($breads, [
                 'id' => $menus[$foundKey]['id'],

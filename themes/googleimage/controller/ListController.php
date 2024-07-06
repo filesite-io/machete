@@ -80,6 +80,21 @@ Class ListController extends Controller {
         return $this->render($viewName, $params, $pageTitle);
     }
 
+    //实现php 5.5开始支持的array_column方法
+    protected function array_column($arr, $col) {
+        $out = array();
+
+        if (!empty($arr) && is_array($arr) && !empty($col)) {
+            foreach ($arr as $index => $item) {
+                if (!empty($item[$col])) {
+                    array_push($out, $item[$col]);
+                }
+            }
+        }
+
+        return $out;
+    }
+
     //根据目录结构以及当前目录获取面包屑
     protected function getBreadcrumbs($menus, $subcate) {
         $breads = array();
@@ -90,7 +105,7 @@ Class ListController extends Controller {
             'url' => $subcate['path'],
         ]);
 
-        $foundKey = array_search($subcate['pid'], array_column($menus, 'id'));
+        $foundKey = array_search($subcate['pid'], $this->array_column($menus, 'id'));
         if ($foundKey !== false) {
             array_unshift($breads, [
                 'id' => $menus[$foundKey]['id'],

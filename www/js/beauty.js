@@ -9,7 +9,7 @@ if ($('#image_site').get(0)) {
     // 图片浏览
     $('[data-fancybox]').fancybox({
         toolbar: true,
-        loop: false,
+        loop: true,
         smallBtn: false,
         buttons: ["zoom", "slideShow", "fullScreen", "download", "thumbs", "close"],
         iframe: {
@@ -25,13 +25,20 @@ if ($('#image_site').get(0)) {
 
     // 返回顶部
     var scrolltop = $('#image_site .scroll_topJS');
+
+    var timer_icon_fade = null;
     $(window).scroll(function () {
-        if ($(this).scrollTop() > 100) {
-            scrolltop.fadeIn();
-        } else {
-            scrolltop.fadeOut();
-        }
+        if (timer_icon_fade) {clearTimeout(timer_icon_fade);}
+
+        timer_icon_fade = setTimeout(function() {
+            if ($(window).scrollTop() > 100) {
+                scrolltop.fadeIn();
+            } else {
+                scrolltop.fadeOut();
+            }
+        }, 100);
     });
+
     scrolltop.on('touchstart click', function () {
         $('html, body').animate({ scrollTop: 0 }, 380);
         return false;
