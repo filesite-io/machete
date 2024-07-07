@@ -104,7 +104,7 @@ if ($('#image_site').get(0)) {
         toggleLampshow(lanpnum);
     }
     $('#image_site .lampJS').click(function () {
-        lanpnum = lanpnum == 0 ? 1 : 0;
+        lanpnum = !lanpnum ? 1 : 0;
         toggleLampshow(lanpnum);
         saveLanpnumToLocalstorage(lanpnum);
     });
