@@ -147,7 +147,7 @@ eof;
                 echo <<<eof
                 <div class="im_img_title">
                     <span>
-                        <img src="/img/beauty/folder.svg" alt="folder" width="24">
+                        <img src="/img/beauty/folder.svg" alt="folder" width="20">
                         {$title}
                     </span>
                 </div>
@@ -184,6 +184,10 @@ eof;
                 }
 
                 $title = !empty($file['title']) ? $file['title'] : $file['filename'];
+                //图片、视频显示文件创建日期
+                if (!empty($file['fstat']['ctime'])) {
+                    $title = date('Y-m-d', $file['fstat']['ctime']);
+                }
 
                 if ($index > 0) {
                     echo <<<eof
