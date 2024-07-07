@@ -40,6 +40,21 @@ Class FrontApiController extends SiteController {
         return $this->renderJson(compact('code', 'msg', 'err', 'data'));
     }
 
+    //删除当前用户的缓存数据
+    protected function cleanAllFilesCache() {
+        if (empty(FSC::$app['user_id'])) {return false;}
+
+        $prefix = FSC::$app['user_id'];
+
+        $cacheKey = "{$prefix}_allFilesTree";
+        Common::cleanFileCache($cacheKey);
+
+        $cacheKey = "{$prefix}_allFilesData";
+        Common::cleanFileCache($cacheKey);
+
+        return true;
+    }
+
     /*
      * 参数：
      * content: 从抖音或其它平台复制出来的视频分享内容，或者视频网址
@@ -149,6 +164,9 @@ Class FrontApiController extends SiteController {
                 $stats = TajianStats::init();
                 TajianStats::increase('video');
                 $saved = TajianStats::save();
+
+                //清空缓存
+                $this->cleanAllFilesCache();
             }
         }
 
@@ -897,6 +915,9 @@ eof;
                 //保存
                 $saved = $this->saveTags($tags, $allTags);
                 if (!empty($saved)) {
+                    //清空缓存
+                    $this->cleanAllFilesCache();
+
                     $msg = "分类已保存";
                     $code = 1;
                 }else {
@@ -957,6 +978,9 @@ eof;
                     $stats = TajianStats::init();
                     TajianStats::decrease('tag');
                     $saved = TajianStats::save();
+
+                    //清空缓存
+                    $this->cleanAllFilesCache();
 
                     $msg = "分类已删除";
                     $code = 1;
@@ -1038,6 +1062,9 @@ eof;
                         TajianStats::increase('tag');
                         $saved = TajianStats::save();
 
+                        //清空缓存
+                        $this->cleanAllFilesCache();
+
                         $msg = "分类已添加";
                         $code = 1;
                     }else {
@@ -1116,6 +1143,8 @@ eof;
                     TajianStats::decrease('video');
                     $saved = TajianStats::save();
 
+                    //清空缓存
+                    $this->cleanAllFilesCache();
 
                     $msg = "视频已删除";
                     $code = 1;
@@ -1183,6 +1212,9 @@ eof;
                 }
 
                 if ($saved !== false) {
+                    //清空缓存
+                    $this->cleanAllFilesCache();
+
                     $msg = "操作完成";
                     $code = 1;
                 }else {
@@ -1255,6 +1287,9 @@ eof;
                     $saved = Common::createNewFavDir($loginedUser['cellphone'], $loginedUser['username'], $new_dir, $new_nickname);
 
                     if ($saved !== false) {
+                        //清空缓存
+                        $this->cleanAllFilesCache();
+
                         $msg = "新账号创建完成";
                         $code = 1;
                     }else {

@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/../../../lib/DirScanner.php';
 require_once __DIR__ . '/../../../plugins/Parsedown.php';
+require_once __DIR__ . '/../../../plugins/Common.php';
 require_once __DIR__ . '/SiteController.php';
 
 Class ListController extends SiteController {
@@ -16,8 +17,30 @@ Class ListController extends SiteController {
 
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
-        $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
-        $scanResults = $scanner->getScanResults();
+
+        //优先从缓存读取数据
+        $prefix = FSC::$app['user_id'];
+        $cacheKey = "{$prefix}_allFilesTree";
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $dirTree = $cachedData;
+            $scanner->setTreeData($cachedData);
+        }else {
+            $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
+            Common::saveCacheToFile($cacheKey, $dirTree);
+        }
+
+        //优先从缓存读取数据
+        $cacheKey = "{$prefix}_allFilesData";
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $scanResults = $cachedData;
+            $scanner->setScanResults($cachedData);
+        }else {
+            $scanResults = $scanner->getScanResults();
+            Common::saveCacheToFile($cacheKey, $scanResults);
+        }
+
 
         $titles = array();
         $readmeFile = $scanner->getDefaultReadme();

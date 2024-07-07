@@ -38,8 +38,30 @@ Class SiteController extends Controller {
 
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
-        $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
-        $scanResults = $scanner->getScanResults();
+
+        //优先从缓存读取数据
+        $prefix = FSC::$app['user_id'];
+        $cacheKey = "{$prefix}_allFilesTree";
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $dirTree = $cachedData;
+            $scanner->setTreeData($cachedData);
+        }else {
+            $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
+            Common::saveCacheToFile($cacheKey, $dirTree);
+        }
+
+        //优先从缓存读取数据
+        $cacheKey = "{$prefix}_allFilesData";
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $scanResults = $cachedData;
+            $scanner->setScanResults($cachedData);
+        }else {
+            $scanResults = $scanner->getScanResults();
+            Common::saveCacheToFile($cacheKey, $scanResults);
+        }
+
 
         //获取目录
         $menus = $scanner->getMenus();
@@ -346,8 +368,30 @@ Class SiteController extends Controller {
 
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
-        $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
-        $scanResults = $scanner->getScanResults();
+
+        //优先从缓存读取数据
+        $prefix = FSC::$app['user_id'];
+        $cacheKey = "{$prefix}_allFilesTree";
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $dirTree = $cachedData;
+            $scanner->setTreeData($cachedData);
+        }else {
+            $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 3);
+            Common::saveCacheToFile($cacheKey, $dirTree);
+        }
+
+        //优先从缓存读取数据
+        $cacheKey = "{$prefix}_allFilesData";
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $scanResults = $cachedData;
+            $scanner->setScanResults($cachedData);
+        }else {
+            $scanResults = $scanner->getScanResults();
+            Common::saveCacheToFile($cacheKey, $scanResults);
+        }
+
 
         $titles = array();
         $htmlReadme = '';
