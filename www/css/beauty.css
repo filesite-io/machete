@@ -102,6 +102,7 @@ a:link{text-decoration:none}
 .lampshow .text_dark{color:#808080}
 .lampshow .text_dark a{color:#f4f7fd}
 
+#qrimg{width:160px;height:160px;margin:0 auto 20px auto;background-color:#FFF;padding:5px;border:1px solid #EEE;border-radius:5px}
 
 @media screen and (max-width: 1199px) {
     .im_item {

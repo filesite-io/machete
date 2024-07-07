@@ -67,21 +67,46 @@ if ($('#image_site').get(0)) {
 
 
     // 白天黑夜模式切换
-    var lanpnum = 0;
-    $('#image_site .lampJS').click(function () {
-        if (lanpnum == 0) {
+    var saveLanpnumToLocalstorage = function(lanpnum) {
+        try {
+            var key = 'user_lanpnum';
+            localStorage.setItem(key, lanpnum);
+        }catch(err) {
+            console.error('保存本地存储失败', err);
+        }
+    };
+
+    var getLanpnumFromLocalstorage = function() {
+        try {
+            var key = 'user_lanpnum';
+            return localStorage.getItem(key);
+        }catch(err) {
+            console.error('保存本地存储失败', err);
+        }
+
+        return false;
+    };
+
+    var toggleLampshow = function(lanpnum) {
+        if (lanpnum == 1) {
             $('#markdowncss').attr('href', '/css/github-markdown-dark.css');
             $(document.body).addClass('lampshow');
             $('#image_site .navbarJS').removeClass('navbar-default').addClass('navbar-inverse'); // 导航栏用bootstrap主题切换
-            lanpnum = 1;
-        } else if (lanpnum == 1) {
+        } else if (lanpnum == 0) {
             $('#markdowncss').attr('href', '/css/github-markdown-light.css');
             $(document.body).removeClass('lampshow');
             $('#image_site .navbarJS').addClass('navbar-default').removeClass('navbar-inverse');
-            lanpnum = 0;
         }
+    };
 
-        return;
+    var lanpnum = getLanpnumFromLocalstorage();
+    if (lanpnum !== false) {
+        toggleLampshow(lanpnum);
+    }
+    $('#image_site .lampJS').click(function () {
+        lanpnum = lanpnum == 0 ? 1 : 0;
+        toggleLampshow(lanpnum);
+        saveLanpnumToLocalstorage(lanpnum);
     });
 
     // 音乐播放
@@ -105,6 +130,16 @@ if ($('#image_site').get(0)) {
             $('#music_main').get(0).play();
             $('.musicJS').addClass('music_put');
             musicState = 1;
+        });
+    }
+
+    //二维码显示
+    if ($('#qrimg').length > 0 && typeof(QRCode) != 'undefined') {
+        var qrcode = new QRCode("qrimg", {
+            text: location.href,
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
         });
     }
 

@@ -31,6 +31,10 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
 
         <!-- 尾部网站信息 -->
         <footer class="web_info vercenter">
+            <div class="qrcode text-center">
+                <p>用手机扫码打开</p>
+                <div id="qrimg"></div>
+            </div>
             <p>
                 Copyright <span>&copy;2022</span>
                 by <a href="https://filesite.io/" target="_blank">FileSite.io</a>
@@ -92,6 +96,7 @@ eof;
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/lazyload.js"></script>
     <script src="/js/fubox.min.js"></script>
+    <script src="/js/qrcode.min.js"></script>
     <script src="/js/beauty.js?v<?= Html::getStaticFileVersion('beauty.js', 'js') ?>"></script>
     <?php echo Html::getGACode(); ?>
 </body>
