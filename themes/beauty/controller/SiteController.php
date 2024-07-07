@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/../../../lib/DirScanner.php';
 require_once __DIR__ . '/../../../plugins/Parsedown.php';
+require_once __DIR__ . '/../../../plugins/Common.php';
 
 Class SiteController extends Controller {
 
@@ -16,8 +17,30 @@ Class SiteController extends Controller {
         
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
-        $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 4);
-        $scanResults = $scanner->getScanResults();
+
+        //优先从缓存读取数据
+        $cacheKey = 'allFilesTree';
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $dirTree = $cachedData;
+            $scanner->setTreeData($cachedData);
+        }else {
+            $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 4);
+            Common::saveCacheToFile($cacheKey, $dirTree);
+        }
+
+        //优先从缓存读取数据
+        $cacheKey = 'allFilesData';
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $scanResults = $cachedData;
+            $scanner->setScanResults($cachedData);
+        }else {
+            $scanResults = $scanner->getScanResults();
+            Common::saveCacheToFile($cacheKey, $scanResults);
+        }
+
+
         //获取目录
         $menus = $scanner->getMenus();
 
@@ -62,6 +85,7 @@ Class SiteController extends Controller {
             $mp3File = $scanner->getDefaultFile('mp3');
         }
 
+
         //翻页支持
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', 24);
@@ -75,8 +99,8 @@ Class SiteController extends Controller {
         }
         $viewName = 'index';
         $params = compact(
-            'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme',
-            'mp3File', 'page', 'pageSize'
+            'cateId', 'page', 'pageSize',
+            'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

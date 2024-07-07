@@ -528,4 +528,56 @@ Class Common {
         return preg_replace("/^(.{3,})\d{4}(.{4})$/i", '$1****$2', $cellphone);
     }
 
+    //保存数据到文件缓存
+    //缓存数据格式：{ctime: timestamp, data: anything}
+    public static function saveCacheToFile($key, $data) {
+        $cacheData = array(
+            "ctime" => time(),
+            "data" => $data,
+        );
+        $jsonData = json_encode($cacheData);
+        $cacheDir = __DIR__ . '/../runtime/cache/';
+
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0700, true);
+        }
+
+        $cache_filename = "{$cacheDir}{$key}.json";
+        return file_put_contents($cache_filename, $jsonData);
+    }
+
+    //从文件缓存读取数据
+    //expireSeconds: 缓存失效时间，默认10分钟
+    public static function getCacheFromFile($key, $expireSeconds = 600) {
+        $cacheDir = __DIR__ . '/../runtime/cache/';
+        $cache_filename = "{$cacheDir}{$key}.json";
+
+        if (file_exists($cache_filename)) {
+            $jsonData = file_get_contents($cache_filename);
+            $data = json_decode($jsonData, true);
+
+            //如果缓存没有失效
+            $now = time();
+            if ($now - $data['ctime'] <= $expireSeconds) {
+                return $data['data'];
+            }else {
+                return null;
+            }
+        }
+
+        return false;
+    }
+
+    //删除缓存文件
+    public static function cleanFileCache($key) {
+        $cacheDir = __DIR__ . '/../runtime/cache/';
+        $cache_filename = "{$cacheDir}{$key}.json";
+
+        if (file_exists($cache_filename)) {
+            return unlink($cache_filename);
+        }
+
+        return false;
+    }
+
 }

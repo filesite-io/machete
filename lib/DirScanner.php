@@ -620,6 +620,16 @@ Class DirScanner {
         return $this->scanResults;
     }
 
+    //设置扫描结果，以支持缓存
+    public function setScanResults($data) {
+        $this->scanResults = $data;
+    }
+
+    //设置tree，以支持缓存
+    public function setTreeData($data) {
+        $this->tree = $data;
+    }
+
     //获取菜单，扫描结果中的目录结构
     public function getMenus($tree = array()) {
         $results = empty($tree) ? $this->tree : $tree;
