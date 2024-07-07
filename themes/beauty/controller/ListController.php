@@ -19,7 +19,8 @@ Class ListController extends Controller {
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
 
         //优先从缓存读取数据
-        $cacheKey = 'allFilesTree';
+        $prefix = FSC::$app['config']['theme'];
+        $cacheKey = "{$prefix}_allFilesTree";
         $cachedData = Common::getCacheFromFile($cacheKey);
         if (!empty($cachedData)) {
             $dirTree = $cachedData;
@@ -30,7 +31,7 @@ Class ListController extends Controller {
         }
 
         //优先从缓存读取数据
-        $cacheKey = 'allFilesData';
+        $cacheKey = "{$prefix}_allFilesData";
         $cachedData = Common::getCacheFromFile($cacheKey);
         if (!empty($cachedData)) {
             $scanResults = $cachedData;

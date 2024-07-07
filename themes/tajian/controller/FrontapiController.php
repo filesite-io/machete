@@ -480,6 +480,9 @@ eof;
                 $code = 0;
                 $err = '签名验证不通过！';
             }else if (!empty($task_result['done'])) {    //如果任务成功抓取到数据
+                //清空缓存
+                $this->cleanAllFilesCache();
+
                 $video_id = $this->getVideoId($task_result['url']);
                 $saveUrlRes = $this->saveUrlShortCut($video_id, $task_result['url']);
                 $saveDescRes = $this->saveDescriptionFiles($video_id, $task_result);
