@@ -535,7 +535,7 @@ Class Common {
             "ctime" => time(),
             "data" => $data,
         );
-        $jsonData = json_encode($cacheData);
+        $jsonData = json_encode($cacheData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $cacheDir = __DIR__ . '/../runtime/cache/';
 
         if (!is_dir($cacheDir)) {

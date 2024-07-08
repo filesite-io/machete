@@ -104,9 +104,26 @@ if ($('#image_site').get(0)) {
         toggleLampshow(lanpnum);
     }
     $('#image_site .lampJS').click(function () {
-        lanpnum = !lanpnum ? 1 : 0;
+        lanpnum = !lanpnum || lanpnum != 1 ? 1 : 0;
         toggleLampshow(lanpnum);
         saveLanpnumToLocalstorage(lanpnum);
+    });
+
+    //刷新缓存
+    $('.cleanCacheJS').click(function () {
+        $.ajax({
+            url: '/site/cleancache',
+            dataType: 'json',
+            method: 'POST'
+        }).done(function(data) {
+            if (data.code == 1) {
+                location.reload();
+            }else {
+                alert('缓存清空失败，请稍后重试，错误信息：' + data.msg);
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            alert('请求失败，请稍后重试，错误信息：' + errorThrown);
+        });
     });
 
     // 音乐播放

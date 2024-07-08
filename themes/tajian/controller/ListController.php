@@ -17,6 +17,7 @@ Class ListController extends SiteController {
 
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
+        $scanner->setRootDir(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory']);
 
         //优先从缓存读取数据
         $prefix = FSC::$app['user_id'];

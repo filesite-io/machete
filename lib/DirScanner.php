@@ -535,6 +535,11 @@ Class DirScanner {
         return $this->webRoot;
     }
 
+    //设置扫描绝对根目录
+    public function setRootDir($dir) {
+        $this->rootDir = realpath($dir);
+    }
+
     //获取是否开启防盗链
     public function isSecureOn() {
         return $this->nginxSecureOn;

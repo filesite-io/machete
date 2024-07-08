@@ -17,6 +17,7 @@ Class SiteController extends Controller {
         
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
+        $scanner->setRootDir(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory']);
 
         //优先从缓存读取数据
         $prefix = FSC::$app['config']['theme'];
@@ -104,6 +105,20 @@ Class SiteController extends Controller {
             'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File'
         );
         return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //清空缓存
+    public function actionCleancache() {
+        $prefix = FSC::$app['config']['theme'];
+        $cacheKey = "{$prefix}_allFilesTree";
+        Common::cleanFileCache($cacheKey);
+
+        $cacheKey = "{$prefix}_allFilesData";
+        Common::cleanFileCache($cacheKey);
+
+        $code = 1;
+        $msg = 'OK';
+        return $this->renderJson(compact('code', 'msg'));
     }
 
 }
