@@ -20,36 +20,38 @@
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <?php
-                $selectedId = $viewData['cateId'];
-                $breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
-                if (!empty($viewData['menus'])) {        //只显示第一级目录
-                    foreach ($viewData['menus'] as $index => $item) {
-                        $selected = $item['id'] == $selectedId || (!empty($breadcrumbs) && $item['id'] == $breadcrumbs[0]['id']) ? 'active' : '';
-                        echo <<<eof
-        <li class="{$selected}"><a href="/?id={$item['id']}">{$item['directory']}</a></li>
-eof;
-                    }
-                }
-                ?>
-            </ul>
-            <?php /*
-            <form class="navbar-form navbar-left">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="搜索图片名称">
-                </div>
-                <button type="submit" class="btn btn-default">搜索</button>
-            </form>
-            */ ?>
             <div class="nb_right nav navbar-nav navbar-right hidden-xs">
                 <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="width:24px">
                 <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
             </div>
+            <form class="navbar-form navbar-right">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="搜索图片名称">
+                </div>
+                <button type="submit" class="btn btn-default">搜索</button>
+            </form>
+
+            <ul class="nav navbar-fixed-left">
+                <?php
+                $selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';
+                $breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
+                if (!empty($viewData['menus'])) {        //只显示第一级目录
+                    foreach ($viewData['menus'] as $index => $item) {
+                        $selected = $item['id'] == $selectedId || (!empty($breadcrumbs) && $item['id'] == $breadcrumbs[0]['id']) ? 'active' : '';
+                        echo <<<eof
+        <li class="{$selected}"><a href="{$item['path']}">{$item['directory']}</a></li>
+eof;
+                    }
+                }
+                ?>
+            </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
+
+<!-- 内容主题 -->
+<div class="img_main">
 
 <?php
 if (!empty($breadcrumbs)) {
@@ -76,13 +78,38 @@ eof;
 }
 ?>
 
-<!-- 内容主题 -->
-<div class="img_main">
     <div class="im_mainl row">
         <?php
         $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
         $category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
         $total = 0;     //翻页支持
+
+
+        //如果没有选中任何目录，则把所有目录显示出来
+        if (empty($selectedId) && !empty($viewData['menus'])) {
+            foreach ($viewData['menus'] as $index => $dir) {
+                echo <<<eof
+            <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
+                <a href="{$dir['path']}" class="bor_radius dir_item" data-id="{$dir['id']}" data-cid="{$dir['cid']}">
+eof;
+
+                $title = !empty($dir['title']) ? $dir['title'] : $dir['directory'];
+                echo <<<eof
+                <div class="im_img_title">
+                    <span>
+                        <img src="/img/beauty/folder.svg" alt="folder" width="20">
+                        {$title}
+                    </span>
+                </div>
+            </a>
+        </div>
+eof;
+            }
+        }else if (empty($category['directories']) && empty($category['files'])) {
+            echo <<<eof
+    <div class="alert alert-warning">此目录下没有图片和视频哦，复制照片目录或文件到目录里刷新网页即可。</div>
+eof;
+        }
 
         //当前目录的描述介绍
         if (!empty($category['description'])) {
@@ -99,12 +126,11 @@ eof;
         }
 
         if (!empty($category['directories'])) {        //两级目录支持
-            $total = count($category['directories']);     //翻页支持
             $index = 0;
             foreach ($category['directories'] as $dir) {
                 echo <<<eof
             <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                <a href="{$dir['path']}" class="bor_radius">
+                <a href="{$dir['path']}&cid={$viewData['cacheDataId']}" class="bor_radius dir_item" data-id="{$dir['id']}" data-cid="{$viewData['cacheDataId']}">
 eof;
 
                 if (!empty($dir['snapshot'])) {
@@ -169,11 +195,11 @@ eof;
         }
 
         if (!empty($category['files'])) {        //一级目录支持
-            $total = count($category['files']);     //翻页支持
+            $total = Html::getDataTotal($category['files'], $imgExts);     //翻页支持
             $pageStartIndex = ($viewData['page']-1) * $viewData['pageSize'];
             $index = 0;
             foreach ($category['files'] as $file) {
-                if (!in_array($file['extension'], $imgExts)) {
+                if (empty($file['extension']) || !in_array($file['extension'], $imgExts)) {
                     continue;
                 }
 
@@ -194,7 +220,7 @@ eof;
                 if ($index > 0) {
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title}" title="{$title}">
+    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title} - {$file['filename']}" title="{$title} - {$file['filename']}">
         <img src="/img/beauty/lazy.svg" data-original="{$file['path']}" class="bor_radius im_img lazy" alt="{$file['filename']}">
         <div class="im_img_title">
             <span>
@@ -208,7 +234,7 @@ eof;
                 } else {
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title}" title="{$title}">
+    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title} - {$file['filename']}" title="{$title} - {$file['filename']}">
         <img src="{$file['path']}" class="bor_radius im_img" alt="{$file['filename']}">
         <div class="im_img_title">
             <span>
@@ -231,7 +257,9 @@ eof;
 
 <div class="text-center">
 <?php
-$pagination = Html::getPaginationHtmlCode($viewData['page'], $viewData['pageSize'], $total);
-echo $pagination;
+if ($total > 0) {
+    $pagination = Html::getPaginationHtmlCode($viewData['page'], $viewData['pageSize'], $total);
+    echo $pagination;
+}
 ?>
 </div>

@@ -17,22 +17,25 @@ Class SiteController extends Controller {
         
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
-        $scanner->setRootDir(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory']);
+
+        $rootDir = __DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'];
+        $scanner->setRootDir($rootDir);
 
         //优先从缓存读取数据
-        $prefix = FSC::$app['config']['theme'];
-        $cacheKey = "{$prefix}_allFilesTree";
+        $defaultCateId = $scanner->getId(preg_replace("/\/$/", '', realpath($rootDir)));
+        $maxScanDeep = 0;       //最大扫描目录级数
+        $cacheKey = $this->getCacheKey($defaultCateId, 'tree', $maxScanDeep);
         $cachedData = Common::getCacheFromFile($cacheKey);
         if (!empty($cachedData)) {
             $dirTree = $cachedData;
             $scanner->setTreeData($cachedData);
         }else {
-            $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], 4);
+            $dirTree = $scanner->scan(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'], $maxScanDeep);
             Common::saveCacheToFile($cacheKey, $dirTree);
         }
 
         //优先从缓存读取数据
-        $cacheKey = "{$prefix}_allFilesData";
+        $cacheKey = $cacheDataId = $this->getCacheKey($defaultCateId, 'data', $maxScanDeep);
         $cachedData = Common::getCacheFromFile($cacheKey);
         if (!empty($cachedData)) {
             $scanResults = $cachedData;
@@ -42,17 +45,44 @@ Class SiteController extends Controller {
             Common::saveCacheToFile($cacheKey, $scanResults);
         }
 
+        //优先从缓存获取目录数据
+        $cacheKey = $this->getCacheKey('all', 'menu', $maxScanDeep);
+        $menus = Common::getCacheFromFile($cacheKey);
 
-        //获取目录
-        $menus = $scanner->getMenus();
+        if (empty($menus) && !empty($scanResults)) {
+            //获取目录
+            $menus = $scanner->getMenus();
 
+            //在path网址中追加cid缓存key参数
+            if (!empty($menus)) {
+                foreach ($menus as $index => $menu) {
+                    $menus[$index]['cid'] = $cacheDataId;
+                    $menus[$index]['path'] .= "&cid={$cacheDataId}";
+                }
+            }
+
+            $titles = array();
+            $readmeFile = $scanner->getDefaultReadme();
+            if (!empty($readmeFile)) {
+                if (!empty($readmeFile['sort'])) {
+                    $menus_sorted = explode("\n", $readmeFile['sort']);
+                }
+            }
+
+            //排序
+            $sortedTree = $this->sortMenusAndDirTree($menus_sorted, $menus, $dirTree);
+            if (!empty($sortedTree)) {
+                $menus = $sortedTree['menus'];
+                $dirTree = $sortedTree['dirTree'];
+            }
+
+            Common::saveCacheToFile($cacheKey, $menus);     //保存目录数据
+        }
+
+        //获取联系方式
         $titles = array();
         $readmeFile = $scanner->getDefaultReadme();
         if (!empty($readmeFile)) {
-            if (!empty($readmeFile['sort'])) {
-                $menus_sorted = explode("\n", $readmeFile['sort']);
-            }
-
             $titles = $scanner->getMDTitles($readmeFile['id']);
 
             $Parsedown = new Parsedown();
@@ -61,30 +91,15 @@ Class SiteController extends Controller {
             $htmlReadme = $scanner->fixMDUrls($readmeFile['realpath'], $htmlReadme);
         }
 
-        //排序
-        $sortedTree = $this->sortMenusAndDirTree($menus_sorted, $menus, $dirTree);
-        if (!empty($sortedTree)) {
-            $menus = $sortedTree['menus'];
-            $dirTree = $sortedTree['dirTree'];
-        }
 
-        $cateId = $this->get('id', $menus[0]['id']);
-        $subcate = $scanResults[$cateId];
-
-        //获取当前目录下的readme
-        $cateReadmeFile = $scanner->getDefaultReadme($cateId);
-        if (!empty($cateReadmeFile)) {
-            $Parsedown = new Parsedown();
-            $content = file_get_contents($cateReadmeFile['realpath']);
-            $htmlCateReadme = $Parsedown->text($content);
-            $htmlCateReadme = $scanner->fixMDUrls($cateReadmeFile['realpath'], $htmlCateReadme);
-        }
-
-        //获取默认mp3文件
-        $rootCateId = $this->get('id', '');
-        $mp3File = $scanner->getDefaultFile('mp3', $rootCateId);
+        //优先从缓存获取默认mp3文件
+        $cacheKey = $this->getCacheKey('root', 'mp3', $maxScanDeep);
+        $mp3File = Common::getCacheFromFile($cacheKey);
         if (empty($mp3File)) {
             $mp3File = $scanner->getDefaultFile('mp3');
+            if (!empty($mp3File)) {
+                Common::saveCacheToFile($cacheKey, $mp3File);
+            }
         }
 
 
@@ -101,24 +116,62 @@ Class SiteController extends Controller {
         }
         $viewName = 'index';
         $params = compact(
-            'cateId', 'page', 'pageSize',
+            'page', 'pageSize', 'cacheDataId',
             'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
 
-    //清空缓存
+    //清空所有缓存
     public function actionCleancache() {
-        $prefix = FSC::$app['config']['theme'];
-        $cacheKey = "{$prefix}_allFilesTree";
-        Common::cleanFileCache($cacheKey);
-
-        $cacheKey = "{$prefix}_allFilesData";
-        Common::cleanFileCache($cacheKey);
-
         $code = 1;
         $msg = 'OK';
+
+        try {
+            $cacheDir = __DIR__ . '/../../../runtime/cache/';
+            $files = scandir($cacheDir);
+            foreach($files as $file) {
+                if (!preg_match('/\.json$/i', $file)) {continue;}
+
+                unlink("{$cacheDir}{$file}");
+            }
+        }catch(Exception $e) {
+            $code = 0;
+            $msg = '缓存清空失败：' . $e->getMessage();
+        }
+
         return $this->renderJson(compact('code', 'msg'));
+    }
+
+    //根据目录id，获取第一张图网址作为封面图返回
+    public function actionDirsnap() {
+        $code = 1;
+        $msg = 'OK';
+        $url = '';
+
+        $cacheId = $this->post('cid', '');
+        $cateId = $this->post('id', '');
+        if (empty($cacheId) || empty($cateId)) {
+            $code = 0;
+            $msg = '参数不能为空';
+        }else {
+            //从缓存数据中获取目录的realpath
+            $cachedData = Common::getCacheFromFile($cacheId);
+            if (!empty($cachedData)) {
+                $realpath = $cachedData[$cateId]['realpath'];
+                $scanner = new DirScanner();
+                $scanner->setWebRoot($this->getCurrentWebroot($realpath));
+                $scanner->setRootDir($realpath);
+
+                $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                $url = $scanner->getSnapshotImage($realpath, $imgExts);
+            }else {
+                $code = 0;
+                $msg = '缓存数据已失效，请刷新网页';
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg', 'url'));
     }
 
 }

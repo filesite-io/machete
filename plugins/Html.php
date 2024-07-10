@@ -142,6 +142,21 @@ eof;
         return "{$cdn}{$localImgUrl}";
     }
 
+    //根据文件类型，获取数组中符合条件文件总数
+    public static function getDataTotal($files, $fileTypes) {
+        $total = 0;
+
+        foreach ($files as $file) {
+            if (empty($file['extension']) || !in_array($file['extension'], $fileTypes)) {
+                continue;
+            }
+
+            $total ++;
+        }
+
+        return $total;
+    }
+
     //参数：page、limit
     public static function getPaginationLink($url, $page, $pageSize = 24) {
         $arr = explode('?', $url);
@@ -226,6 +241,9 @@ eof;
         {$previousLink}
         {$otherLinks}
         {$nextLink}
+        <li class="page-item disabled">
+            <span class="page-link">总数 <strong>{$total}</strong></span>
+        </li>
     </ul>
 </nav>
 eof;

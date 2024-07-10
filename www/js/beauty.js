@@ -109,6 +109,30 @@ if ($('#image_site').get(0)) {
         saveLanpnumToLocalstorage(lanpnum);
     });
 
+    //异步加载目录的封面图
+    $('.dir_item').each(function(index, el) {
+        var cid = $(el).attr('data-cid'), id = $(el).attr('data-id');
+        if ($(el).find('.im_img').length == 0) {
+            $.ajax({
+                url: '/site/dirsnap',
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    cid: cid,
+                    id: id
+                }
+            }).done(function(data) {
+                if (data.code == 1 && data.url) {
+                    $(el).find('.im_img_title').before('<img src="' + data.url + '" class="bor_radius im_img">');
+                }else {
+                    console.error('目录封面图获取失败：%s', data.msg);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.error('获取封面图失败，错误信息：' + errorThrown);
+            });
+        }
+    });
+
     //刷新缓存
     $('.cleanCacheJS').click(function () {
         $.ajax({
@@ -117,7 +141,7 @@ if ($('#image_site').get(0)) {
             method: 'POST'
         }).done(function(data) {
             if (data.code == 1) {
-                location.reload();
+                location.href = '/';
             }else {
                 alert('缓存清空失败，请稍后重试，错误信息：' + data.msg);
             }

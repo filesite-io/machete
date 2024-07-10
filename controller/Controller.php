@@ -305,4 +305,23 @@ Class Controller {
         return array_pop($arr);
     }
 
+    //get cache key
+    protected function getCacheKey($cateId, $dataType = 'tree', $maxScanDeep = 2) {
+        $prefix = FSC::$app['config']['theme'];
+        return "{$prefix}_{$dataType}_{$maxScanDeep}_{$cateId}";
+    }
+
+    protected function getCurrentWebroot($realpath) {
+        $realpath = preg_replace('/\/[^\/]+\.[^\/]+$/', '', $realpath);    //删除文件名，只保留目录
+        if (empty($realpath)) {return '/';}
+
+        $webroot = FSC::$app['config']['content_directory'];
+        $arr = explode($webroot, $realpath);
+        if (count($arr) < 2) {
+            return $webroot;
+        }
+
+        return "{$webroot}{$arr[1]}/";
+    }
+
 }

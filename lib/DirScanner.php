@@ -32,9 +32,8 @@ Class DirScanner {
     private $webRoot = '/content/';                 //网站静态文件相对路径的根目录
     private $scanningDirLevel = 0;                  //当前扫描的目录深度
     private $scanStartTime = 0;                     //扫描开始时间，单位：秒
-    private $scanResults = array();                      //目录扫描结果
-    private $tree = array();                             //目录扫描树形结构
-
+    private $scanResults = array();                 //目录扫描结果
+    private $tree = array();                        //目录扫描树形结构
 
     protected $supportFileExtensions = array(            //支持的文件类型
         'txt',     //纯文本
@@ -144,12 +143,10 @@ Class DirScanner {
     }
 
     //根据文件路径生成唯一编号
-    //使用相对路径计算md5值
-    private function getId($realpath) {
-        if (!empty($this->rootDir)) {
-            $realpath = str_replace($this->rootDir, '', $realpath);
-        }
-        return !empty($realpath) ? md5($realpath) : '';
+    public function getId($realpath) {
+        if ($realpath == '/') {return md5($realpath);}
+
+        return !empty($realpath) ? md5(preg_replace('/\/$/', '', $realpath)) : '';
     }
 
     //判断Nginx防盗链MD5加密方式字符串是否合格
@@ -777,7 +774,7 @@ Class DirScanner {
                     }
                 }
             }
-        }else if (!empty($dirid) && !empty($this->scanResults)) {
+        }else if (!empty($dirid) && !empty($this->scanResults) && !empty($this->scanResults[$dirid])) {
             $directory = $this->scanResults[$dirid];
             if (!empty($directory) && !empty($directory['files'])) {
                 foreach($directory['files'] as $id => $file) {
@@ -797,6 +794,31 @@ Class DirScanner {
         }
 
         return $readme;
+    }
+
+    //获取目录下第一个图片作为封面图返回
+    public function getSnapshotImage($realpath, $imgExts = array('jpg', 'jpeg', 'png', 'webp', 'gif')) {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($realpath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        $imgUrl = '';
+        foreach ($iterator as $item) {
+            if ($item->isFile()) {
+                $extension = $item->getExtension();
+                if (in_array(strtolower($extension), $imgExts)) {
+                    $imgPath = $item->getPath() . '/' . $item->getFilename();
+                    $imgData = $this->getFileData($imgPath);
+                    if (!empty($imgData['path'])) {
+                        $imgUrl = $imgData['path'];
+                    }
+                    break;
+                }
+            }
+        }
+
+        return $imgUrl;
     }
 
 }
