@@ -25,12 +25,15 @@
                 <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
             </div>
+            
+            <?php /*
             <form class="navbar-form navbar-right">
                 <div class="form-group">
                     <input type="text" class="form-control" placeholder="搜索图片名称">
                 </div>
                 <button type="submit" class="btn btn-default">搜索</button>
             </form>
+            */ ?>
 
             <ul class="nav navbar-fixed-left">
                 <?php
