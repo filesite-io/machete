@@ -7,6 +7,7 @@ body{position:relative;font-family: 微軟正黑體;
 ul,li{list-style:none;margin:0;padding:0}
 img,span{display:inline-block;max-width:100%}
 a{color:#464c5c}
+.markdown-body li{list-style:disc}
 
 .img-responsive{max-width:100%;display:block}
 .elementBlock{display:block !important}
@@ -109,6 +110,7 @@ a:link{text-decoration:none}
 .page_meta .breadcrumb{background:none;display: inline-block;padding:8px 0 8px 0;margin:0}
 .breadcrumbs{padding-left:1.5em;padding-bottom:10px;font-size:13px}
 .breadcrumbs small{font-size:13px}
+.breadcrumbs .total{padding-right:10px}
 
 /* 主题切换 */
 .lampshow .web_info{border-color:#363636}
@@ -139,6 +141,8 @@ a:link{text-decoration:none}
     .hidden-xs{display:none}
     .navbar-fixed-left{position:static;width:100%}
     .img_main{margin-left:0}
+
+    .pagination>li>a, .pagination>li>span{padding:3px 7px}
 }
 
 @keyframes musicTurn {

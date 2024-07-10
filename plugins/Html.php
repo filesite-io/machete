@@ -189,14 +189,14 @@ eof;
         //上一页
         $previousLink = <<<eof
         <li class="page-item disabled">
-            <span class="page-link">上一页</span>
+            <span class="page-link">上<span class="hidden-xs">一</span>页</span>
         </li>
 eof;
         if ($page > 1) {
             $url = self::getPaginationLink($currentUrl, $page-1, $limit);
             $previousLink = <<<eof
         <li class="page-item">
-            <a class="page-link" href="{$url}">上一页</a>
+            <a class="page-link" href="{$url}">上<span class="hidden-xs">一</span>页</a>
         </li>
 eof;
         }
@@ -204,22 +204,22 @@ eof;
         //下一页
         $nextLink = <<<eof
         <li class="page-item disabled">
-            <span class="page-link">下一页</span>
+            <span class="page-link">下<span class="hidden-xs">一</span>页</span>
         </li>
 eof;
         if ($page < $maxPage) {
             $url = self::getPaginationLink($currentUrl, $page+1, $limit);
             $nextLink = <<<eof
         <li class="page-item">
-            <a class="page-link" href="{$url}">下一页</a>
+            <a class="page-link" href="{$url}">下<span class="hidden-xs">一</span>页</a>
         </li>
 eof;
         }
 
-        //中间显示 10 页
+        //包括当前页一共显示 10 页
         $otherLinks = '';
-        $startPage = $page > 5 ? $page - 5 : 1;
-        $endPage = $startPage + 10 < $maxPage ? $startPage + 10 : $maxPage;
+        $startPage = floor(($page-1) / 10)*10 + 1;
+        $endPage = $startPage + 9 < $maxPage ? $startPage + 9 : $maxPage;
         for ($i = $startPage; $i <= $endPage; $i ++) {
             $url = self::getPaginationLink($currentUrl, $i, $limit);
             if ($i != $page) {
@@ -241,9 +241,6 @@ eof;
         {$previousLink}
         {$otherLinks}
         {$nextLink}
-        <li class="page-item disabled">
-            <span class="page-link">总数 <strong>{$total}</strong></span>
-        </li>
     </ul>
 </nav>
 eof;

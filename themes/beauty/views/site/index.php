@@ -54,10 +54,21 @@ eof;
 <div class="img_main">
 
 <?php
+$imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+$category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
+$total = 0;     //翻页支持
+
+if (!empty($category['files'])) {
+    $total = Html::getDataTotal($category['files'], $imgExts);     //翻页支持
+}
+        
+
 if (!empty($breadcrumbs)) {
     echo <<<eof
     <div class="breadcrumbs text_dark">
+        <span class="pull-right total">总数 <strong>{$total}</strong></span>
         <small>当前位置：</small>
+        <a href="/">首页</a> / 
 eof;
 
     foreach ($breadcrumbs as $bread) {
@@ -80,32 +91,13 @@ eof;
 
     <div class="im_mainl row">
         <?php
-        $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
-        $category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
-        $total = 0;     //翻页支持
-
-
         //如果没有选中任何目录，则把所有目录显示出来
         if (empty($selectedId) && !empty($viewData['menus'])) {
-            foreach ($viewData['menus'] as $index => $dir) {
-                echo <<<eof
-            <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                <a href="{$dir['path']}" class="bor_radius dir_item" data-id="{$dir['id']}" data-cid="{$dir['cid']}">
-eof;
-
-                $title = !empty($dir['title']) ? $dir['title'] : $dir['directory'];
-                echo <<<eof
-                <div class="im_img_title">
-                    <span>
-                        <img src="/img/beauty/folder.svg" alt="folder" width="20">
-                        {$title}
-                    </span>
-                </div>
-            </a>
-        </div>
-eof;
-            }
-        }else if (empty($category['directories']) && empty($category['files'])) {
+            $category = array(
+                'directories' => $viewData['menus'],
+                'files' => $viewData['scanResults'],
+            );
+        }else if (!empty($selectedId) && empty($category['directories']) && empty($category['files'])) {
             echo <<<eof
     <div class="alert alert-warning">此目录下没有图片和视频哦，复制照片目录或文件到目录里刷新网页即可。</div>
 eof;
@@ -195,7 +187,6 @@ eof;
         }
 
         if (!empty($category['files'])) {        //一级目录支持
-            $total = Html::getDataTotal($category['files'], $imgExts);     //翻页支持
             $pageStartIndex = ($viewData['page']-1) * $viewData['pageSize'];
             $index = 0;
             foreach ($category['files'] as $file) {

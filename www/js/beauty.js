@@ -125,7 +125,7 @@ if ($('#image_site').get(0)) {
                 if (data.code == 1 && data.url) {
                     $(el).find('.im_img_title').before('<img src="' + data.url + '" class="bor_radius im_img">');
                 }else {
-                    console.error('目录封面图获取失败：%s', data.msg);
+                    console.warn('目录 %s 里没有任何图片', id);
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.error('获取封面图失败，错误信息：' + errorThrown);

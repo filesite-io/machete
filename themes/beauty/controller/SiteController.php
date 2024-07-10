@@ -61,7 +61,6 @@ Class SiteController extends Controller {
                 }
             }
 
-            $titles = array();
             $readmeFile = $scanner->getDefaultReadme();
             if (!empty($readmeFile)) {
                 if (!empty($readmeFile['sort'])) {
@@ -81,14 +80,23 @@ Class SiteController extends Controller {
 
         //获取联系方式
         $titles = array();
-        $readmeFile = $scanner->getDefaultReadme();
-        if (!empty($readmeFile)) {
-            $titles = $scanner->getMDTitles($readmeFile['id']);
+        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (empty($cachedData)) {
+            $readmeFile = $scanner->getDefaultReadme();
+            if (!empty($readmeFile)) {
+                $titles = $scanner->getMDTitles($readmeFile['id']);
 
-            $Parsedown = new Parsedown();
-            $content = file_get_contents($readmeFile['realpath']);
-            $htmlReadme = $Parsedown->text($content);
-            $htmlReadme = $scanner->fixMDUrls($readmeFile['realpath'], $htmlReadme);
+                $Parsedown = new Parsedown();
+                $content = file_get_contents($readmeFile['realpath']);
+                $htmlReadme = $Parsedown->text($content);
+                $htmlReadme = $scanner->fixMDUrls($readmeFile['realpath'], $htmlReadme);
+
+                Common::saveCacheToFile($cacheKey, array('htmlReadme' => $htmlReadme, 'titles' => $titles));
+            }
+        }else {
+            $htmlReadme = $cachedData['htmlReadme'];
+            $titles = $cachedData['titles'];
         }
 
 
@@ -107,7 +115,7 @@ Class SiteController extends Controller {
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', 24);
 
-        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
+        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io";
         if (!empty($readmeFile['title'])) {
             $pageTitle = $readmeFile['title'];
         }

@@ -24,11 +24,11 @@ Class ListController extends Controller {
 
         $scanner = new DirScanner();
 
-        //TODO: 根据参数cid获取id对应的目录realpath，从而只扫描这个目录
+        //根据参数cid获取id对应的目录realpath，从而只扫描这个目录
         $cacheSeconds = 3600;
         $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
         if (empty($cachedParentData)) {
-            throw new Exception("缓存已过期，请返回上一页重新进入！", 404);
+            return $this->redirect('/');
         }
 
         $currentDir = $cachedParentData[$cateId];
@@ -89,7 +89,14 @@ Class ListController extends Controller {
         //非首页统一从缓存获取目录数据，有效期 1 小时
         $cacheKey = $this->getCacheKey('all', 'menu', $maxScanDeep);
         $menus = Common::getCacheFromFile($cacheKey, 3600);
-        
+
+        //获取根目录下的readme
+        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $cachedData = Common::getCacheFromFile($cacheKey);
+        if (!empty($cachedData)) {
+            $htmlReadme = $cachedData['htmlReadme'];
+        }
+
 
         //获取目录面包屑
         $subcate = $scanResults[$cateId];
@@ -114,7 +121,7 @@ Class ListController extends Controller {
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', 24);
 
-        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统";
+        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io";
         if (!empty($subcate)) {
             $pageTitle = "{$subcate['directory']}的照片，来自{$pageTitle}";
             if (!empty($subcate['title'])) {
