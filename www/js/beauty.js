@@ -65,123 +65,124 @@ if ($('#image_site').get(0)) {
         }, 500);
     });
 
+}
 
-    // 白天黑夜模式切换
-    var saveLanpnumToLocalstorage = function(lanpnum) {
-        try {
-            var key = 'user_lanpnum';
-            localStorage.setItem(key, lanpnum);
-        }catch(err) {
-            console.error('保存本地存储失败', err);
-        }
-    };
 
-    var getLanpnumFromLocalstorage = function() {
-        try {
-            var key = 'user_lanpnum';
-            return localStorage.getItem(key);
-        }catch(err) {
-            console.error('保存本地存储失败', err);
-        }
-
-        return false;
-    };
-
-    var toggleLampshow = function(lanpnum) {
-        if (lanpnum == 1) {
-            $('#markdowncss').attr('href', '/css/github-markdown-dark.css');
-            $(document.body).addClass('lampshow');
-            $('#image_site .navbarJS').removeClass('navbar-default').addClass('navbar-inverse'); // 导航栏用bootstrap主题切换
-        } else if (lanpnum == 0) {
-            $('#markdowncss').attr('href', '/css/github-markdown-light.css');
-            $(document.body).removeClass('lampshow');
-            $('#image_site .navbarJS').addClass('navbar-default').removeClass('navbar-inverse');
-        }
-    };
-
-    var lanpnum = getLanpnumFromLocalstorage();
-    if (lanpnum !== false) {
-        toggleLampshow(lanpnum);
+// 白天黑夜模式切换
+var saveLanpnumToLocalstorage = function(lanpnum) {
+    try {
+        var key = 'user_lanpnum';
+        localStorage.setItem(key, lanpnum);
+    }catch(err) {
+        console.error('保存本地存储失败', err);
     }
-    $('#image_site .lampJS').click(function () {
-        lanpnum = !lanpnum || lanpnum != 1 ? 1 : 0;
-        toggleLampshow(lanpnum);
-        saveLanpnumToLocalstorage(lanpnum);
-    });
+};
 
-    //异步加载目录的封面图
-    $('.dir_item').each(function(index, el) {
-        var cid = $(el).attr('data-cid'), id = $(el).attr('data-id');
-        if ($(el).find('.im_img').length == 0) {
-            $.ajax({
-                url: '/site/dirsnap',
-                method: 'POST',
-                dataType: 'json',
-                data: {
-                    cid: cid,
-                    id: id
-                }
-            }).done(function(data) {
-                if (data.code == 1 && data.url) {
-                    $(el).find('.im_img_title').before('<img src="' + data.url + '" class="bor_radius im_img">');
-                }else {
-                    console.warn('目录 %s 里没有任何图片', id);
-                }
-            }).fail(function(jqXHR, textStatus, errorThrown) {
-                console.error('获取封面图失败，错误信息：' + errorThrown);
-            });
-        }
-    });
+var getLanpnumFromLocalstorage = function() {
+    try {
+        var key = 'user_lanpnum';
+        return localStorage.getItem(key);
+    }catch(err) {
+        console.error('保存本地存储失败', err);
+    }
 
-    //刷新缓存
-    $('.cleanCacheJS').click(function () {
+    return false;
+};
+
+var toggleLampshow = function(lanpnum) {
+    if (lanpnum == 1) {
+        $('#markdowncss').attr('href', '/css/github-markdown-dark.css');
+        $(document.body).addClass('lampshow');
+        $('.navbarJS').removeClass('navbar-default').addClass('navbar-inverse'); // 导航栏用bootstrap主题切换
+    } else if (lanpnum == 0) {
+        $('#markdowncss').attr('href', '/css/github-markdown-light.css');
+        $(document.body).removeClass('lampshow');
+        $('.navbarJS').addClass('navbar-default').removeClass('navbar-inverse');
+    }
+};
+
+var lanpnum = getLanpnumFromLocalstorage();
+if (lanpnum !== false) {
+    toggleLampshow(lanpnum);
+}
+$('.lampJS').click(function () {
+    lanpnum = !lanpnum || lanpnum != 1 ? 1 : 0;
+    toggleLampshow(lanpnum);
+    saveLanpnumToLocalstorage(lanpnum);
+});
+
+//异步加载目录的封面图
+$('.dir_item').each(function(index, el) {
+    var cid = $(el).attr('data-cid'), id = $(el).attr('data-id');
+    if ($(el).find('.im_img').length == 0) {
         $.ajax({
-            url: '/site/cleancache',
+            url: '/site/dirsnap',
+            method: 'POST',
             dataType: 'json',
-            method: 'POST'
+            data: {
+                cid: cid,
+                id: id
+            }
         }).done(function(data) {
-            if (data.code == 1) {
-                location.href = '/';
+            if (data.code == 1 && data.url) {
+                $(el).find('.im_img_title').before('<img src="' + data.url + '" class="bor_radius im_img">');
             }else {
-                alert('缓存清空失败，请稍后重试，错误信息：' + data.msg);
+                console.warn('目录 %s 里没有任何图片', id);
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
-            alert('请求失败，请稍后重试，错误信息：' + errorThrown);
+            console.error('获取封面图失败，错误信息：' + errorThrown);
         });
+    }
+});
+
+
+//刷新缓存
+$('.cleanCacheJS').click(function () {
+    $.ajax({
+        url: '/site/cleancache',
+        dataType: 'json',
+        method: 'POST'
+    }).done(function(data) {
+        if (data.code == 1) {
+            location.href = '/';
+        }else {
+            alert('缓存清空失败，请稍后重试，错误信息：' + data.msg);
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        alert('请求失败，请稍后重试，错误信息：' + errorThrown);
     });
+});
 
-    // 音乐播放
-    if ($('#music_main').length > 0) {
-        var musicState = 0;
-        $('#music_main').get(0).volume = 0.5; // 控制音量
-        $('.musicJS').click(function () {
-            if (musicState == 0) {
-                $('#music_main').get(0).play();
-                $('.musicJS').addClass('music_put');
-                musicState = 1;
-            } else {
-                $('#music_main').get(0).pause();
-                $('.musicJS').removeClass('music_put');
-                musicState = 0;
-            }
-            return;
-        })
-
-        $(document).one('touchstart mousedown', function () {
+// 音乐播放
+if ($('#music_main').length > 0) {
+    var musicState = 0;
+    $('#music_main').get(0).volume = 0.5; // 控制音量
+    $('.musicJS').click(function () {
+        if (musicState == 0) {
             $('#music_main').get(0).play();
             $('.musicJS').addClass('music_put');
             musicState = 1;
-        });
-    }
+        } else {
+            $('#music_main').get(0).pause();
+            $('.musicJS').removeClass('music_put');
+            musicState = 0;
+        }
+        return;
+    })
 
-    //二维码显示
-    if ($('#qrimg').length > 0 && typeof(QRCode) != 'undefined') {
-        var qrcode = new QRCode("qrimg", {
-            text: location.href,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
-    }
+    $(document).one('touchstart mousedown', function () {
+        $('#music_main').get(0).play();
+        $('.musicJS').addClass('music_put');
+        musicState = 1;
+    });
+}
 
+//二维码显示
+if ($('#qrimg').length > 0 && typeof(QRCode) != 'undefined') {
+    var qrcode = new QRCode("qrimg", {
+        text: location.href,
+        colorDark : "#000000",
+        colorLight : "#ffffff",
+        correctLevel : QRCode.CorrectLevel.L
+    });
 }

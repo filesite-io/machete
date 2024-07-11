@@ -85,7 +85,6 @@ Class ListController extends Controller {
             $scanResults = array($cateId => $currentDir);       //重新组装数据
         }
 
-
         //非首页统一从缓存获取目录数据，有效期 1 小时
         $cacheKey = $this->getCacheKey('all', 'menu', $maxScanDeep);
         $menus = Common::getCacheFromFile($cacheKey, 3600);

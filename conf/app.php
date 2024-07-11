@@ -49,6 +49,9 @@ $configs = array(
         'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif'),
     ),
 
+    'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif'),
+    'supportedVideoExts' => array('mp4', 'mov', 'm3u8'),
+
     /*
     //视频皮肤配置
     'videoblog' => array(

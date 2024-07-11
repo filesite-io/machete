@@ -47,12 +47,16 @@ Class DirScanner {
         'ico',     //图标
         'mp3',     //音乐
         'mp4',     //视频
+        'mov',     //视频
         'ts',      //视频
         'm3u8',    //视频
     );
+
+    //暂未使用
+    /*
     protected $maxReadFilesize = array(                  //默认每种文件读取内容最大大小
         'txt' => 102400,          //纯文本
-        'md' => 5242880,        //纯文本
+        'md' => 5242880,          //纯文本
         'url' => 20480,           //快捷方式
         'jpg' => 512000,          //图片
         'jpeg' => 512000,         //图片
@@ -60,11 +64,13 @@ Class DirScanner {
         'webp' => 512000,         //图片
         'gif' => 512000,          //图片
         'ico' => 51200,           //图标
-        'mp3' => 10485760,      //音乐，10M
-        'mp4' => 104857600,     //视频，100M
-        'ts' => 10485760,       //视频，10M
-        'm3u8' => 10485760,     //视频，10M
+        'mp3' => 10485760,        //音乐，10M
+        'mp4' => 104857600,       //视频，100M
+        'mov' => 104857600,       //视频，100M
+        'ts' => 10485760,         //视频，10M
+        'm3u8' => 10485760,       //视频，10M
     );
+
     protected $securedFileExtensions = array(            //开启Nginx防盗链的文件类型
         'jpg',     //图片
         'jpeg',    //图片
@@ -74,9 +80,11 @@ Class DirScanner {
         'ico',     //图标
         'mp3',     //音乐
         'mp4',     //视频
+        'mov',     //视频
         'ts',      //视频
         'm3u8',    //视频
     );
+    */
 
     public $scanTimeCost = 0;                       //上一次目录扫描耗时，单位：毫秒
     public $isApi = false;                          //如果为API获取数据，则realpath只返回相对路径
@@ -274,7 +282,7 @@ Class DirScanner {
     }
 
     //合并描述文件内容到md文件或者目录数据
-    //增加视频文件：mp4, m3u8描述文件支持
+    //增加视频文件：mp4, mov, m3u8描述文件支持
     //增加.url文件支持
     private function mergeDescriptionData($realpath) {
         $data = array();
@@ -284,12 +292,15 @@ Class DirScanner {
         $targetFile = '';
         $targetFile_md = preg_replace('/_?[a-z0-9]+\.txt$/U', '.md', $realpath);
         $targetFile_mp4 = preg_replace('/_?[a-z0-9]+\.txt$/U', '.mp4', $realpath);
+        $targetFile_mov = preg_replace('/_?[a-z0-9]+\.txt$/U', '.mov', $realpath);
         $targetFile_m3u8 = preg_replace('/_?[a-z0-9]+\.txt$/U', '.m3u8', $realpath);
         $targetFile_url = preg_replace('/_?[a-z0-9]+\.txt$/U', '.url', $realpath);
         if (file_exists($targetFile_md)) {
             $targetFile = $targetFile_md;
         }else if (file_exists($targetFile_mp4)) {
             $targetFile = $targetFile_mp4;
+        }else if (file_exists($targetFile_mov)) {
+            $targetFile = $targetFile_mov;
         }else if (file_exists($targetFile_m3u8)) {
             $targetFile = $targetFile_m3u8;
         }else if (file_exists($targetFile_url)) {
@@ -391,6 +402,7 @@ Class DirScanner {
             'ico' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'mp3' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'mp4' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'mov' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'ts' => "{$webRoot}{$directory}{$filename}.{$extension}",
         );
 

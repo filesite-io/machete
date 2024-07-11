@@ -1,10 +1,18 @@
-<!-- 顶部导航栏模块 -->
+<?php
+$selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';
+$total = 0;     //翻页支持
+
+$imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+$videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+$supportedExts = array_merge($imgExts, $videoExts);
+
+?><!-- 顶部导航栏模块 -->
 <nav class="navbar navbar-default navbar-fixed-top navbarJS">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display navbar-inverse-->
         <div class="navbar-header">
             <div class="navbar-toggle">
-                <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="width:24px">
+                <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
                 <img class="svg icon1 svgimg lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
                 <button type="button" class="collapsed mr_button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -21,7 +29,7 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <div class="nb_right nav navbar-nav navbar-right hidden-xs">
-                <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="width:24px">
+                <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
                 <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
             </div>
@@ -37,7 +45,6 @@
 
             <ul class="nav navbar-fixed-left">
                 <?php
-                $selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';
                 $breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
                 if (!empty($viewData['menus'])) {        //只显示第一级目录
                     foreach ($viewData['menus'] as $index => $item) {
@@ -57,19 +64,32 @@ eof;
 <div class="img_main">
 
 <?php
-$imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
 $category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
-$total = 0;     //翻页支持
+
+//如果是首页
+if (empty($selectedId) && !empty($viewData['menus'])) {
+    $category = array(
+        'directories' => $viewData['menus'],
+        'files' => $viewData['scanResults'],
+    );
+}
 
 if (!empty($category['files'])) {
-    $total = Html::getDataTotal($category['files'], $imgExts);     //翻页支持
+    $total = Html::getDataTotal($category['files'], $supportedExts);     //翻页支持
 }
         
 
 if (!empty($breadcrumbs)) {
+    $totalNum = '';
+    if ($total > 0) {
+        $totalNum = <<<eof
+    <span class="pull-right total">总数 <strong>{$total}</strong></span>
+eof;
+    }
+
     echo <<<eof
     <div class="breadcrumbs text_dark">
-        <span class="pull-right total">总数 <strong>{$total}</strong></span>
+        {$totalNum}
         <small>当前位置：</small>
         <a href="/">首页</a> / 
 eof;
@@ -189,11 +209,12 @@ eof;
             echo '<div class="im_mainl row">';
         }
 
+        //显示图片、视频
         if (!empty($category['files'])) {        //一级目录支持
             $pageStartIndex = ($viewData['page']-1) * $viewData['pageSize'];
             $index = 0;
             foreach ($category['files'] as $file) {
-                if (empty($file['extension']) || !in_array($file['extension'], $imgExts)) {
+                if (empty($file['extension']) || !in_array($file['extension'], $supportedExts)) {
                     continue;
                 }
 
@@ -212,33 +233,65 @@ eof;
                 }
 
                 if ($index > 0) {
-                    echo <<<eof
+                    if (in_array($file['extension'], $imgExts)) {
+                        echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title} - {$file['filename']}" title="{$title} - {$file['filename']}">
         <img src="/img/beauty/lazy.svg" data-original="{$file['path']}" class="bor_radius im_img lazy" alt="{$file['filename']}">
         <div class="im_img_title">
-            <span>
-                <img src="/img/beauty/image.svg" alt="image" width="20">
+            <span class="right-bottom">
                 {$title}
             </span>
         </div>
     </a>
 </div>
 eof;
+                    }else if (in_array($file['extension'], $videoExts)) {       //输出视频
+                        $videoUrl = urlencode($file['path']);
+                        echo <<<eof
+<div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
+    <a href="/site/player?url={$videoUrl}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
+        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img" alt="{$file['filename']}">
+        <div class="im_img_title">
+            <span class="right-bottom">
+                {$title}
+            </span>
+        </div>
+    </a>
+</div>
+eof;
+                    }
+
+                    
                 } else {
-                    echo <<<eof
+                    if (in_array($file['extension'], $imgExts)) {
+                        echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title} - {$file['filename']}" title="{$title} - {$file['filename']}">
         <img src="{$file['path']}" class="bor_radius im_img" alt="{$file['filename']}">
         <div class="im_img_title">
-            <span>
-                <img src="/img/beauty/image.svg" alt="image" width="20">
+            <span class="right-bottom">
                 {$title}
             </span>
         </div>
     </a>
 </div>
 eof;
+                    }else if (in_array($file['extension'], $videoExts)) {       //输出视频
+                        $videoUrl = urlencode($file['path']);
+                        echo <<<eof
+<div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
+    <a href="/site/player?url={$videoUrl}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
+        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img" alt="{$file['filename']}">
+        <div class="im_img_title">
+            <span class="right-bottom">
+                {$title}
+            </span>
+        </div>
+    </a>
+</div>
+eof;
+                    }
                 }
 
                 $index++;
@@ -251,7 +304,7 @@ eof;
 
 <div class="text-center">
 <?php
-if ($total > 0) {
+if ($total > $viewData['pageSize']) {
     $pagination = Html::getPaginationHtmlCode($viewData['page'], $viewData['pageSize'], $total);
     echo $pagination;
 }

@@ -173,6 +173,15 @@ Class SiteController extends Controller {
 
                 $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
                 $url = $scanner->getSnapshotImage($realpath, $imgExts);
+                
+                //支持视频目录
+                if (empty($url)) {
+                    $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+                    $firstVideoPath = $scanner->getSnapshotImage($realpath, $videoExts);
+                    if (!empty($firstVideoPath)) {
+                        $url = '/img/beauty/video_dir.png';
+                    }
+                }
             }else {
                 $code = 0;
                 $msg = '缓存数据已失效，请刷新网页';
@@ -180,6 +189,25 @@ Class SiteController extends Controller {
         }
 
         return $this->renderJson(compact('code', 'msg', 'url'));
+    }
+
+    public function actionPlayer() {
+        $videoUrl = $this->get('url', '');
+        if (empty($videoUrl)) {
+            throw new Exception("缺少视频地址url参数！", 403);
+        }
+
+        $arr = parse_url($videoUrl);
+        $videoFilename = basename($arr['path']);
+
+
+        $pageTitle = "视频播放器";
+        $this->layout = 'player';
+        $viewName = 'player';
+        $params = compact(
+            'videoUrl', 'videoFilename'
+        );
+        return $this->render($viewName, $params, $pageTitle);
     }
 
 }

@@ -311,12 +311,12 @@ Class Controller {
         return "{$prefix}_{$dataType}_{$maxScanDeep}_{$cateId}";
     }
 
-    protected function getCurrentWebroot($realpath) {
-        $realpath = preg_replace('/\/[^\/]+\.[^\/]+$/', '', $realpath);    //删除文件名，只保留目录
-        if (empty($realpath)) {return '/';}
+    //根据目录的绝对路径，获取网站的相对路径
+    protected function getCurrentWebroot($dir_realpath) {
+        if (empty($dir_realpath)) {return '/';}
 
         $webroot = FSC::$app['config']['content_directory'];
-        $arr = explode($webroot, $realpath);
+        $arr = explode($webroot, $dir_realpath);
         if (count($arr) < 2) {
             return $webroot;
         }
