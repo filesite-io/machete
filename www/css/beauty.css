@@ -7,7 +7,8 @@ body{position:relative;font-family: 微軟正黑體;
 ul,li{list-style:none;margin:0;padding:0}
 img,span{display:inline-block;max-width:100%}
 a{color:#464c5c}
-.markdown-body li{list-style:disc}
+.markdown-body ul li{list-style:disc}
+.markdown-body ol li{list-style:number}
 
 .img-responsive{max-width:100%;display:block}
 .elementBlock{display:block !important}
