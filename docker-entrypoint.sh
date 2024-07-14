@@ -1,16 +1,14 @@
 #!/bin/sh
 theme=$1
-if [ ! -d "/var/www/machete/themes/${theme}/" ]; then
-    theme=webdirectory
+if [ -d "/var/www/machete/themes/${theme}/" ]; then
+    echo "Theme chosed [${theme}]."
+
+    ## 复制对应皮肤的配置文件
+    cd /var/www/machete/runtime/
+    rm -f custom_config.json
+    cp "../conf/custom_config_${theme}.json" ./custom_config.json
+    chmod 777 custom_config.json
 fi
-
-echo "Theme chosed [${theme}]."
-
-## 复制对应皮肤的配置文件
-cd /var/www/machete/runtime/
-rm -f custom_config.json
-cp "../conf/custom_config_${theme}.json" ./custom_config.json
-chown apache:apache custom_config.json
 
 ## 启动samba
 if [ -e /usr/sbin/smbd ]; then

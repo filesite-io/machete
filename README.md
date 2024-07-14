@@ -160,12 +160,12 @@ machete在容器中的目录：
 示例如下：
 ```
 docker run --name machete -p 1080:80 \
-    -v /mine/content/:/var/www/machete/www/content/ \
+    -v /d/图片目录/:/var/www/machete/www/girls/ \
     -itd filesite/machete \
-    manual
+    beauty
 ```
 
-这样可以通过更新本地内容目录```/mine/content/```的文件来实时更新网站内容。
+这样可以通过更新本地内容目录```/d/图片目录/```的文件来实时更新网站内容。
 
 不同皮肤对应的容器目录如下：
 
@@ -196,9 +196,20 @@ http://127.0.0.1:1081
 ```
 
 
+升级容器中的代码：
+```
+docker exec -it machete /var/www/machete/bin/upgrade.sh
+```
+
+
 ## 后台管理内容
 
 最新版本已经支持网页版后台和samba文件共享方式管理内容。
+
+说明：
+由于本项目是针对小型网站设计的，后台只支持目录级数不超过4级，文件数量不超过 1 万的目录，
+**如果你所映射的目录文件数量超过1万，不建议使用后台来管理文件内容**。
+
 
 ### 网页版后台
 

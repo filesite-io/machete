@@ -16,7 +16,6 @@ RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.n
     && rm -f master.tar.gz \
     && mv machete/ /var/www/ \
     && cd /var/www/machete/ \
-    && mkdir www/navs/ && mkdir www/girls/ && mkdir www/videos/ \
     && chown apache:apache runtime/ \
     && chown -R apache:apache www/content/ \
     && chown apache:apache www/navs/ \

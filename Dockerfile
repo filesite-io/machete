@@ -13,7 +13,6 @@ RUN apk add rsync nginx zlib-dev libpng-dev freetype-dev libjpeg-turbo-dev \
     && rm -f master.tar.gz \
     && mv machete/ /var/www/ \
     && cd /var/www/machete/ \
-    && mkdir www/navs/ && mkdir www/girls/ && mkdir www/videos/ \
     && chown www-data:www-data runtime/ \
     && chown -R www-data:www-data www/content/ \
     && chown www-data:www-data www/navs/ \
