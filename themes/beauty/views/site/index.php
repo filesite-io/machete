@@ -228,7 +228,8 @@ eof;
 
                 $title = !empty($file['title']) ? $file['title'] : $file['filename'];
                 //图片、视频显示文件修改日期
-                if (!empty($file['fstat']['mtime']) && !empty($file['fstat']['ctime'])) {
+                $title = Common::getDateFromString($file['filename']);
+                if (empty($title) && !empty($file['fstat']['mtime']) && !empty($file['fstat']['ctime'])) {
                     $title = date('Y-m-d', min($file['fstat']['mtime'], $file['fstat']['ctime']));
                 }
 

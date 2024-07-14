@@ -127,6 +127,8 @@ a:link{text-decoration:none}
 .videoplayer{max-width:800px;margin:0 auto;text-align:center}
 .videoplayer video{width:100%}
 .videotitle{max-width:600px;overflow:hidden;text-wrap:nowrap;text-overflow:ellipsis}
+.mt-2{margin-top:2em}
+.mr-1{margin-right:1em}
 
 @media screen and (max-width: 1199px) {
     .im_item {

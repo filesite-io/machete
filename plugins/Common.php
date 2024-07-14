@@ -580,4 +580,29 @@ Class Common {
         return false;
     }
 
+    //从字符串中解析时间戳、日期，返回Y-m-d格式的日期字符串
+    public static function getDateFromString($str) {
+        $date = '';
+
+        try {
+            preg_match('/^.*(\d{13}).*$/', $str, $matches);     //单位毫秒的时间戳
+            if (empty($matches[1])) {       //再尝试单位秒的时间戳
+                preg_match('/^.*(\d{10}).*$/', $str, $matches);
+                if (empty($matches[1])) {       //再尝试Y-m-d格式的日期
+                    preg_match('/^.*(\d{4}[012]{2}\d{2}).*$/', $str, $matches);
+                    if (!empty($matches[1])) {
+                        $date = date('Y-m-d', strtotime($matches[1]));
+                    }
+                }else {
+                    $date = date('Y-m-d', (int)$matches[1]);
+                }
+            }else {
+                $date = date('Y-m-d', (int)$matches[1] / 1000);
+            }
+
+        }catch(Exception $e) {}
+
+        return $date;
+    }
+
 }

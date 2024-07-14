@@ -35,4 +35,10 @@
         id="myvideo">
         <source src="<?php echo $viewData['videoUrl']; ?>" type="video/mp4">
     </video>
+    <div class="text-right mt-2 mr-1">
+        <a class="btn btn-info" href="<?php echo $viewData['videoUrl']; ?>">
+            ⬇️
+            下载视频
+        </a>
+    </div>
 </div>
