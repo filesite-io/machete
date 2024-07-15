@@ -91,9 +91,9 @@ Class ListController extends Controller {
 
         //获取根目录下的readme
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $cachedData = Common::getCacheFromFile($cacheKey);
-        if (!empty($cachedData)) {
-            $htmlReadme = $cachedData['htmlReadme'];
+        $readmeFile = Common::getCacheFromFile($cacheKey);
+        if (!empty($readmeFile)) {
+            $htmlReadme = $readmeFile['htmlReadme'];
         }
 
 
@@ -121,18 +121,13 @@ Class ListController extends Controller {
         $pageSize = $this->get('limit', 24);
 
 
-        //获取网站名称和版权申明
-        $maxScanDeep = 0;       //最大扫描目录级数
-        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $readmeFile = Common::getCacheFromFile($cacheKey);
-
         //底部版权申明配置支持
         $copyright = '';
         if (!empty($readmeFile['copyright'])) {
             $copyright = $readmeFile['copyright'];
         }
 
-        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io";
+        $pageTitle = !empty($readmeFile['titles']) ? $readmeFile['titles'][0]['name']: $currentDir['directory'];
         if (!empty($readmeFile['title'])) {
             $pageTitle = $readmeFile['title'];
         }
