@@ -120,9 +120,16 @@ eof;
                 'directories' => $viewData['menus'],
                 'files' => $viewData['scanResults'],
             );
-        }else if (!empty($selectedId) && empty($category['directories']) && empty($category['files'])) {
+        }else if (empty($category['directories']) && $total == 0) {
             echo <<<eof
-    <div class="alert alert-warning">此目录下没有图片和视频哦，复制照片目录或文件到目录里刷新网页即可。</div>
+    <div class="alert alert-warning">
+        <h2>咦？没有图片或视频</h2>
+        <p class="mt-2">
+            空目录吗？复制照片目录或文件到目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存。
+            <br>
+            如果不是空目录，点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存，网页有 10 分钟缓存。
+        </p>
+    </div>
 eof;
         }
 
