@@ -585,19 +585,19 @@ Class Common {
         $date = '';
 
         try {
-            preg_match('/^.*(\d{13}).*$/', $str, $matches);     //单位毫秒的时间戳
-            if (empty($matches[1])) {       //再尝试单位秒的时间戳
-                preg_match('/^.*(\d{10}).*$/', $str, $matches);
-                if (empty($matches[1])) {       //再尝试Y-m-d格式的日期
-                    preg_match('/^.*(\d{4}[012]{2}\d{2}).*$/', $str, $matches);
+            preg_match('/^.*((?:19|20|21)\d{2}[01][0-9][0123]\d).*$/U', $str, $matches);        //尝试Y-m-d格式的日期
+            if (empty($matches[1])) {                                                           //再尝试单位秒的时间戳
+                preg_match('/^.*(\d{10}).*$/U', $str, $matches);
+                if (empty($matches[1])) {
+                    preg_match('/^.*(\d{13}).*$/U', $str, $matches);                            //单位毫秒的时间戳
                     if (!empty($matches[1])) {
-                        $date = date('Y-m-d', strtotime($matches[1]));
+                        $date = date('Y-m-d', (int)$matches[1] / 1000);
                     }
                 }else {
                     $date = date('Y-m-d', (int)$matches[1]);
                 }
             }else {
-                $date = date('Y-m-d', (int)$matches[1] / 1000);
+                $date = date('Y-m-d', strtotime($matches[1]));
             }
 
         }catch(Exception $e) {}
