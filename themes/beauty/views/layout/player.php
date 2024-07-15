@@ -33,7 +33,12 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
                 <p>用手机扫码打开</p>
                 <div id="qrimg"></div>
             </div>
-            <p>
+            <p class="copyright">
+                <?php
+                if (!empty($viewData['copyright'])) {
+                    echo $viewData['copyright'];
+                }else {
+                ?>
                 <span>&copy;2022 - <?=date('Y')?></span>
                 by <a href="https://filesite.io/" target="_blank">FileSite.io</a>
                 <br>
@@ -42,6 +47,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
                     - 执行耗时: {page_time_cost} ms
                 <?php } ?>
                 <br>友情链接：<a href="https://tajian.tv" target="_blank">Ta荐 - 你的聚宝盆</a>
+            <?php } ?>
             </p>
         </footer>
     </div>

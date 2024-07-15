@@ -33,7 +33,9 @@ Machete是一款简单易用的家庭相册系统，可方便更新升级、支�
 * README_title.txt - 网站名称配置文件
 * README_copyright.txt - 版权申明配置文件
 
-注意配置文件名大小写必须一致！
+注意：
+* 配置文件名大小写必须一致！
+* 如果映射的目录里没有README.md文件，请先从源码www/girls/目录复制README.md
 
 
 配置文件内容填写纯文本的中英文信息（支持html代码），示例：

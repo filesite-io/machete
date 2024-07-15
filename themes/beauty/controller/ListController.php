@@ -120,17 +120,27 @@ Class ListController extends Controller {
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', 24);
 
-        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io";
-        if (!empty($subcate)) {
-            $pageTitle = "{$subcate['directory']}的照片，来自{$pageTitle}";
-            if (!empty($subcate['title'])) {
-                $pageTitle = $subcate['title'];
-            }
+
+        //获取网站名称和版权申明
+        $maxScanDeep = 0;       //最大扫描目录级数
+        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $readmeFile = Common::getCacheFromFile($cacheKey);
+
+        //底部版权申明配置支持
+        $copyright = '';
+        if (!empty($readmeFile['copyright'])) {
+            $copyright = $readmeFile['copyright'];
         }
+
+        $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io";
+        if (!empty($readmeFile['title'])) {
+            $pageTitle = $readmeFile['title'];
+        }
+
         $viewName = '//site/index';     //共享视图
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
-            'mp3File', 'page', 'pageSize', 'cacheDataId'
+            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

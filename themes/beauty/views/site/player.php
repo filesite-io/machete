@@ -12,7 +12,7 @@
             </div>
 
             <a class="navbar-brand" href="/">
-                <span class="verMiddle">家庭相册</span>
+                <span class="verMiddle"><?php echo $pageTitle; ?></span>
             </a>
             <span class="navbar-text videotitle"><?php echo $viewData['videoFilename']; ?></span>
         </div>
@@ -36,7 +36,7 @@
         <source src="<?php echo $viewData['videoUrl']; ?>" type="video/mp4">
     </video>
     <div class="text-right mt-2 mr-1">
-        <a class="btn btn-info" href="<?php echo $viewData['videoUrl']; ?>">
+        <a class="btn btn-default" href="<?php echo $viewData['videoUrl']; ?>">
             ⬇️
             下载视频
         </a>

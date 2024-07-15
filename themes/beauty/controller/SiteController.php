@@ -11,7 +11,7 @@ Class SiteController extends Controller {
     public function actionIndex() {
         //获取数据
         $menus = array();        //菜单，一级目录
-        $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
+        $htmlReadme = array();   //Readme.md 内容，底部网站详细介绍
         $htmlCateReadme = '';   //当前目录下的Readme.md 内容
         $menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
         
@@ -92,9 +92,17 @@ Class SiteController extends Controller {
                 $htmlReadme = $Parsedown->text($content);
                 $htmlReadme = $scanner->fixMDUrls($readmeFile['realpath'], $htmlReadme);
 
-                Common::saveCacheToFile($cacheKey, array('htmlReadme' => $htmlReadme, 'titles' => $titles));
+                $title = !empty($readmeFile['title']) ? $readmeFile['title'] : '';
+                $copyright = !empty($readmeFile['copyright']) ? $readmeFile['copyright'] : '';
+                Common::saveCacheToFile($cacheKey, array(
+                        'htmlReadme' => $htmlReadme,
+                        'titles' => $titles,
+                        'title' => $title,
+                        'copyright' => $copyright,
+                    ));
             }
         }else {
+            $readmeFile = $cachedData;
             $htmlReadme = $cachedData['htmlReadme'];
             $titles = $cachedData['titles'];
         }
@@ -208,11 +216,22 @@ Class SiteController extends Controller {
         $videoFilename = basename($arr['path']);
 
 
+        //获取联系方式
+        $maxScanDeep = 0;       //最大扫描目录级数
+        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $readmeFile = Common::getCacheFromFile($cacheKey);
+
+        //底部版权申明配置支持
+        $copyright = '';
+        if (!empty($readmeFile['copyright'])) {
+            $copyright = $readmeFile['copyright'];
+        }
+
         $pageTitle = "视频播放器";
         $this->layout = 'player';
         $viewName = 'player';
         $params = compact(
-            'videoUrl', 'videoFilename'
+            'videoUrl', 'videoFilename', 'copyright'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
