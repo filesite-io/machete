@@ -122,10 +122,17 @@ Class SiteController extends Controller {
         if (!empty($subcate)) {
             $pageTitle = "{$subcate['directory']}照片，来自{$pageTitle}";
         }
+
+        //底部版权申明配置支持
+        $copyright = '';
+        if (!empty($readmeFile['copyright'])) {
+            $copyright = $readmeFile['copyright'];
+        }
+
         $viewName = 'index';
         $params = compact(
             'page', 'pageSize', 'cacheDataId',
-            'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File'
+            'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

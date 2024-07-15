@@ -23,7 +23,7 @@ $supportedExts = array_merge($imgExts, $videoExts);
 
             <a class="navbar-brand" href="/">
                 <!--img class="verMiddle" src="/content/machete_icon.png" alt="logo图片"-->
-                <span class="verMiddle">家庭相册</span>
+                <span class="verMiddle"><?php echo $pageTitle; ?></span>
             </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
