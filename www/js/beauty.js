@@ -370,4 +370,8 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
 
         setTimeout(takeScreenshot, screenshot_start);
     });
+
+    $('.btn-snapshot').click(function() {
+        takeScreenshot();
+    });
 }
