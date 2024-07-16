@@ -178,40 +178,47 @@ Class SiteController extends Controller {
             $code = 0;
             $msg = '参数不能为空';
         }else {
-            //从缓存数据中获取目录的realpath
-            $cachedData = Common::getCacheFromFile($cacheId);
-            if (!empty($cachedData)) {
-                $realpath = $cachedData[$cateId]['realpath'];
-                $scanner = new DirScanner();
-                $scanner->setWebRoot($this->getCurrentWebroot($realpath));
-                $scanner->setRootDir($realpath);
+            //优先从缓存获取
+            $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
+            $url = Common::getCacheFromFile($cacheKey);
 
-                $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
-                $imgFile = $scanner->getSnapshotImage($realpath, $imgExts);
+            if (empty($url)) {
+                //从缓存数据中获取目录的realpath
+                $cachedData = Common::getCacheFromFile($cacheId);
+                if (!empty($cachedData)) {
+                    $realpath = $cachedData[$cateId]['realpath'];
+                    $scanner = new DirScanner();
+                    $scanner->setWebRoot($this->getCurrentWebroot($realpath));
+                    $scanner->setRootDir($realpath);
 
-                
-                //支持视频目录
-                if (empty($imgFile)) {
-                    $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
-                    $firstVideo = $scanner->getSnapshotImage($realpath, $videoExts);
-                    if (!empty($firstVideo)) {
-                        $url = '/img/beauty/video_dir.png';
+                    $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                    $imgFile = $scanner->getSnapshotImage($realpath, $imgExts);
 
-                        //尝试从缓存数据中获取封面图
-                        $cacheKey = $firstVideo['id'];
-                        $expireSeconds = 86400*30;  //有效期30天
-                        $cacheSubDir = 'video';
-                        $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
-                        if (!empty($cachedData)) {
-                            $url = $cachedData['snapshot'];
+                    //支持视频目录
+                    if (empty($imgFile)) {
+                        $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+                        $firstVideo = $scanner->getSnapshotImage($realpath, $videoExts);
+                        if (!empty($firstVideo)) {
+                            $url = '/img/beauty/video_dir.png';
+
+                            //尝试从缓存数据中获取封面图
+                            $cacheKey_snap = $this->getCacheKey($firstVideo['id'], 'vmeta');;
+                            $expireSeconds = 86400*30;  //有效期30天
+                            $cacheSubDir = 'video';
+                            $cachedData = Common::getCacheFromFile($cacheKey_snap, $expireSeconds, $cacheSubDir);
+                            if (!empty($cachedData)) {
+                                $url = $cachedData['snapshot'];
+                                Common::saveCacheToFile($cacheKey, $url);
+                            }
                         }
+                    }else {
+                        $url = $imgFile['path'];
+                        Common::saveCacheToFile($cacheKey, $url);
                     }
                 }else {
-                    $url = $imgFile['path'];
+                    $code = 0;
+                    $msg = '缓存数据已失效，请刷新网页';
                 }
-            }else {
-                $code = 0;
-                $msg = '缓存数据已失效，请刷新网页';
             }
         }
 
@@ -261,7 +268,7 @@ Class SiteController extends Controller {
             $code = 0;
             $msg = '参数不能为空';
         }else {
-            $cacheKey = $videoId;
+            $cacheKey = $this->getCacheKey($videoId, 'vmeta');
             $expireSeconds = 86400*30;  //有效期30天
             $cacheSubDir = 'video';
             $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
@@ -287,7 +294,7 @@ Class SiteController extends Controller {
             $code = 0;
             $msg = '参数不能为空';
         }else {
-            $cacheKey = $videoId;
+            $cacheKey = $this->getCacheKey($videoId, 'vmeta');
             $cacheSubDir = 'video';
             $saved = Common::saveCacheToFile($cacheKey, $metaData, $cacheSubDir);
             if ($saved !== false) {

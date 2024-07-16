@@ -306,7 +306,7 @@ Class Controller {
     }
 
     //get cache key
-    protected function getCacheKey($cateId, $dataType = 'tree', $maxScanDeep = 2) {
+    protected function getCacheKey($cateId, $dataType = 'tree', $maxScanDeep = 0) {
         $prefix = FSC::$app['config']['theme'];
         return "{$prefix}_{$dataType}_{$maxScanDeep}_{$cateId}";
     }
