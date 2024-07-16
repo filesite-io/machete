@@ -7,4 +7,4 @@ docker rmi filesite/machete
 docker build --no-cache -t filesite/machete -f ./Dockerfile .
 
 ## build filesite/machete:samba
-docker build --no-cache -t filesite/machete:samba -f ./Dockerfile_samba .
+##docker build --no-cache -t filesite/machete:samba -f ./Dockerfile_samba .

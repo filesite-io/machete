@@ -815,22 +815,19 @@ Class DirScanner {
             RecursiveIteratorIterator::SELF_FIRST
         );
 
-        $imgUrl = '';
+        $imgData = null;
         foreach ($iterator as $item) {
             if ($item->isFile()) {
                 $extension = $item->getExtension();
                 if (in_array(strtolower($extension), $imgExts)) {
                     $imgPath = $item->getPath() . '/' . $item->getFilename();
                     $imgData = $this->getFileData($imgPath);
-                    if (!empty($imgData['path'])) {
-                        $imgUrl = $imgData['path'];
-                    }
                     break;
                 }
             }
         }
 
-        return $imgUrl;
+        return $imgData;
     }
 
 }

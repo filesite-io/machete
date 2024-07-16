@@ -187,15 +187,27 @@ Class SiteController extends Controller {
                 $scanner->setRootDir($realpath);
 
                 $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
-                $url = $scanner->getSnapshotImage($realpath, $imgExts);
+                $imgFile = $scanner->getSnapshotImage($realpath, $imgExts);
+
                 
                 //支持视频目录
-                if (empty($url)) {
+                if (empty($imgFile)) {
                     $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
-                    $firstVideoPath = $scanner->getSnapshotImage($realpath, $videoExts);
-                    if (!empty($firstVideoPath)) {
+                    $firstVideo = $scanner->getSnapshotImage($realpath, $videoExts);
+                    if (!empty($firstVideo)) {
                         $url = '/img/beauty/video_dir.png';
+
+                        //尝试从缓存数据中获取封面图
+                        $cacheKey = $firstVideo['id'];
+                        $expireSeconds = 86400*30;  //有效期30天
+                        $cacheSubDir = 'video';
+                        $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+                        if (!empty($cachedData)) {
+                            $url = $cachedData['snapshot'];
+                        }
                     }
+                }else {
+                    $url = $imgFile['path'];
                 }
             }else {
                 $code = 0;
