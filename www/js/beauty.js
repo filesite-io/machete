@@ -304,15 +304,20 @@ $('.video-poster').each(function(index, el) {
 });
 
 //保存视频数据
-var saveVideoMeta = function(videoId, metaData) {
+var saveVideoMeta = function(videoId, metaData, manual) {
+    var params = {
+            id: videoId,
+            meta: metaData
+        };
+    if (typeof(manual) != 'undefined' && manual) {
+        params.manual = 1;
+    }
+
     $.ajax({
         url: '/site/savevideometa',
         method: 'POST',
         dataType: 'json',
-        data: {
-            id: videoId,
-            meta: metaData
-        }
+        data: params
     }).done(function(data) {
         if (data.code != 1) {
             console.warn('视频数据保存失败', data.msg);
@@ -331,7 +336,7 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         preload: 'auto'
     });
 
-    var takeScreenshot = function() {
+    var takeScreenshot = function(manual) {
         //myPlayer.pause();
 
         var height = myPlayer.videoHeight(), width = myPlayer.videoWidth(),
@@ -351,7 +356,7 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
             saveVideoMeta($('video.vjs-tech').attr('data-id'), {
                 duration: duration,
                 snapshot: snapshotImg
-            });
+            }, manual);
         }
 
         //myPlayer.play();
@@ -371,7 +376,15 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         setTimeout(takeScreenshot, screenshot_start);
     });
 
-    $('.btn-snapshot').click(function() {
-        takeScreenshot();
+    $('.btn-snapshot').click(function(e) {
+        var clickedBtn = $(e.target);
+        clickedBtn.prop('disabled', true);
+
+        var manual = 1;
+        takeScreenshot(manual);
+
+        setTimeout(function() {
+            clickedBtn.prop('disabled', false);
+        }, 3000);
     });
 }

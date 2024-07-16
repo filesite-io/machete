@@ -87,7 +87,14 @@ echo ""
 
 
 # upgrade nginx config
-cp /var/www/machete/conf/nginx_machete.conf /etc/nginx/http.d/machete.conf
+if [ -d /etc/nginx/http.d/ ]; then
+    cp /var/www/machete/conf/nginx_machete.conf /etc/nginx/http.d/machete.conf
+fi
+
+if [ -d /etc/nginx/conf.d/ ]; then
+    cp /var/www/machete/conf/nginx_machete.conf /etc/nginx/conf.d/machete.conf
+fi
+
 /usr/sbin/nginx -s reload
 echo "Nginx config upgraded and reloaded."
 echo ""

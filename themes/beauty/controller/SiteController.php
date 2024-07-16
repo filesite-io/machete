@@ -283,20 +283,33 @@ Class SiteController extends Controller {
         return $this->renderJson(compact('code', 'msg', 'meta'));
     }
 
-    //保存视频meta数据到缓存
+    //保存视频meta数据到缓存，支持手动生成
     public function actionSavevideometa() {
         $code = 0;
         $msg = 'OK';
 
         $videoId = $this->post('id', '');
         $metaData = $this->post('meta', '');
+        $manual = $this->post('manual', 0);
         if (empty($videoId) || empty($metaData)) {
             $code = 0;
             $msg = '参数不能为空';
         }else {
             $cacheKey = $this->getCacheKey($videoId, 'vmeta');
             $cacheSubDir = 'video';
-            $saved = Common::saveCacheToFile($cacheKey, $metaData, $cacheSubDir);
+            $saved = true;
+
+            if (!empty($manual)) {
+                $metaData['manual'] = 1;
+                $saved = Common::saveCacheToFile($cacheKey, $metaData, $cacheSubDir);
+            }else {
+                $expireSeconds = 86400*30;  //有效期30天
+                $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+                if (empty($cachedData) || empty($cachedData['manual'])) {
+                    $saved = Common::saveCacheToFile($cacheKey, $metaData, $cacheSubDir);
+                }
+            }
+
             if ($saved !== false) {
                 $code = 1;
             }
