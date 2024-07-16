@@ -256,15 +256,15 @@ if ($('#pr-player').length > 0 && typeof(videojs) != 'undefined') {
             var duration = myPlayer.duration();
 
             //更新视频封面图和视频时长
-            if (duration && snapshotImg) {
+            if (duration && snapshotImg && /^data:image\/.+;base64,/i.test(snapshotImg)) {
                 $('#poster_'+mc_video_id).attr('src', snapshotImg);
                 $('#poster_'+mc_video_id).parent('a').find('.duration').text(formatDuration(duration));
-            }
 
-            saveVideoMeta(mc_video_id, {
-                duration: duration,
-                snapshot: snapshotImg
-            });
+                saveVideoMeta(mc_video_id, {
+                    duration: duration,
+                    snapshot: snapshotImg
+                });
+            }
 
             mc_video_id = '';           //reset
         }
@@ -343,11 +343,14 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         var ctx = canvas.getContext('2d');
         ctx.drawImage( video, 0, 0, canvas.width, canvas.height );
 
-        var snapshotImg = canvas.toDataURL('image/jpeg');
-        saveVideoMeta($('video.vjs-tech').attr('data-id'), {
-            duration: myPlayer.duration(),
-            snapshot: snapshotImg
-        });
+        var snapshotImg = canvas.toDataURL('image/jpeg'),
+            duration = myPlayer.duration();
+        if (duration && snapshotImg && /^data:image\/.+;base64,/i.test(snapshotImg)) {
+            saveVideoMeta($('video.vjs-tech').attr('data-id'), {
+                duration: duration,
+                snapshot: snapshotImg
+            });
+        }
 
         myPlayer.play();
     });
