@@ -66,6 +66,9 @@ if [ -f "master.tar.gz" ]; then
 
 fi
 
+echo "Machete front-end upgraded."
+echo ""
+
 
 # upgrade admin
 cd /var/www/downloads/
@@ -79,6 +82,16 @@ if [ -f "master.tar.gz" ]; then
     mv jialuomaadmin/dist/ /var/www/machete/www/admin
 
 fi
+echo "Admin system upgraded."
+echo ""
 
-echo "Machete upgrade done."
+
+# upgrade nginx config
+cp /var/www/machete/conf/nginx_machete.conf /etc/nginx/http.d/machete.conf
+/usr/sbin/nginx -s reload
+echo "Nginx config upgraded and reloaded."
+echo ""
+
+echo ""
+echo "==Machete upgrade done.=="
 echo ""

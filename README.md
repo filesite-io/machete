@@ -202,6 +202,32 @@ docker exec -it machete /var/www/machete/bin/upgrade.sh
 ```
 
 
+### 配置修改
+
+修改配置有两种方式：
+1. 进入容器目录：/var/www/machete/runtime/，修改**custom_config.json**后保存即可；
+2. 命令行修改
+```
+docker exec -it machete php /var/www/machete/bin/command.php config "do=set&key=screenshot_start&val=1000"
+```
+
+上述命令为修改配置项**screenshot_start**的示例。
+
+配置读取、修改、删除命令：
+```
+php /var/www/machete/bin/command.php config "参数"
+```
+
+参数说明：
+* do  - 操作，可选值：get, all, set, del（分别对应获取单个配置项、所有配置项、设置单个配置项、删除单个配置项）
+* key - 配置项名称
+* val - 配置项值
+
+
+说明：
+不支持数组类型的配置修改，可用配置项明细参考：**conf/app.php**。
+
+
 ## 后台管理内容
 
 最新版本已经支持网页版后台和samba文件共享方式管理内容。

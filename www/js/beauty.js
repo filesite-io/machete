@@ -331,8 +331,8 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         preload: 'auto'
     });
 
-    myPlayer.one('playing', function() {
-        myPlayer.pause();
+    var takeScreenshot = function() {
+        //myPlayer.pause();
 
         var height = myPlayer.videoHeight(), width = myPlayer.videoWidth(),
             aspect = height / width;
@@ -354,6 +354,20 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
             });
         }
 
-        myPlayer.play();
+        //myPlayer.play();
+    };
+
+    myPlayer.one('playing', function() {
+        var screenshot_start = $('video.vjs-tech').attr('data-screenshot-start');
+
+        if (screenshot_start) {
+            screenshot_start = parseInt(screenshot_start);
+        }
+
+        if (!screenshot_start) {
+            screenshot_start = 1000;
+        }
+
+        setTimeout(takeScreenshot, screenshot_start);
     });
 }

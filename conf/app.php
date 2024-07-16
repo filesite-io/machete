@@ -51,6 +51,7 @@ $configs = array(
 
     'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif'),
     'supportedVideoExts' => array('mp4', 'mov', 'm3u8'),
+    'screenshot_start' => 8000,     //视频播放页快照截取开始时间，单位：毫秒
 
     /*
     //视频皮肤配置

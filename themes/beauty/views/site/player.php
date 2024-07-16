@@ -29,6 +29,7 @@
 <div class="videoplayer">
     <video
         data-id="<?php echo $viewData['videoId']; ?>"
+        data-screenshot-start="<?php echo FSC::$app['config']['screenshot_start']; ?>"
         class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
         controls
         playsinline
@@ -37,7 +38,7 @@
         <source src="<?php echo $viewData['videoUrl']; ?>" type="video/mp4">
     </video>
     <div class="text-right mt-2 mr-1">
-        <a class="btn btn-default" href="<?php echo $viewData['videoUrl']; ?>">
+        <a class="btn btn-default" href="<?php echo $viewData['videoUrl']; ?>&download=1">
             ⬇️
             下载视频
         </a>
