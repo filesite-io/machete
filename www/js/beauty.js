@@ -259,6 +259,7 @@ if ($('#pr-player').length > 0 && typeof(videojs) != 'undefined') {
             if (duration && snapshotImg && /^data:image\/.+;base64,/i.test(snapshotImg)) {
                 $('#poster_'+mc_video_id).attr('src', snapshotImg);
                 $('#poster_'+mc_video_id).parent('a').find('.duration').text(formatDuration(duration));
+                $('#poster_'+mc_video_id).parent('a').find('.playbtn').removeClass('hide');
 
                 saveVideoMeta(mc_video_id, {
                     duration: duration,
@@ -289,6 +290,7 @@ var getVideoMetaAndShowIt = function(videoId, videoUrl) {
         }else {
             $('#poster_'+videoId).attr('src', data.meta.snapshot);
             $('#poster_'+videoId).parent('a').find('.duration').text(formatDuration(data.meta.duration));
+            $('#poster_'+videoId).parent('a').find('.playbtn').removeClass('hide');
         }
     }).fail(function(jqXHR, textStatus, errorThrown) {
         console.error('视频数据获取失败，错误信息：' + errorThrown);

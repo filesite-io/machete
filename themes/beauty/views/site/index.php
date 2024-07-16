@@ -268,7 +268,7 @@ eof;
                 {$title}
             </span>
         </div>
-        <img src="/img/video-play.svg" class="playbtn" alt="video play button">
+        <img src="/img/video-play.svg" class="playbtn hide" alt="video play button">
         <span class="duration">00:00:00</span>
     </a>
 </div>
@@ -304,7 +304,7 @@ eof;
                 {$title}
             </span>
         </div>
-        <img src="/img/video-play.svg" class="playbtn" alt="video play button">
+        <img src="/img/video-play.svg" class="playbtn hide" alt="video play button">
         <span class="duration">00:00:00</span>
     </a>
 </div>
