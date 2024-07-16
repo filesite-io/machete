@@ -258,13 +258,18 @@ eof;
                         $videoUrl = urlencode($file['path']);
                         echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="/site/player?url={$videoUrl}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
-        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img" alt="{$file['filename']}">
+    <a href="/site/player?url={$videoUrl}&id={$file['id']}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
+        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
+            data-video-id="{$file['id']}"
+            data-video-url="{$file['path']}"
+            alt="{$file['filename']}">
         <div class="im_img_title">
             <span class="right-bottom">
                 {$title}
             </span>
         </div>
+        <img src="/img/video-play.svg" class="playbtn" alt="video play button">
+        <span class="duration">00:00:00</span>
     </a>
 </div>
 eof;
@@ -289,13 +294,18 @@ eof;
                         $videoUrl = urlencode($file['path']);
                         echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="/site/player?url={$videoUrl}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
-        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img" alt="{$file['filename']}">
+    <a href="/site/player?url={$videoUrl}&id={$file['id']}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
+        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
+            data-video-id="{$file['id']}"
+            data-video-url="{$file['path']}"
+            alt="{$file['filename']}">
         <div class="im_img_title">
             <span class="right-bottom">
                 {$title}
             </span>
         </div>
+        <img src="/img/video-play.svg" class="playbtn" alt="video play button">
+        <span class="duration">00:00:00</span>
     </a>
 </div>
 eof;
@@ -317,4 +327,13 @@ if ($total > $viewData['pageSize']) {
     echo $pagination;
 }
 ?>
+</div>
+
+<div class="video_previewer">
+    <video
+        class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
+        playsinline
+        poster="" 
+        id="pr-player">
+    </video>
 </div>

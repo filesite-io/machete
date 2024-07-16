@@ -14,6 +14,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <!--for theme beauty-->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/fubox.min.css" rel="stylesheet">
+    <link href="/css/video-js.min.css" rel="stylesheet">
     <link href="/css/beauty.css?v<?= Html::getStaticFileVersion('beauty.css', 'css') ?>" rel="stylesheet">
     <link href="/css/github-markdown-light.css" rel="stylesheet" id="markdowncss">
 </head>
@@ -98,6 +99,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <script src="/js/lazyload.js"></script>
     <script src="/js/fubox.min.js"></script>
     <script src="/js/qrcode.min.js"></script>
+    <script src="/js/video.min.js"></script>
     <script src="/js/beauty.js?v<?= Html::getStaticFileVersion('beauty.js', 'js') ?>"></script>
     <?php echo Html::getGACode(); ?>
 </body>

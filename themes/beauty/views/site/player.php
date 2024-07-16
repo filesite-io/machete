@@ -27,12 +27,13 @@
 </nav>
 
 <div class="videoplayer">
-    <video class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
+    <video
+        data-id="<?php echo $viewData['videoId']; ?>"
+        class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
         controls
         playsinline
-        data-setup='{"autoplay":"muted"}'
         poster="" 
-        id="myvideo">
+        id="my-player">
         <source src="<?php echo $viewData['videoUrl']; ?>" type="video/mp4">
     </video>
     <div class="text-right mt-2 mr-1">

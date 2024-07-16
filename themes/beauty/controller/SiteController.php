@@ -208,8 +208,9 @@ Class SiteController extends Controller {
 
     public function actionPlayer() {
         $videoUrl = $this->get('url', '');
-        if (empty($videoUrl)) {
-            throw new Exception("缺少视频地址url参数！", 403);
+        $videoId = $this->get('id', '');
+        if (empty($videoUrl) || empty($videoId)) {
+            throw new Exception("缺少视频地址url或id参数！", 403);
         }
 
         $arr = parse_url($videoUrl);
@@ -231,9 +232,58 @@ Class SiteController extends Controller {
         $this->layout = 'player';
         $viewName = 'player';
         $params = compact(
-            'videoUrl', 'videoFilename', 'copyright'
+            'videoUrl', 'videoId', 'videoFilename', 'copyright'
         );
         return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //根据视频文件id返回缓存数据：
+    //{duration: 单位秒的时长, snapshot: base64格式的jpg封面图}
+    public function actionVideometa() {
+        $code = 1;
+        $msg = 'OK';
+        $meta = array();
+
+        $videoId = $this->get('id', '');
+        if (empty($videoId)) {
+            $code = 0;
+            $msg = '参数不能为空';
+        }else {
+            $cacheKey = $videoId;
+            $expireSeconds = 86400*30;  //有效期30天
+            $cacheSubDir = 'video';
+            $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+            if (!empty($cachedData)) {
+                $meta = $cachedData;
+            }else {
+                $code = 0;
+                $msg = '此视频无缓存或缓存已过期';
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg', 'meta'));
+    }
+
+    //保存视频meta数据到缓存
+    public function actionSavevideometa() {
+        $code = 0;
+        $msg = 'OK';
+
+        $videoId = $this->post('id', '');
+        $metaData = $this->post('meta', '');
+        if (empty($videoId) || empty($metaData)) {
+            $code = 0;
+            $msg = '参数不能为空';
+        }else {
+            $cacheKey = $videoId;
+            $cacheSubDir = 'video';
+            $saved = Common::saveCacheToFile($cacheKey, $metaData, $cacheSubDir);
+            if ($saved !== false) {
+                $code = 1;
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg'));
     }
 
 }

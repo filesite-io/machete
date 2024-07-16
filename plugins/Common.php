@@ -530,13 +530,18 @@ Class Common {
 
     //保存数据到文件缓存
     //缓存数据格式：{ctime: timestamp, data: anything}
-    public static function saveCacheToFile($key, $data) {
+    public static function saveCacheToFile($key, $data, $cacheSubDir = '') {
         $cacheData = array(
             "ctime" => time(),
             "data" => $data,
         );
         $jsonData = json_encode($cacheData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $cacheDir = __DIR__ . '/../runtime/cache/';
+
+        //子目录支持
+        if (!empty($cacheSubDir)) {
+            $cacheDir .= preg_match('/\/$/', $cacheSubDir) ? $cacheSubDir : "{$cacheSubDir}/";
+        }
 
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir, 0700, true);
@@ -548,8 +553,12 @@ Class Common {
 
     //从文件缓存读取数据
     //expireSeconds: 缓存失效时间，默认10分钟
-    public static function getCacheFromFile($key, $expireSeconds = 600) {
+    public static function getCacheFromFile($key, $expireSeconds = 600, $cacheSubDir = '') {
         $cacheDir = __DIR__ . '/../runtime/cache/';
+        //子目录支持
+        if (!empty($cacheSubDir)) {
+            $cacheDir .= preg_match('/\/$/', $cacheSubDir) ? $cacheSubDir : "{$cacheSubDir}/";
+        }
         $cache_filename = "{$cacheDir}{$key}.json";
 
         if (file_exists($cache_filename)) {
@@ -569,8 +578,12 @@ Class Common {
     }
 
     //删除缓存文件
-    public static function cleanFileCache($key) {
+    public static function cleanFileCache($key, $cacheSubDir = '') {
         $cacheDir = __DIR__ . '/../runtime/cache/';
+        //子目录支持
+        if (!empty($cacheSubDir)) {
+            $cacheDir .= preg_match('/\/$/', $cacheSubDir) ? $cacheSubDir : "{$cacheSubDir}/";
+        }
         $cache_filename = "{$cacheDir}{$key}.json";
 
         if (file_exists($cache_filename)) {
