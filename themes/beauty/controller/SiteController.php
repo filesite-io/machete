@@ -217,10 +217,10 @@ Class SiteController extends Controller {
                         $img_id = $imgFile['id'];
 
                         //小尺寸图片支持
-                        $cacheKey = $this->getCacheKey($imgFile['id'], 'imgsm');
+                        $cacheKey_smimg = $this->getCacheKey($imgFile['id'], 'imgsm');
                         $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
                         $cacheSubDir = 'image';
-                        $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+                        $cachedData = Common::getCacheFromFile($cacheKey_smimg, $expireSeconds, $cacheSubDir);
                         if (!empty($cachedData)) {
                             $url = $cachedData;
                             $img_id = '';   //无需再次生成小尺寸图片
@@ -239,6 +239,29 @@ Class SiteController extends Controller {
         }
 
         return $this->renderJson(compact('code', 'msg', 'url', 'img_id'));
+    }
+
+    //保存目录封面图到缓存
+    public function actionSavedirsnap() {
+        $code = 0;
+        $msg = 'OK';
+
+        $cateId = $this->post('id', '');    //目录id
+        $url = $this->post('url', '');      //base64格式的图片数据或者图片网址
+        if (empty($cateId) || empty($url)) {
+            $code = 0;
+            $msg = '参数不能为空';
+        }else {
+            $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
+            $img_id = '';   //为保持数据格式一致，图片id传空
+            $saved = Common::saveCacheToFile($cacheKey, compact('url', 'img_id'));
+
+            if ($saved !== false) {
+                $code = 1;
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg'));
     }
 
     //优先从缓存获取小尺寸的图片

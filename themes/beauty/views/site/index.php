@@ -65,6 +65,7 @@ eof;
 
 <?php
 $category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
+$btnSetSnap = '<button class="btn btn-xs btn-info btn-set-snap">选作封面</button>';
 
 //如果是首页
 if (empty($selectedId) && !empty($viewData['menus'])) {
@@ -72,6 +73,7 @@ if (empty($selectedId) && !empty($viewData['menus'])) {
         'directories' => $viewData['menus'],
         'files' => $viewData['scanResults'],
     );
+    $btnSetSnap = '';
 }
 
 if (!empty($category['files'])) {
@@ -220,6 +222,7 @@ eof;
         if (!empty($category['files'])) {        //一级目录支持
             $pageStartIndex = ($viewData['page']-1) * $viewData['pageSize'];
             $index = 0;
+
             foreach ($category['files'] as $file) {
                 if (empty($file['extension']) || !in_array($file['extension'], $supportedExts)) {
                     continue;
@@ -245,7 +248,11 @@ eof;
                     $smallUrl = "/site/smallimg/?id={$file['id']}&url={$imgUrl}";
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title} - {$file['filename']}" title="{$title} - {$file['filename']}">
+    <a href="javascript:;" class="bor_radius" data-fancybox="gallery"
+        data-src="{$file['path']}"
+        data-caption="{$title} - {$file['filename']}"
+        data-pid="{$file['pid']}"
+        title="{$title} - {$file['filename']}">
         <img src="/img/beauty/lazy.svg"
             data-id="{$file['id']}"
             data-original="{$smallUrl}"
@@ -255,6 +262,7 @@ eof;
                 {$title}
             </span>
         </div>
+        {$btnSetSnap}
     </a>
 </div>
 eof;

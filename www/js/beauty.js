@@ -20,14 +20,6 @@ if ($('#image_site').get(0)) {
         }
     })
 
-    // 图片懒加载
-    /*
-    $("img.lazy").lazyload({
-        effect: "fadeIn",
-        event: "scroll"
-    });
-    */
-
     //需要浏览器支持naturalWidth
     var saveSmallImg = function(imgEl) {
         var width = imgEl.width,
@@ -47,6 +39,8 @@ if ($('#image_site').get(0)) {
 
         var smallImg = canvas.toDataURL('image/jpeg');
         if (smallImg && /^data:image\/.+;base64,/i.test(smallImg)) {
+            imgEl.src = smallImg;
+
             var params = {
                     id: $(imgEl).attr('data-id'),
                     data: smallImg
@@ -77,6 +71,39 @@ if ($('#image_site').get(0)) {
             saveSmallImg(el);
         }
     });
+
+
+    //设置目录封面图
+    $('.btn-set-snap').click(function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        var btn = $(evt.target),
+            cateId = $(btn).parents('a').attr('data-pid'),
+            imgUrl = $(btn).parents('a').find('img.im_img').attr('src');
+        if (cateId && imgUrl) {
+            var params = {
+                    id: cateId,
+                    url: imgUrl
+                };
+
+            $(btn).prop('disabled', true);
+            $.ajax({
+                url: '/site/savedirsnap',
+                method: 'POST',
+                dataType: 'json',
+                data: params
+            }).done(function(data) {
+                $(btn).prop('disabled', false);
+                if (data.code != 1) {
+                    console.warn('目录封面图保存失败', data.msg);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                $(btn).prop('disabled', false);
+                console.error('目录封面图保存失败，错误信息：' + errorThrown);
+            });
+        }
+    });
+
 
     // 返回顶部
     var scrolltop = $('#image_site .scroll_topJS');
