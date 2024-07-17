@@ -171,6 +171,7 @@ Class SiteController extends Controller {
         $code = 1;
         $msg = 'OK';
         $url = '';
+        $img_id = '';
 
         $cacheId = $this->post('cid', '');
         $cateId = $this->post('id', '');
@@ -180,9 +181,9 @@ Class SiteController extends Controller {
         }else {
             //优先从缓存获取
             $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
-            $url = Common::getCacheFromFile($cacheKey);
+            $cachedData = Common::getCacheFromFile($cacheKey);
 
-            if (empty($url)) {
+            if (empty($cachedData)) {
                 //从缓存数据中获取目录的realpath
                 $cachedData = Common::getCacheFromFile($cacheId);
                 if (!empty($cachedData)) {
@@ -208,11 +209,12 @@ Class SiteController extends Controller {
                             $cachedData = Common::getCacheFromFile($cacheKey_snap, $expireSeconds, $cacheSubDir);
                             if (!empty($cachedData)) {
                                 $url = $cachedData['snapshot'];
-                                Common::saveCacheToFile($cacheKey, $url);
+                                Common::saveCacheToFile($cacheKey, compact('url', 'img_id'));
                             }
                         }
                     }else {
                         $url = $imgFile['path'];
+                        $img_id = $imgFile['id'];
 
                         //小尺寸图片支持
                         $cacheKey = $this->getCacheKey($imgFile['id'], 'imgsm');
@@ -221,18 +223,22 @@ Class SiteController extends Controller {
                         $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
                         if (!empty($cachedData)) {
                             $url = $cachedData;
+                            $img_id = '';   //无需再次生成小尺寸图片
                         }
 
-                        Common::saveCacheToFile($cacheKey, $url);
+                        Common::saveCacheToFile($cacheKey, compact('url', 'img_id'));
                     }
                 }else {
                     $code = 0;
                     $msg = '缓存数据已失效，请刷新网页';
                 }
+            }else {
+                $url = $cachedData['url'];
+                $img_id = $cachedData['img_id'];
             }
         }
 
-        return $this->renderJson(compact('code', 'msg', 'url'));
+        return $this->renderJson(compact('code', 'msg', 'url', 'img_id'));
     }
 
     //优先从缓存获取小尺寸的图片

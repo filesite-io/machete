@@ -180,7 +180,21 @@ $('.dir_item').each(function(index, el) {
             }
         }).done(function(data) {
             if (data.code == 1 && data.url) {
-                $(el).find('.im_img_title').before('<img src="' + data.url + '" class="bor_radius im_img">');
+                var imgHtml = '<img src="' + data.url + '"';
+                if (data.img_id) {
+                    imgHtml += ' data-id="' + data.img_id + '"'
+                }
+                imgHtml += ' class="bor_radius im_img">';
+                $(el).find('.im_img_title').before(imgHtml);
+
+                if (data.img_id) {
+                    setTimeout(function() {
+                        var imgs = $(el).find('.im_img');
+                        if (imgs.length > 0) {
+                            saveSmallImg(imgs[0]);
+                        }
+                    }, 100);
+                }
             }else {
                 console.warn('目录 %s 里没有任何图片', id);
             }
