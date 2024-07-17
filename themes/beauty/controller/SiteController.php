@@ -281,8 +281,11 @@ Class SiteController extends Controller {
             $imgType = preg_replace('/^data:(image\/.+);base64,.+$/i', "$1", $cachedData);
             $base64_img = preg_replace('/^data:image\/.+;base64,/i', '', $cachedData);
 
+            $img_data = base64_decode($base64_img);
             header("Content-Type: {$imgType}");
-            echo base64_decode($base64_img);
+            header('Cache-Control: max-age=86400');
+            header("Etag: " . md5($img_data));
+            echo $img_data;
             exit;
         }
 
