@@ -284,7 +284,7 @@ Class SiteController extends Controller {
 
             $img_data = base64_decode($base64_img);
             header("Content-Type: {$imgType}");
-            header('Cache-Control: max-age=86400');
+            header('Cache-Control: max-age=3600');  //缓存 1 小时
             header("Etag: " . md5($img_data));
             echo $img_data;
             exit;
