@@ -266,6 +266,7 @@ Class SiteController extends Controller {
     }
 
     //优先从缓存获取小尺寸的图片
+    //增加父目录封面图缓存更新
     public function actionSmallimg() {
         $imgId = $this->get('id', '');
         $imgUrl = $this->get('url', '');
@@ -297,12 +298,20 @@ Class SiteController extends Controller {
         $code = 0;
         $msg = 'OK';
 
+        $cateId = $this->post('pid', '');
         $imgId = $this->post('id', '');
         $imgData = $this->post('data', '');     //base64格式的图片数据
         if (empty($imgId) || empty($imgData)) {
             $code = 0;
             $msg = '参数不能为空';
         }else {
+            //如果是目录封面图生成缩略图，则更新目录封面图缓存数据
+            if (!empty($cateId)) {
+                $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
+                $img_id = '';   //为保持数据格式一致，图片id传空
+                Common::saveCacheToFile($cacheKey, array('url' => $imgData, 'img_id' => $img_id));
+            }
+
             $cacheKey = $this->getCacheKey($imgId, 'imgsm');
             $cacheSubDir = 'image';
             $saved = Common::saveCacheToFile($cacheKey, $imgData, $cacheSubDir);

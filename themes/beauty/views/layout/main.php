@@ -101,6 +101,13 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <script src="/js/qrcode.min.js"></script>
     <script src="/js/video.min.js"></script>
     <script src="/js/beauty.js?v<?= Html::getStaticFileVersion('beauty.js', 'js') ?>"></script>
+    <script>
+        <?php if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
+            echo <<<eof
+var disableSmallImage = true;
+eof;
+        } ?>
+    </script>
     <?php echo Html::getGACode(); ?>
 </body>
 </html>

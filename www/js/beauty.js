@@ -21,18 +21,27 @@ if ($('#image_site').get(0)) {
     })
 
     //需要浏览器支持naturalWidth
-    var saveSmallImg = function(imgEl) {
+    var saveSmallImg = function(imgEl, cateId) {
         var width = imgEl.width,
+            height = imgEl.height,
             naturalWidth = imgEl.naturalWidth,
             naturalHeight = imgEl.naturalHeight;
-        if (!naturalWidth || naturalWidth - width < 100) {return false;}
+        if (!naturalWidth || naturalWidth <= 600 || naturalHeight <= 500 ||
+            (typeof(disableSmallImage) != 'undefined' && disableSmallImage)
+        ) {
+            return false;
+        }
 
         var aspect = naturalHeight / naturalWidth;
-
         var canvas = document.createElement('canvas');
 
-        canvas.width = width;
-        canvas.height = width * aspect;
+        if (naturalWidth <= naturalHeight) {
+            canvas.width = width * 2.5 <= 600 ? width * 2.5 : 600;
+            canvas.height = canvas.width * aspect;
+        }else {
+            canvas.height = height * 2.5 <= 500 ? height * 2.5 : 500;
+            canvas.width = canvas.height / aspect;
+        }
 
         var ctx = canvas.getContext('2d');
         ctx.drawImage( imgEl, 0, 0, canvas.width, canvas.height );
@@ -45,6 +54,9 @@ if ($('#image_site').get(0)) {
                     id: $(imgEl).attr('data-id'),
                     data: smallImg
                 };
+            if (typeof(cateId) != 'undefined' && cateId) {
+                params.pid = cateId;
+            }
 
             $.ajax({
                 url: '/site/savesmallimg',
@@ -218,7 +230,7 @@ $('.dir_item').each(function(index, el) {
                     setTimeout(function() {
                         var imgs = $(el).find('.im_img');
                         if (imgs.length > 0) {
-                            saveSmallImg(imgs[0]);
+                            saveSmallImg(imgs[0], id);
                         }
                     }, 100);
                 }
