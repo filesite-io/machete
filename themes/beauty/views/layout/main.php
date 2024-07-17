@@ -96,7 +96,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <!--for theme googleimage-->
     <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
-    <script src="/js/lazyload.js"></script>
+    <script src="/js/lazyload.min.js"></script>
     <script src="/js/fubox.min.js"></script>
     <script src="/js/qrcode.min.js"></script>
     <script src="/js/video.min.js"></script>

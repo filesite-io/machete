@@ -177,15 +177,15 @@ eof;
                     }
 
                     if (in_array($first_img['extension'], $imgExts)) {
-                        if ($index > 0) {
-                            echo <<<eof
-    <img src="/img/beauty/lazy.svg" data-original="{$first_img['path']}" class="bor_radius im_img lazy" alt="{$first_img['filename']}">
+                        $imgUrl = urlencode($first_img['path']);
+                        $smallUrl = "/site/smallimg/?id={$first_img['id']}&url={$imgUrl}";
+                        echo <<<eof
+    <img src="/img/beauty/lazy.svg"
+        data-id="{$first_img['id']}"
+        data-original="{$smallUrl}"
+        data-original_="{$first_img['path']}"
+        class="bor_radius im_img lazy" alt="{$first_img['filename']}">
 eof;
-                        } else {
-                            echo <<<eof
-    <img src="{$first_img['path']}" class="bor_radius im_img" alt="{$first_img['filename']}">
-eof;
-                        }
                     } else {
                         echo <<<eof
     <img src="/img/default.png" class="bor_radius im_img" alt="default image">
@@ -240,12 +240,16 @@ eof;
                     $title = date('Y-m-d', min($file['fstat']['mtime'], $file['fstat']['ctime']));
                 }
 
-                if ($index > 0) {
-                    if (in_array($file['extension'], $imgExts)) {
-                        echo <<<eof
+                if (in_array($file['extension'], $imgExts)) {
+                    $imgUrl = urlencode($file['path']);
+                    $smallUrl = "/site/smallimg/?id={$file['id']}&url={$imgUrl}";
+                    echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title} - {$file['filename']}" title="{$title} - {$file['filename']}">
-        <img src="/img/beauty/lazy.svg" data-original="{$file['path']}" class="bor_radius im_img lazy" alt="{$file['filename']}">
+        <img src="/img/beauty/lazy.svg"
+            data-id="{$file['id']}"
+            data-original="{$smallUrl}"
+            class="bor_radius im_img lazy" alt="{$file['filename']}">
         <div class="im_img_title">
             <span class="right-bottom">
                 {$title}
@@ -254,9 +258,9 @@ eof;
     </a>
 </div>
 eof;
-                    }else if (in_array($file['extension'], $videoExts)) {       //输出视频
-                        $videoUrl = urlencode($file['path']);
-                        echo <<<eof
+                }else if (in_array($file['extension'], $videoExts)) {       //输出视频
+                    $videoUrl = urlencode($file['path']);
+                    echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="/site/player?url={$videoUrl}&id={$file['id']}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
         <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
@@ -273,44 +277,8 @@ eof;
     </a>
 </div>
 eof;
-                    }
-
-                    
-                } else {
-                    if (in_array($file['extension'], $imgExts)) {
-                        echo <<<eof
-<div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="javascript:;" class="bor_radius" data-fancybox="gallery" data-src="{$file['path']}" data-caption="{$title} - {$file['filename']}" title="{$title} - {$file['filename']}">
-        <img src="{$file['path']}" class="bor_radius im_img" alt="{$file['filename']}">
-        <div class="im_img_title">
-            <span class="right-bottom">
-                {$title}
-            </span>
-        </div>
-    </a>
-</div>
-eof;
-                    }else if (in_array($file['extension'], $videoExts)) {       //输出视频
-                        $videoUrl = urlencode($file['path']);
-                        echo <<<eof
-<div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="/site/player?url={$videoUrl}&id={$file['id']}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
-        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
-            data-video-id="{$file['id']}"
-            data-video-url="{$file['path']}"
-            alt="{$file['filename']}">
-        <div class="im_img_title">
-            <span class="right-bottom">
-                {$title}
-            </span>
-        </div>
-        <img src="/img/video-play.svg" class="playbtn hide" alt="video play button">
-        <span class="duration">00:00:00</span>
-    </a>
-</div>
-eof;
-                    }
                 }
+
 
                 $index++;
             }

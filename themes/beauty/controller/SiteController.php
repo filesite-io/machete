@@ -203,7 +203,7 @@ Class SiteController extends Controller {
 
                             //尝试从缓存数据中获取封面图
                             $cacheKey_snap = $this->getCacheKey($firstVideo['id'], 'vmeta');;
-                            $expireSeconds = 86400*30;  //有效期30天
+                            $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
                             $cacheSubDir = 'video';
                             $cachedData = Common::getCacheFromFile($cacheKey_snap, $expireSeconds, $cacheSubDir);
                             if (!empty($cachedData)) {
@@ -213,6 +213,16 @@ Class SiteController extends Controller {
                         }
                     }else {
                         $url = $imgFile['path'];
+
+                        //小尺寸图片支持
+                        $cacheKey = $this->getCacheKey($imgFile['id'], 'imgsm');
+                        $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
+                        $cacheSubDir = 'image';
+                        $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+                        if (!empty($cachedData)) {
+                            $url = $cachedData;
+                        }
+
                         Common::saveCacheToFile($cacheKey, $url);
                     }
                 }else {
@@ -223,6 +233,53 @@ Class SiteController extends Controller {
         }
 
         return $this->renderJson(compact('code', 'msg', 'url'));
+    }
+
+    //优先从缓存获取小尺寸的图片
+    public function actionSmallimg() {
+        $imgId = $this->get('id', '');
+        $imgUrl = $this->get('url', '');
+        if (empty($imgId) || empty($imgUrl)) {
+            return $this->redirect('/img/beauty/lazy.svg');
+        }
+
+        $cacheKey = $this->getCacheKey($imgId, 'imgsm');
+        $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
+        $cacheSubDir = 'image';
+        $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+        if (!empty($cachedData)) {
+            $imgType = preg_replace('/^data:(image\/.+);base64,.+$/i', "$1", $cachedData);
+            $base64_img = preg_replace('/^data:image\/.+;base64,/i', '', $cachedData);
+
+            header("Content-Type: {$imgType}");
+            echo base64_decode($base64_img);
+            exit;
+        }
+
+        return $this->redirect($imgUrl);
+    }
+
+    //保存小尺寸图片数据到缓存
+    public function actionSavesmallimg() {
+        $code = 0;
+        $msg = 'OK';
+
+        $imgId = $this->post('id', '');
+        $imgData = $this->post('data', '');     //base64格式的图片数据
+        if (empty($imgId) || empty($imgData)) {
+            $code = 0;
+            $msg = '参数不能为空';
+        }else {
+            $cacheKey = $this->getCacheKey($imgId, 'imgsm');
+            $cacheSubDir = 'image';
+            $saved = Common::saveCacheToFile($cacheKey, $imgData, $cacheSubDir);
+
+            if ($saved !== false) {
+                $code = 1;
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg'));
     }
 
     public function actionPlayer() {
@@ -269,7 +326,7 @@ Class SiteController extends Controller {
             $msg = '参数不能为空';
         }else {
             $cacheKey = $this->getCacheKey($videoId, 'vmeta');
-            $expireSeconds = 86400*30;  //有效期30天
+            $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
             $cacheSubDir = 'video';
             $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
             if (!empty($cachedData)) {
@@ -303,7 +360,7 @@ Class SiteController extends Controller {
                 $metaData['manual'] = 1;
                 $saved = Common::saveCacheToFile($cacheKey, $metaData, $cacheSubDir);
             }else {
-                $expireSeconds = 86400*30;  //有效期30天
+                $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
                 $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
                 if (empty($cachedData) || empty($cachedData['manual'])) {
                     $saved = Common::saveCacheToFile($cacheKey, $metaData, $cacheSubDir);

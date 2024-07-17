@@ -52,6 +52,7 @@ $configs = array(
     'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif'),
     'supportedVideoExts' => array('mp4', 'mov', 'm3u8'),
     'screenshot_start' => 1000,     //视频播放页快照截取开始时间，单位：毫秒
+    'screenshot_expire_seconds' => 315360000,   //视频封面图缓存3650天
 
     /*
     //视频皮肤配置

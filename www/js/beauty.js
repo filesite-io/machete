@@ -21,9 +21,61 @@ if ($('#image_site').get(0)) {
     })
 
     // 图片懒加载
+    /*
     $("img.lazy").lazyload({
         effect: "fadeIn",
         event: "scroll"
+    });
+    */
+
+    //需要浏览器支持naturalWidth
+    var saveSmallImg = function(imgEl) {
+        var width = imgEl.width,
+            naturalWidth = imgEl.naturalWidth,
+            naturalHeight = imgEl.naturalHeight;
+        if (!naturalWidth || naturalWidth - width < 100) {return false;}
+
+        var aspect = naturalHeight / naturalWidth;
+
+        var canvas = document.createElement('canvas');
+
+        canvas.width = width;
+        canvas.height = width * aspect;
+
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage( imgEl, 0, 0, canvas.width, canvas.height );
+
+        var smallImg = canvas.toDataURL('image/jpeg');
+        if (smallImg && /^data:image\/.+;base64,/i.test(smallImg)) {
+            var params = {
+                    id: $(imgEl).attr('data-id'),
+                    data: smallImg
+                };
+
+            $.ajax({
+                url: '/site/savesmallimg',
+                method: 'POST',
+                dataType: 'json',
+                data: params
+            }).done(function(data) {
+                if (data.code != 1) {
+                    console.warn('小尺寸图片数据保存失败', data.msg);
+                }
+            }).fail(function(jqXHR, textStatus, errorThrown) {
+                console.error('小尺寸图片数据保存失败，错误信息：' + errorThrown);
+            });
+        }
+    };
+
+    //https://github.com/verlok/vanilla-lazyload
+    var myLazyLoad = new LazyLoad({
+        data_src: 'original',
+        callback_error: function(el, ioe, lazyins) {
+            el.src = '/img/default.png';
+        },
+        callback_loaded: function(el, ioe, lazyins) {
+            saveSmallImg(el);
+        }
     });
 
     // 返回顶部
