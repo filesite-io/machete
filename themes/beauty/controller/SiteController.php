@@ -181,7 +181,8 @@ Class SiteController extends Controller {
         }else {
             //优先从缓存获取
             $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
-            $cachedData = Common::getCacheFromFile($cacheKey);
+            $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
+            $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds);
 
             if (empty($cachedData)) {
                 //从缓存数据中获取目录的realpath
