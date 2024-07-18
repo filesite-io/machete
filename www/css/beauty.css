@@ -124,6 +124,10 @@ a:link{text-decoration:none}
 .lampshow .text_dark{color:#808080}
 .lampshow .text_dark a{color:#f4f7fd}
 
+.gap-hr{position:relative}
+.gap-hr .btn-dir-ext{position:absolute;left:50%;top:50%;margin-top:-11px;margin-left:-26px}
+.gap-hr .btn-dir-ext img{width:13px}
+
 #qrimg{width:160px;height:160px;margin:0 auto 20px auto;background-color:#FFF;padding:5px;border:1px solid #EEE;border-radius:5px;overflow:hidden}
 
 .videoplayer{max-width:800px;margin:0 auto;text-align:center}

@@ -235,7 +235,9 @@ $('.dir_item').each(function(index, el) {
                     }, 100);
                 }
             }else {
-                console.warn('目录 %s 里没有任何图片', id);
+                //console.warn('目录 %s 里没有任何图片', id);
+                var imgHtml = '<img src="/img/default.png">';
+                $(el).find('.im_img_title').before(imgHtml);
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('获取封面图失败，错误信息：' + errorThrown);
@@ -265,6 +267,15 @@ $('.cleanCacheJS').click(function () {
 if ($('#music_main').length > 0) {
     var musicState = 0;
     $('#music_main').get(0).volume = 0.5; // 控制音量
+    $('#music_main').one('canplay', function() {
+        var cookieKey = 'audio_current_time';
+        var currentTime = Cookies.get(cookieKey);
+        if (currentTime > 0) {
+            this.currentTime = currentTime;
+            $('.musicJS').addClass('music_put');
+        }
+    });
+
     $('.musicJS').click(function () {
         if (musicState == 0) {
             $('#music_main').get(0).play();
@@ -282,6 +293,22 @@ if ($('#music_main').length > 0) {
         $('#music_main').get(0).play();
         $('.musicJS').addClass('music_put');
         musicState = 1;
+    });
+
+    $(window).on('beforeunload', function() {
+        $('#music_main').get(0).volume = 0.2;       // 减小音量
+        var currentTime = $('#music_main').get(0).currentTime;
+        var cookieKey = 'audio_current_time';
+        Cookies.set(cookieKey, currentTime, { expires: 1 });
+    });
+
+    $(document.body).click(function(evt) {
+        var elA = $(evt.target).parents('a');
+        if (elA.length > 0 && elA.attr('target') == '_blank') {   //点击视频暂停音乐
+            $('#music_main').get(0).pause();
+            $('.musicJS').removeClass('music_put');
+            musicState = 0;
+        }
     });
 }
 
@@ -493,3 +520,25 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         }, 3000);
     });
 }
+
+
+//目录收拢、展开
+$('.btn-dir-ext').click(function(evt) {
+    var cookieKey = 'dir_ext_status';
+    var status = $('.btn-dir-ext').attr('data-status');
+    if (status == 'opened') {
+        $('.btn-dir-ext').attr('data-status', 'closed');
+        $('.btn-dir-ext').parents('.gap-hr').prev('.im_mainl').addClass('hide');
+        $('.btn-dir-ext').find('img').attr('src', '/img/arrow-down.svg');
+        $('.btn-dir-ext').find('span').text('展开');
+
+        Cookies.set(cookieKey, 'closed', { expires: 1 });
+    }else {
+        $('.btn-dir-ext').attr('data-status', 'opened');
+        $('.btn-dir-ext').parents('.gap-hr').prev('.im_mainl').removeClass('hide');
+        $('.btn-dir-ext').find('img').attr('src', '/img/arrow-up.svg');
+        $('.btn-dir-ext').find('span').text('收拢');
+
+        Cookies.set(cookieKey, 'opened', { expires: 1 });
+    }
+});

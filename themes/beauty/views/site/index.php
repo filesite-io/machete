@@ -6,6 +6,7 @@ $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config
 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
 $supportedExts = array_merge($imgExts, $videoExts);
 
+$dir_ext_status = !empty($_COOKIE['dir_ext_status']) ? $_COOKIE['dir_ext_status'] : 'opened';
 ?><!-- 顶部导航栏模块 -->
 <nav class="navbar navbar-default navbar-fixed-top navbarJS">
     <div class="container-fluid">
@@ -114,8 +115,7 @@ eof;
 }
 ?>
 
-    <div class="im_mainl row">
-        <?php
+    <?php
         //如果没有选中任何目录，则把所有目录显示出来
         if (empty($selectedId) && !empty($viewData['menus'])) {
             $category = array(
@@ -149,12 +149,20 @@ eof;
 eof;
         }
 
+    $dirHideClass = $dir_ext_status == 'closed' ? 'hide' : '';
+    ?>
+    <div class="im_mainl row <?php echo $dirHideClass; ?>">
+        <?php
         if (!empty($category['directories'])) {        //两级目录支持
             $index = 0;
             foreach ($category['directories'] as $dir) {
+                $dirUrl = $dir['path'];
+                if (strpos($dirUrl, 'cid=') === false) {
+                    $dirUrl .= "&cid={$viewData['cacheDataId']}";
+                }
                 echo <<<eof
             <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                <a href="{$dir['path']}&cid={$viewData['cacheDataId']}" class="bor_radius dir_item" data-id="{$dir['id']}" data-cid="{$viewData['cacheDataId']}">
+                <a href="{$dirUrl}" class="bor_radius dir_item" data-id="{$dir['id']}" data-cid="{$viewData['cacheDataId']}">
 eof;
 
                 if (!empty($dir['snapshot'])) {
@@ -212,9 +220,18 @@ eof;
 
             //分割目录和文件
             echo '</div>';
+
             if (!empty($category['files']) && count($category['files']) > 3) {
-                echo '<hr>';
+                $arrowImg = $dir_ext_status == 'opened' ? 'arrow-up.svg' : 'arrow-down.svg';
+                $btnTxt = $dir_ext_status == 'opened' ? '收拢' : '展开';
+                echo <<<eof
+<div class="gap-hr">
+    <hr>
+    <button class="btn btn-default btn-xs btn-dir-ext" data-status="{$dir_ext_status}"><img src="/img/{$arrowImg}" alt="directory toggle"> <span>{$btnTxt}</span></button>
+</div>
+eof;
             }
+
             echo '<div class="im_mainl row">';
         }
 

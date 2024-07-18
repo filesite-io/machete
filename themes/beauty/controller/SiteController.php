@@ -180,9 +180,10 @@ Class SiteController extends Controller {
             $msg = '参数不能为空';
         }else {
             //优先从缓存获取
-            $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
+            $cacheKey = $this->getCacheKey($cateId, 'snap');
             $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
-            $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds);
+            $cacheSubDir = 'dir';
+            $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
 
             if (empty($cachedData)) {
                 //从缓存数据中获取目录的realpath
@@ -210,7 +211,8 @@ Class SiteController extends Controller {
                             $cachedData = Common::getCacheFromFile($cacheKey_snap, $expireSeconds, $cacheSubDir);
                             if (!empty($cachedData)) {
                                 $url = $cachedData['snapshot'];
-                                Common::saveCacheToFile($cacheKey, compact('url', 'img_id'));
+                                $cacheSubDir = 'dir';
+                                Common::saveCacheToFile($cacheKey, compact('url', 'img_id'), $cacheSubDir);
                             }
                         }
                     }else {
@@ -227,7 +229,8 @@ Class SiteController extends Controller {
                             $img_id = '';   //无需再次生成小尺寸图片
                         }
 
-                        Common::saveCacheToFile($cacheKey, compact('url', 'img_id'));
+                        $cacheSubDir = 'dir';
+                        Common::saveCacheToFile($cacheKey, compact('url', 'img_id'), $cacheSubDir);
                     }
                 }else {
                     $code = 0;
@@ -253,9 +256,10 @@ Class SiteController extends Controller {
             $code = 0;
             $msg = '参数不能为空';
         }else {
-            $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
+            $cacheKey = $this->getCacheKey($cateId, 'snap');
             $img_id = '';   //为保持数据格式一致，图片id传空
-            $saved = Common::saveCacheToFile($cacheKey, compact('url', 'img_id'));
+            $cacheSubDir = 'dir';
+            $saved = Common::saveCacheToFile($cacheKey, compact('url', 'img_id'), $cacheSubDir);
 
             if ($saved !== false) {
                 $code = 1;
@@ -307,9 +311,10 @@ Class SiteController extends Controller {
         }else {
             //如果是目录封面图生成缩略图，则更新目录封面图缓存数据
             if (!empty($cateId)) {
-                $cacheKey = $this->getCacheKey($cateId, 'dirsnap');
+                $cacheKey = $this->getCacheKey($cateId, 'snap');
                 $img_id = '';   //为保持数据格式一致，图片id传空
-                Common::saveCacheToFile($cacheKey, array('url' => $imgData, 'img_id' => $img_id));
+                $cacheSubDir = 'dir';
+                Common::saveCacheToFile($cacheKey, array('url' => $imgData, 'img_id' => $img_id), $cacheSubDir);
             }
 
             $cacheKey = $this->getCacheKey($imgId, 'imgsm');
