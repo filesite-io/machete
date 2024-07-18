@@ -217,23 +217,25 @@ eof;
                 $index++;
             }
 
+        }
 
-            //分割目录和文件
-            echo '</div>';
 
-            if (!empty($category['files']) && count($category['files']) > 3) {
-                $arrowImg = $dir_ext_status == 'opened' ? 'arrow-up.svg' : 'arrow-down.svg';
-                $btnTxt = $dir_ext_status == 'opened' ? '收拢' : '展开';
-                echo <<<eof
+        //分割目录和文件
+        echo '</div>';
+
+        if (!empty($category['directories'])) {        //两级目录支持
+            $arrowImg = $dir_ext_status == 'opened' ? 'arrow-up.svg' : 'arrow-down.svg';
+            $btnTxt = $dir_ext_status == 'opened' ? '收拢' : '展开';
+            echo <<<eof
 <div class="gap-hr">
     <hr>
     <button class="btn btn-default btn-xs btn-dir-ext" data-status="{$dir_ext_status}"><img src="/img/{$arrowImg}" alt="directory toggle"> <span>{$btnTxt}</span></button>
 </div>
 eof;
-            }
-
-            echo '<div class="im_mainl row">';
         }
+
+        echo '<div class="im_mainl row">';
+
 
         //显示图片、视频
         if (!empty($category['files'])) {        //一级目录支持
