@@ -62,6 +62,7 @@ a:link{text-decoration:none}
     overflow-y: auto;
     bottom: 0;
     z-index: 1000;
+    padding-bottom:3em;
 }
 .navbar-fixed-left .active a{background-color:#e7e7e7;color:#555}
 .lampshow .navbar-fixed-left{background-color:#222}

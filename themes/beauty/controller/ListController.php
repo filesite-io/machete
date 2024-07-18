@@ -85,13 +85,15 @@ Class ListController extends Controller {
             $scanResults = array($cateId => $currentDir);       //重新组装数据
         }
 
-        //非首页统一从缓存获取目录数据，有效期 1 小时
+        //非首页统一从缓存获取目录数据，有效期 1 天
         $cacheKey = $this->getCacheKey('all', 'menu', $maxScanDeep);
-        $menus = Common::getCacheFromFile($cacheKey, 3600);
+        $expireSeconds = 86400;
+        $menus = Common::getCacheFromFile($cacheKey, $expireSeconds);
 
         //获取根目录下的readme
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $readmeFile = Common::getCacheFromFile($cacheKey);
+        $expireSeconds = 86400;
+        $readmeFile = Common::getCacheFromFile($cacheKey, $expireSeconds);
         if (!empty($readmeFile)) {
             $htmlReadme = $readmeFile['htmlReadme'];
         }
@@ -113,7 +115,8 @@ Class ListController extends Controller {
         //获取默认mp3文件
         //优先从缓存获取默认mp3文件
         $cacheKey = $this->getCacheKey('root', 'mp3', $maxScanDeep);
-        $mp3File = Common::getCacheFromFile($cacheKey);
+        $expireSeconds = 86400;
+        $mp3File = Common::getCacheFromFile($cacheKey, $expireSeconds);
 
 
         //翻页支持
