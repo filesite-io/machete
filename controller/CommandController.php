@@ -35,6 +35,12 @@ eof;
             throw new Exception("缺少key参数！", 403);
         }
 
+        //val数据格式转换
+        if ($param_value === 'false') {
+            $param_value = false;
+        }else if ($param_value === 'true') {
+            $param_value = true;
+        }
 
         $config_file = __DIR__ . "/../runtime/custom_config.json";
         if (file_exists($config_file)) {

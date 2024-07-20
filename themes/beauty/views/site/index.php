@@ -189,6 +189,9 @@ eof;
                     if (in_array($first_img['extension'], $imgExts)) {
                         $imgUrl = urlencode($first_img['path']);
                         $smallUrl = "/site/smallimg/?id={$first_img['id']}&url={$imgUrl}";
+                        if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
+                            $smallUrl = $first_img['path'];
+                        }
                         echo <<<eof
     <img src="/img/beauty/lazy.svg"
         data-id="{$first_img['id']}"
@@ -265,6 +268,9 @@ eof;
                 if (in_array($file['extension'], $imgExts)) {
                     $imgUrl = urlencode($file['path']);
                     $smallUrl = "/site/smallimg/?id={$file['id']}&url={$imgUrl}";
+                    if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
+                        $smallUrl = $file['path'];
+                    }
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="javascript:;" class="bor_radius" data-fancybox="gallery"

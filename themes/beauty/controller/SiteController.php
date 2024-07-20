@@ -172,6 +172,7 @@ Class SiteController extends Controller {
         $msg = 'OK';
         $url = '';
         $img_id = '';
+        $size = 'orignal';
 
         $cacheId = $this->post('cid', '');
         $cateId = $this->post('id', '');
@@ -184,6 +185,18 @@ Class SiteController extends Controller {
             $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
             $cacheSubDir = 'dir';
             $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+
+            //如果关闭缩略图
+            if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
+                if (!empty($cachedData) && !empty($cachedData['size']) && $cachedData['size'] == 'small') {
+                    $cachedData = null;
+                }
+            }
+
+            //弃用老版本数据格式，抛弃没有size属性的
+            if (!empty($cachedData) && empty($cachedData['size'])) {
+                $cachedData = null;
+            }
 
             if (empty($cachedData)) {
                 //从缓存数据中获取目录的realpath
@@ -212,25 +225,30 @@ Class SiteController extends Controller {
                             if (!empty($cachedData)) {
                                 $url = $cachedData['snapshot'];
                                 $cacheSubDir = 'dir';
-                                Common::saveCacheToFile($cacheKey, compact('url', 'img_id'), $cacheSubDir);
+                                $size = 'vm';
+                                Common::saveCacheToFile($cacheKey, compact('url', 'img_id', 'size'), $cacheSubDir);
                             }
                         }
                     }else {
                         $url = $imgFile['path'];
                         $img_id = $imgFile['id'];
+                        $size = 'orignal';
 
                         //小尺寸图片支持
-                        $cacheKey_smimg = $this->getCacheKey($imgFile['id'], 'imgsm');
-                        $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
-                        $cacheSubDir = 'image';
-                        $cachedData = Common::getCacheFromFile($cacheKey_smimg, $expireSeconds, $cacheSubDir);
-                        if (!empty($cachedData)) {
-                            $url = $cachedData;
-                            $img_id = '';   //无需再次生成小尺寸图片
+                        if (!empty(FSC::$app['config']['enableSmallImage']) && FSC::$app['config']['enableSmallImage'] !== 'false') {
+                            $cacheKey_smimg = $this->getCacheKey($imgFile['id'], 'imgsm');
+                            $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
+                            $cacheSubDir = 'image';
+                            $cachedData = Common::getCacheFromFile($cacheKey_smimg, $expireSeconds, $cacheSubDir);
+                            if (!empty($cachedData)) {
+                                $url = $cachedData;
+                                $img_id = '';   //无需再次生成小尺寸图片
+                                $size = 'small';
+                            }
                         }
 
                         $cacheSubDir = 'dir';
-                        Common::saveCacheToFile($cacheKey, compact('url', 'img_id'), $cacheSubDir);
+                        Common::saveCacheToFile($cacheKey, compact('url', 'img_id', 'size'), $cacheSubDir);
                     }
                 }else {
                     $code = 0;
@@ -259,7 +277,13 @@ Class SiteController extends Controller {
             $cacheKey = $this->getCacheKey($cateId, 'snap');
             $img_id = '';   //为保持数据格式一致，图片id传空
             $cacheSubDir = 'dir';
-            $saved = Common::saveCacheToFile($cacheKey, compact('url', 'img_id'), $cacheSubDir);
+
+            $size = 'orignal';
+            if (!empty(FSC::$app['config']['enableSmallImage']) && FSC::$app['config']['enableSmallImage'] !== 'false') {
+                $size = 'small';
+            }
+
+            $saved = Common::saveCacheToFile($cacheKey, compact('url', 'img_id', 'size'), $cacheSubDir);
 
             if ($saved !== false) {
                 $code = 1;
@@ -314,7 +338,8 @@ Class SiteController extends Controller {
                 $cacheKey = $this->getCacheKey($cateId, 'snap');
                 $img_id = '';   //为保持数据格式一致，图片id传空
                 $cacheSubDir = 'dir';
-                Common::saveCacheToFile($cacheKey, array('url' => $imgData, 'img_id' => $img_id), $cacheSubDir);
+                $size = 'small';
+                Common::saveCacheToFile($cacheKey, array('url' => $imgData, 'img_id' => $img_id, 'size' => $size), $cacheSubDir);
             }
 
             $cacheKey = $this->getCacheKey($imgId, 'imgsm');
