@@ -157,14 +157,13 @@ eof;
         return $total;
     }
 
-    //参数：page、limit
-    public static function getPaginationLink($url, $page, $pageSize = 24) {
+    //根据指定参数，以及当前网址，生成新的网址
+    public static function getLinkByParams($url, $getParams = array()) {
         $arr = explode('?', $url);
         if (count($arr) == 1) {     //不含问号
-            return "{$url}?page={$page}&limit={$pageSize}";
+            return "{$url}?" . http_build_query($getParams);
         }
 
-        $paginationParams = array('page', 'limit');
         $newParms = array();
         $baseUrl = $arr[0];
         $queryString = $arr[1];
@@ -172,13 +171,20 @@ eof;
         if (count($params) > 0) {
             foreach ($params as $item) {
                 list($name, $val) = explode('=', $item);
-                if (!in_array($name, $paginationParams)) {
+                if (!isset($getParams[$name])) {
                     array_push($newParms, $item);
                 }
             }
         }
 
-        return $baseUrl . "?page={$page}&limit={$pageSize}" . (!empty($newParms) ? '&'.implode('&', $newParms) : '');
+        return "{$baseUrl}?" . http_build_query($getParams) . (!empty($newParms) ? '&'.implode('&', $newParms) : '');
+    }
+
+    //参数：page、limit
+    public static function getPaginationLink($url, $page, $limit = 24) {
+        $paginationParams = compact('page', 'limit');
+
+        return self::getLinkByParams($url, $paginationParams);
     }
 
     //输出翻页组件，page从1开始

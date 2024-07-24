@@ -82,37 +82,37 @@ if (!empty($category['files'])) {
 }
         
 
-if (!empty($breadcrumbs)) {
-    $totalNum = '';
-    if ($total > 0) {
-        $totalNum = <<<eof
+$totalNum = '';
+if ($total > 0) {
+    $totalNum = <<<eof
     <span class="pull-right total">总数 <strong>{$total}</strong></span>
 eof;
-    }
+}
 
-    echo <<<eof
+echo <<<eof
     <div class="breadcrumbs text_dark">
         {$totalNum}
         <small>当前位置：</small>
-        <a href="/">首页</a> / 
+        <a href="/">首页</a>
 eof;
 
+if (!empty($breadcrumbs)) {
     foreach ($breadcrumbs as $bread) {
         if ($bread['id'] != $selectedId) {
             echo <<<eof
-        <a href="{$bread['url']}">{$bread['name']}</a> / 
+        / <a href="{$bread['url']}">{$bread['name']}</a>
 eof;
         } else {
             echo <<<eof
-        <strong>{$bread['name']}</strong>
+        / <strong>{$bread['name']}</strong>
 eof;
         }
     }
+}
 
-    echo <<<eof
+echo <<<eof
     </div>
 eof;
-}
 ?>
 
     <?php
@@ -122,17 +122,6 @@ eof;
                 'directories' => $viewData['menus'],
                 'files' => $viewData['scanResults'],
             );
-        }else if (empty($category['directories']) && $total == 0) {
-            echo <<<eof
-    <div class="alert alert-warning">
-        <h2>咦？没有图片或视频</h2>
-        <p class="mt-2">
-            空目录吗？复制照片目录或文件到目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存。
-            <br>
-            如果不是空目录，点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存，网页有 10 分钟缓存。
-        </p>
-    </div>
-eof;
         }
 
         //当前目录的描述介绍
@@ -228,14 +217,50 @@ eof;
 
         if (!empty($category['directories'])) {        //两级目录支持
             $arrowImg = $dir_ext_status == 'opened' ? 'arrow-up.svg' : 'arrow-down.svg';
-            $btnTxt = $dir_ext_status == 'opened' ? '收拢' : '展开';
+            $btnTxt = $dir_ext_status == 'opened' ? '收拢目录' : '展开目录';
             echo <<<eof
 <div class="gap-hr">
     <hr>
-    <button class="btn btn-default btn-xs btn-dir-ext" data-status="{$dir_ext_status}"><img src="/img/{$arrowImg}" alt="directory toggle"> <span>{$btnTxt}</span></button>
+    <button class="btn btn-default btn-xs btn-dir-ext" data-status="{$dir_ext_status}" data-opened-title="收拢目录" data-closed-title="展开目录"><img src="/img/{$arrowImg}" alt="directory toggle"> <span>{$btnTxt}</span></button>
 </div>
 eof;
         }
+
+
+        //显示图片、视频筛选链接
+        $arrShowTypes = array(
+            'all' => '所有',
+            'image' => '照片',
+            'video' => '视频',
+        );
+
+        echo '<ul class="nav nav-tabs ml-1">';
+        foreach ($arrShowTypes as $key => $title) {
+            $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
+            $activedClass = $key == $viewData['showType'] ? 'active' : '';
+            echo <<<eof
+            <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
+eof;
+        }
+        echo '</ul>';
+
+        //空目录显示提示信息
+        if (
+            ( empty($selectedId) && empty($category['directories']) ) || 
+            ( !empty($selectedId) && empty($category['files']) )
+        ) {
+            echo <<<eof
+    <div class="alert alert-warning mt-1 mr-1 ml-1">
+        <h2>咦？没有文件哦</h2>
+        <p class="mt-2">
+            空目录吗？复制照片目录或文件到目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存。
+            <br>
+            如果不是空目录，点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存，网页有 10 分钟缓存。
+        </p>
+    </div>
+eof;
+        }
+
 
         echo '<div class="im_mainl row">';
 

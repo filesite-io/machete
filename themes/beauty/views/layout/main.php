@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <link href="/css/main.css?v.1.1" rel="stylesheet">
     <!--for theme beauty-->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/fubox.min.css" rel="stylesheet">
+    <link href="/css/fancybox.css" rel="stylesheet">
     <link href="/css/video-js.min.css" rel="stylesheet">
     <link href="/css/beauty.css?v<?= Html::getStaticFileVersion('beauty.css', 'css') ?>" rel="stylesheet">
     <link href="/css/github-markdown-light.css" rel="stylesheet" id="markdowncss">
@@ -97,7 +97,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/lazyload.min.js"></script>
-    <script src="/js/fubox.min.js"></script>
+    <script src="/js/fancybox.umd.js"></script>
     <script src="/js/qrcode.min.js"></script>
     <script src="/js/video.min.js"></script>
     <script src="/js/js.cookie.min.js"></script>

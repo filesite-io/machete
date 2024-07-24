@@ -10,15 +10,23 @@ window.HELP_IMPROVE_VIDEOJS = false;
 if ($('#image_site').get(0)) {
 
     // 图片浏览
-    $('[data-fancybox]').fancybox({
+    Fancybox.bind('[data-fancybox]', {
         toolbar: true,
         loop: true,
         smallBtn: false,
         buttons: ["zoom", "slideShow", "fullScreen", "download", "thumbs", "close"],
         iframe: {
             preload: false
+        },
+        on: {
+            startSlideshow: function(fancybox) {
+                //console.log('startSlideshow', arguments);
+            },
+            endSlideshow: function(fancybox) {
+                console.log('current', fancybox.getSlide());
+            }
         }
-    })
+    });
 
     //需要浏览器支持naturalWidth
     var saveSmallImg = function(imgEl, cateId) {
@@ -525,19 +533,21 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
 //目录收拢、展开
 $('.btn-dir-ext').click(function(evt) {
     var cookieKey = 'dir_ext_status';
-    var status = $('.btn-dir-ext').attr('data-status');
+    var status = $('.btn-dir-ext').attr('data-status'),
+        opened_title = $('.btn-dir-ext').attr('data-opened-title'),
+        closed_title = $('.btn-dir-ext').attr('data-closed-title');
     if (status == 'opened') {
         $('.btn-dir-ext').attr('data-status', 'closed');
         $('.btn-dir-ext').parents('.gap-hr').prev('.im_mainl').addClass('hide');
         $('.btn-dir-ext').find('img').attr('src', '/img/arrow-down.svg');
-        $('.btn-dir-ext').find('span').text('展开');
+        $('.btn-dir-ext').find('span').text(closed_title);
 
         Cookies.set(cookieKey, 'closed', { expires: 1 });
     }else {
         $('.btn-dir-ext').attr('data-status', 'opened');
         $('.btn-dir-ext').parents('.gap-hr').prev('.im_mainl').removeClass('hide');
         $('.btn-dir-ext').find('img').attr('src', '/img/arrow-up.svg');
-        $('.btn-dir-ext').find('span').text('收拢');
+        $('.btn-dir-ext').find('span').text(opened_title);
 
         Cookies.set(cookieKey, 'opened', { expires: 1 });
     }

@@ -100,8 +100,22 @@ Class ListController extends Controller {
 
 
         //获取目录面包屑
-        $subcate = $scanResults[$cateId];
+        $subcate = !empty($scanResults[$cateId]) ? $scanResults[$cateId] : array();
         $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
+
+        //图片、视频类型筛选支持
+        $showType = $this->get('show', 'all');
+        if ($showType == 'image' && !empty($scanResults[$cateId]['files'])) {
+            $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
+                $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                return !empty($item['extension']) && in_array($item['extension'], $imgExts);
+            });
+        }else if ($showType == 'video' && !empty($scanResults[$cateId]['files'])) {
+            $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
+                $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+                return !empty($item['extension']) && in_array($item['extension'], $videoExts);
+            });
+        }
 
         //获取当前目录下的readme
         $cateReadmeFile = $scanner->getDefaultReadme();
@@ -135,10 +149,56 @@ Class ListController extends Controller {
             $pageTitle = $readmeFile['title'];
         }
 
+
+        //dataType支持：[image, video]
+        $dataType = $this->get('dataType', 'html');
+        if ($dataType == 'image' && !empty($subcate['files'])) {
+            $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+            $imgs = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($subcate['files'] as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
+                    array_push($imgs, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'imgs'));
+        }else if ($dataType == 'video' && !empty($subcate['files'])) {
+            $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+            $videos = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($subcate['files'] as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $videoExts)) {
+                    array_push($videos, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'videos'));
+        }
+
+
         $viewName = '//site/index';     //共享视图
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
-            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright'
+            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

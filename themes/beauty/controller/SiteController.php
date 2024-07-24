@@ -137,9 +137,70 @@ Class SiteController extends Controller {
             $copyright = $readmeFile['copyright'];
         }
 
+        //图片、视频类型筛选支持
+        $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+        $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+
+        $showType = $this->get('show', 'all');
+        if ($showType == 'image') {
+            $scanResults = array_filter($scanResults, function($item) {
+                $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                return !empty($item['extension']) && in_array($item['extension'], $imgExts);
+            });
+        }else if ($showType == 'video') {
+            $scanResults = array_filter($scanResults, function($item) {
+                $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+                return !empty($item['extension']) && in_array($item['extension'], $videoExts);
+            });
+        }
+
+
+        //dataType支持：[image, video]
+        $dataType = $this->get('dataType', 'html');
+        if ($dataType == 'image') {
+            $imgs = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($scanResults as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
+                    array_push($imgs, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'imgs'));
+        }else if ($dataType == 'video') {
+            $videos = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($scanResults as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $videoExts)) {
+                    array_push($videos, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'videos'));
+        }
+
+
         $viewName = 'index';
         $params = compact(
-            'page', 'pageSize', 'cacheDataId',
+            'page', 'pageSize', 'cacheDataId', 'showType',
             'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright'
         );
         return $this->render($viewName, $params, $pageTitle);
