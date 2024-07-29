@@ -9,6 +9,82 @@ window.HELP_IMPROVE_VIDEOJS = false;
 
 if ($('#image_site').get(0)) {
 
+    //获取下一页图片/视频json数据
+    var _slidesOfNextPage = [], _noMoreData = false, currentPage = 1;
+    var getNextPagesJsonData = function(dataType) {
+        if (_slidesOfNextPage.length > 0 || _noMoreData) {return false;}
+
+        var url = new URL(location.href);
+        var api = url.origin + url.pathname;
+
+        if (currentPage == 1 && url.searchParams) {
+            currentPage = url.searchParams.get('page');
+            if (!currentPage) {
+                currentPage = 1;
+            }
+        }
+
+        var newParas = {};
+        for (var key of url.searchParams.keys()) {
+            if (key != 'dataType' && key != 'page') {
+                newParas[key] = url.searchParams.get(key);
+            }
+        }
+
+        newParas['show'] = dataType;
+        newParas['dataType'] = dataType;
+        newParas['page'] = parseInt(currentPage) + 1;
+        currentPage = newParas['page'];
+
+        $.ajax({
+            url: api,
+            method: 'GET',
+            dataType: 'json',
+            data: newParas
+        }).done(function(data) {
+            if (typeof(data.imgs) != 'undefined' && data.imgs.length > 0) {
+                _slidesOfNextPage = data.imgs;
+            }else if (typeof(data.videos) != 'undefined' && data.videos.length > 0) {
+                _slidesOfNextPage = data.videos;
+            }else {
+                _noMoreData = true;
+                console.warn('获取下一页json数据出错啦', data.msg);
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('获取下一页json数据失败，错误信息：' + errorThrown);
+        });
+    };
+
+    //替换已经播放过的上一个图片地址为下一页对应的图片，如果下一页数量不足，则删除上一个图片
+    var refreshFancyBoxStatus = 'off',
+        prevSlide = null;
+    var autoRefreshFancybox = function(fancybox) {
+        if (refreshFancyBoxStatus == 'off') {return false;}
+        getNextPagesJsonData('image');
+
+        var currentSlide = fancybox.getSlide();
+        if (prevSlide && fancybox.isCurrentSlide(prevSlide) == false) {     //替换上一个图片地址
+            var nextImg = _slidesOfNextPage.shift();
+            if (nextImg) {
+                $(prevSlide.el).find('.fancybox__content img').attr('src', nextImg.path);
+                $('.f-thumbs__slide[data-index=' + prevSlide.index + ']').find('img.f-thumbs__slide__img').attr('src', nextImg.path);
+
+                prevSlide.src = nextImg.path;
+                prevSlide.thumbElSrc = nextImg.path;
+                prevSlide.thumbSrc = nextImg.path;
+                prevSlide.caption = nextImg.caption;
+
+                //console.log('prev src replace', prevSlide.index, nextImg.path);
+            }
+        }
+
+        prevSlide = currentSlide;
+
+        setTimeout(function() {
+            autoRefreshFancybox(fancybox);
+        }, 1000);
+    };
+
     // 图片浏览
     Fancybox.bind('[data-fancybox]', {
         toolbar: true,
@@ -20,10 +96,12 @@ if ($('#image_site').get(0)) {
         },
         on: {
             startSlideshow: function(fancybox) {
-                //console.log('startSlideshow', arguments);
+                $('.fancybox__footer .fancybox__thumbs').addClass('is-masked'); //hide thumbs
+                refreshFancyBoxStatus = 'on';
+                autoRefreshFancybox(fancybox);
             },
             endSlideshow: function(fancybox) {
-                console.log('current', fancybox.getSlide());
+                refreshFancyBoxStatus = 'off';
             }
         }
     });
@@ -477,8 +555,6 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
     });
 
     var takeScreenshot = function(manual) {
-        //myPlayer.pause();
-
         var height = myPlayer.videoHeight(), width = myPlayer.videoWidth(),
             aspect = height / width;
         var canvas = document.createElement('canvas');
@@ -498,8 +574,6 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
                 snapshot: snapshotImg
             }, manual);
         }
-
-        //myPlayer.play();
     };
 
     myPlayer.one('playing', function() {

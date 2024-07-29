@@ -98,11 +98,6 @@ Class ListController extends Controller {
             $htmlReadme = $readmeFile['htmlReadme'];
         }
 
-
-        //获取目录面包屑
-        $subcate = !empty($scanResults[$cateId]) ? $scanResults[$cateId] : array();
-        $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
-
         //图片、视频类型筛选支持
         $showType = $this->get('show', 'all');
         if ($showType == 'image' && !empty($scanResults[$cateId]['files'])) {
@@ -116,6 +111,10 @@ Class ListController extends Controller {
                 return !empty($item['extension']) && in_array($item['extension'], $videoExts);
             });
         }
+
+        //获取目录面包屑
+        $subcate = !empty($scanResults[$cateId]) ? $scanResults[$cateId] : array();
+        $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
 
         //获取当前目录下的readme
         $cateReadmeFile = $scanner->getDefaultReadme();
@@ -136,6 +135,8 @@ Class ListController extends Controller {
         //翻页支持
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', 24);
+        $page = (int)$page;
+        $pageSize = (int)$pageSize;
 
 
         //底部版权申明配置支持
@@ -165,6 +166,13 @@ Class ListController extends Controller {
                 }else if ($index >= $pageStartIndex + $pageSize) {
                     break;
                 }
+
+                //增加caption：图片、视频显示文件修改日期
+                $title = Common::getDateFromString($item['filename']);
+                if (empty($title) && !empty($item['fstat']['mtime']) && !empty($item['fstat']['ctime'])) {
+                    $title = date('Y-m-d', min($item['fstat']['mtime'], $item['fstat']['ctime']));
+                }
+                $item['caption'] = "{$title} - {$item['filename']}";
 
                 if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
                     array_push($imgs, $item);

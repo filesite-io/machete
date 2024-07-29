@@ -122,6 +122,8 @@ Class SiteController extends Controller {
         //翻页支持
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', 24);
+        $page = (int)$page;
+        $pageSize = (int)$pageSize;
 
         $pageTitle = !empty($titles) ? $titles[0]['name'] : "FileSite.io";
         if (!empty($readmeFile['title'])) {
@@ -169,6 +171,13 @@ Class SiteController extends Controller {
                 }else if ($index >= $pageStartIndex + $pageSize) {
                     break;
                 }
+
+                //增加caption：图片、视频显示文件修改日期
+                $title = Common::getDateFromString($item['filename']);
+                if (empty($title) && !empty($item['fstat']['mtime']) && !empty($item['fstat']['ctime'])) {
+                    $title = date('Y-m-d', min($item['fstat']['mtime'], $item['fstat']['ctime']));
+                }
+                $item['caption'] = "{$title} - {$item['filename']}";
 
                 if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
                     array_push($imgs, $item);
