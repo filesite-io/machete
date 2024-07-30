@@ -546,6 +546,7 @@ var saveVideoMeta = function(videoId, metaData, manual) {
 };
 
 //视频播放器
+var moreVideos = [], _noMoreVideos = false;
 if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
     var myPlayer = videojs('my-player', {
         controls: true,
@@ -590,6 +591,7 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         setTimeout(takeScreenshot, screenshot_start);
     });
 
+    //生成封面图
     $('.btn-snapshot').click(function(e) {
         var clickedBtn = $(e.target);
         clickedBtn.prop('disabled', true);
@@ -600,6 +602,141 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         setTimeout(function() {
             clickedBtn.prop('disabled', false);
         }, 3000);
+    });
+
+    var getVideoUrl = function(videoId, videoPath) {
+        var url = new URL(location.href);
+        var api = url.origin + url.pathname;
+
+        var newParas = [];
+        for (var key of url.searchParams.keys()) {
+            if (key != 'id' && key != 'url' && key != 'other') {
+                newParas.push(key + '=' + url.searchParams.get(key));
+            }
+        }
+        newParas.push('id=' + videoId);
+        newParas.push('url=' + encodeURIComponent(videoPath));
+
+        return api + '?other=1&' + newParas.join('&');
+    };
+
+    var renderVideos = function(ignoreId, videos) {
+        var template = $('#template_video_item').html(),
+            html = '', tmp = '';
+
+        for (var index in videos) {
+            if (videos[index].id == ignoreId) {continue;}
+            tmp = template.replace('{videoUrl}', getVideoUrl(videos[index].id, videos[index].path));
+            tmp = tmp.replaceAll('{title}', videos[index].filename);
+            tmp = tmp.replaceAll('{videoId}', videos[index].id);
+            tmp = tmp.replaceAll('{videoPath}', videos[index].path);
+
+            html += tmp;
+        }
+
+        return html;
+    };
+
+    //加载更多视频
+    var currentPage = $('.othervideos').attr('data-page'),
+        currentVideoId = $('.othervideos').attr('data-id');
+    var callback_loadNextPage = null;
+    var getOtherVideos = function(currentPage) {
+        if (_noMoreVideos) {return false;}
+        var videoId = $('.othervideos').attr('data-id'),
+            cateId = $('.othervideos').attr('data-pid'),
+            cacheId = $('.othervideos').attr('data-cid');
+        var api = '/list/',
+            params = {
+                id: cateId,
+                cid: cacheId,
+                show: 'video',
+                dataType: 'video',
+                page: currentPage
+            };
+        $.ajax({
+            url: api,
+            method: 'GET',
+            dataType: 'json',
+            data: params
+        }).done(function(data) {
+            if (typeof(data.videos) != 'undefined' && data.videos.length > 0) {
+                moreVideos = data.videos;
+                $('.othervideos').html(renderVideos(videoId, data.videos));
+                setTimeout(function() {
+                    $('.othervideos .video-poster').each(function(index, el) {
+                        var videoId = $(el).attr('data-video-id'),
+                            videoUrl = $(el).attr('data-video-url');
+                        getVideoMetaAndShowIt(videoId, videoUrl);
+                    });
+                }, 50);
+
+                if (callback_loadNextPage) {
+                    callback_loadNextPage(data.videos);
+                }
+            }else {
+                _noMoreVideos = true;
+                console.warn('获取更多视频数据出错啦', data.msg);
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('获取更多视频数据失败，错误信息：' + errorThrown);
+        });
+    };
+
+    getOtherVideos(currentPage);
+
+    //自动播放
+    var playNextVideo = function() {
+        var nextVideo = moreVideos.shift();
+        if (nextVideo.id == currentVideoId && moreVideos.length > 0) {
+            nextVideo = moreVideos.shift();
+        }
+
+        if (nextVideo) {
+            myPlayer.src(nextVideo.path);
+            $('.navbar-header .videotitle').text(nextVideo.filename);
+        }
+    };
+    myPlayer.on('ended', function() {
+        var cachedAutoPlayStatus = Cookies.get('autoplay');
+        if (cachedAutoPlayStatus == 'off') {return false;}
+
+        if (moreVideos && moreVideos.length > 0) {
+            playNextVideo();
+        }else {
+            callback_loadNextPage = function(videos) {
+                playNextVideo();
+            };
+            currentPage = parseInt(currentPage) + 1;
+            getOtherVideos(currentPage);
+        }
+    });
+
+    var switchAutoPlayBtns = function(status) {
+        var cookieKey = 'autoplay';
+        if (status == 'on') {
+            $('.autoplay_disabled').removeClass('btn-primary');
+            $('.autoplay_enabled').addClass('btn-primary');
+            Cookies.set(cookieKey, 'on', { expires: 7 });
+        }else {
+            $('.autoplay_enabled').removeClass('btn-primary');
+            $('.autoplay_disabled').addClass('btn-primary');
+            Cookies.set(cookieKey, 'off', { expires: 7 });
+        }
+        $('#my-player').focus();
+    };
+
+    var cachedAutoPlayStatus = Cookies.get('autoplay');
+    if (cachedAutoPlayStatus == 'off') {
+        $('.autoplay_enabled').removeClass('btn-primary');
+        $('.autoplay_disabled').addClass('btn-primary');
+    }
+
+    $('.autoplay_disabled').click(function() {
+        switchAutoPlayBtns('off');
+    });
+    $('.autoplay_enabled').click(function() {
+        switchAutoPlayBtns('on');
     });
 }
 

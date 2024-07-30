@@ -25,7 +25,7 @@ a:visited{text-decoration:none}
 a:link{text-decoration:none}
 
 .lampshow{background-color:#222}
-.main_style{padding-top:64px}
+.main_style{padding-top:64px;overflow:hidden}
 .navbar-default {
     background-color:#FFF;
 }
@@ -138,6 +138,9 @@ a:link{text-decoration:none}
 .duration{position:absolute;left:5px;bottom:5px;background-color:#222;padding:0 3px;opacity:0.7;border-radius:3px;font-size:12px;color:#FFF}
 .video_previewer{display:none;position:fixed;right:4px;bottom:4px;width:200px;height:112px;overflow:hidden;z-index:1000}
 
+.othervideos{max-height:560px;overflow-y:auto}
+.btn_autoplay{margin:5px}
+
 .mt-2{margin-top:2em}
 .mt-1{margin-top:1em}
 .mr-1{margin-right:1em}
@@ -166,6 +169,7 @@ a:link{text-decoration:none}
 
     .pagination>li>a, .pagination>li>span{padding:3px 7px}
     .videotitle{max-width:52%}
+    .othervideos{max-height:inherit}
 }
 
 @keyframes musicTurn {

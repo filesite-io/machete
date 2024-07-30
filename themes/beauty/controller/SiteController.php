@@ -427,8 +427,13 @@ Class SiteController extends Controller {
     public function actionPlayer() {
         $videoUrl = $this->get('url', '');
         $videoId = $this->get('id', '');
-        if (empty($videoUrl) || empty($videoId)) {
-            throw new Exception("缺少视频地址url或id参数！", 403);
+
+        $cateId = $this->get('pid', '');
+        $cacheParentDataId = $this->get('cid', '');
+        $page = $this->get('page', 1);
+
+        if (empty($videoUrl) || empty($videoId) || empty($cateId) || empty($cacheParentDataId)) {
+            throw new Exception("缺少参数！", 403);
         }
 
         $arr = parse_url($videoUrl);
@@ -450,7 +455,9 @@ Class SiteController extends Controller {
         $this->layout = 'player';
         $viewName = 'player';
         $params = compact(
-            'videoUrl', 'videoId', 'videoFilename', 'copyright'
+            'videoUrl', 'videoId', 'videoFilename',
+            'cateId', 'cacheParentDataId', 'page',
+            'copyright'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

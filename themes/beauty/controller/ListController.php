@@ -25,15 +25,17 @@ Class ListController extends Controller {
         $scanner = new DirScanner();
 
         //根据参数cid获取id对应的目录realpath，从而只扫描这个目录
-        $cacheSeconds = 3600;
+        $cacheSeconds = 86400;
         $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
         if (empty($cachedParentData)) {
             return $this->redirect('/');
         }
 
         $currentDir = $cachedParentData[$cateId];
-        if (empty($currentDir)) {
+        if (strpos($cacheParentDataId, $cateId) === false && empty($currentDir)) {
             throw new Exception("缓存数据中找不到当前目录，请返回上一页重新进入！", 404);
+        }else if (strpos($cacheParentDataId, $cateId) !== false) {
+            $currentDir = $cachedParentData;
         }
 
         $scanner->setWebRoot($this->getCurrentWebroot($currentDir['realpath']));
@@ -42,7 +44,7 @@ Class ListController extends Controller {
         //优先从缓存读取数据
         $maxScanDeep = 0;       //最大扫描目录级数
         $cacheKey = $this->getCacheKey($cateId, 'tree', $maxScanDeep);
-        $cachedData = Common::getCacheFromFile($cacheKey);
+        $cachedData = Common::getCacheFromFile($cacheKey, $cacheSeconds);
         if (!empty($cachedData)) {
             $dirTree = $cachedData;
             $scanner->setTreeData($cachedData);
@@ -53,7 +55,7 @@ Class ListController extends Controller {
 
         //优先从缓存读取数据
         $cacheKey = $cacheDataId = $this->getCacheKey($cateId, 'data', $maxScanDeep);
-        $cachedData = Common::getCacheFromFile($cacheKey);
+        $cachedData = Common::getCacheFromFile($cacheKey, $cacheSeconds);
         if (!empty($cachedData)) {
             $scanResults = $cachedData;
             $scanner->setScanResults($cachedData);
