@@ -123,7 +123,7 @@ a:link{text-decoration:none}
 .lampshow .right_sidebox{background-color:#222;color:#FFF}
 .lampshow .right_sidebox>h5{border-color: #363636}
 .lampshow .text_dark{color:#808080}
-.lampshow .text_dark a{color:#f4f7fd}
+.lampshow .text_dark a, .lampshow .nav-tabs a{color:#f4f7fd}
 
 .gap-hr{position:relative}
 .gap-hr .btn-dir-ext{position:absolute;left:50%;top:50%;margin-top:-11px;margin-left:-26px}

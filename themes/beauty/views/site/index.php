@@ -318,9 +318,14 @@ eof;
 eof;
                 }else if (in_array($file['extension'], $videoExts)) {       //输出视频
                     $videoUrl = urlencode($file['path']);
+                    $linkUrl = "/site/player?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}";
+                    if ($viewData['showType'] == 'video') {
+                        $linkUrl .= "&page={$viewData['page']}";
+                    }
+
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="/site/player?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}&page={$viewData['page']}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
+    <a href="{$linkUrl}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
         <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
             data-video-id="{$file['id']}"
             data-video-url="{$file['path']}"

@@ -54,8 +54,8 @@
     </div>
     <div class="col col-md-4 morevideos">
         <hr class="visible-xs">
-        <div class="btn_autoplay">
-            自动播放
+        <div class="btn_autoplay text_dark">
+            自动播放：
             <div class="btn-group" role="group">
                 <button class="btn btn-default btn-xs autoplay_disabled">关闭</button>
                 <button class="btn btn-primary btn-xs autoplay_enabled">开启</button>
