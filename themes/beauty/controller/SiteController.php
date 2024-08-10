@@ -296,7 +296,7 @@ Class SiteController extends Controller {
                                 $url = $cachedData['snapshot'];
                                 $cacheSubDir = 'dir';
                                 $size = 'vm';
-                                Common::saveCacheToFile($cacheKey, compact('url', 'img_id', 'size'), $cacheSubDir);
+                                Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
                             }
                         }
                     }else {
@@ -310,15 +310,19 @@ Class SiteController extends Controller {
                             $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
                             $cacheSubDir = 'image';
                             $cachedData = Common::getCacheFromFile($cacheKey_smimg, $expireSeconds, $cacheSubDir);
-                            if (!empty($cachedData)) {
+                            if (!empty($cachedData)) {      //已经有缩略图
                                 $url = $cachedData;
-                                $img_id = '';   //无需再次生成小尺寸图片
                                 $size = 'small';
-                            }
-                        }
 
-                        $cacheSubDir = 'dir';
-                        Common::saveCacheToFile($cacheKey, compact('url', 'img_id', 'size'), $cacheSubDir);
+                                //当前目录有缩略图的时候才缓存
+                                $cacheSubDir = 'dir';
+                                Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
+                            }
+                        }else if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
+                            //如果关闭了缩略图功能则缓存原图
+                            $cacheSubDir = 'dir';
+                            Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
+                        }
                     }
                 }else {
                     $code = 0;
@@ -326,11 +330,10 @@ Class SiteController extends Controller {
                 }
             }else {
                 $url = $cachedData['url'];
-                $img_id = $cachedData['img_id'];
             }
         }
 
-        return $this->renderJson(compact('code', 'msg', 'url', 'img_id'));
+        return $this->renderJson(compact('code', 'msg', 'url'));
     }
 
     //保存目录封面图到缓存
@@ -431,6 +434,7 @@ Class SiteController extends Controller {
         $cateId = $this->get('pid', '');
         $cacheParentDataId = $this->get('cid', '');
         $page = $this->get('page', 1);
+        $pageSize = $this->get('limit', 24);
 
         if (empty($videoUrl) || empty($videoId) || empty($cateId) || empty($cacheParentDataId)) {
             throw new Exception("缺少参数！", 403);
@@ -456,7 +460,7 @@ Class SiteController extends Controller {
         $viewName = 'player';
         $params = compact(
             'videoUrl', 'videoId', 'videoFilename',
-            'cateId', 'cacheParentDataId', 'page',
+            'cateId', 'cacheParentDataId', 'page', 'pageSize',
             'copyright'
         );
         return $this->render($viewName, $params, $pageTitle);

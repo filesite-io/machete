@@ -311,15 +311,6 @@ $('.dir_item').each(function(index, el) {
                 }
                 imgHtml += ' class="bor_radius im_img">';
                 $(el).find('.im_img_title').before(imgHtml);
-
-                if (data.img_id) {
-                    setTimeout(function() {
-                        var imgs = $(el).find('.im_img');
-                        if (imgs.length > 0) {
-                            saveSmallImg(imgs[0], id);
-                        }
-                    }, 100);
-                }
             }else {
                 //console.warn('目录 %s 里没有任何图片', id);
                 var imgHtml = '<img src="/img/default.png">';
@@ -639,9 +630,10 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
 
     //加载更多视频
     var currentPage = $('.othervideos').attr('data-page'),
+        currentPageSize = $('.othervideos').attr('data-page-size'),
         currentVideoId = $('.othervideos').attr('data-id');
     var callback_loadNextPage = null;
-    var getOtherVideos = function(currentPage) {
+    var getOtherVideos = function() {
         if (_noMoreVideos) {return false;}
         var videoId = $('.othervideos').attr('data-id'),
             cateId = $('.othervideos').attr('data-pid'),
@@ -652,7 +644,8 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
                 cid: cacheId,
                 show: 'video',
                 dataType: 'video',
-                page: currentPage
+                page: currentPage,
+                limit: currentPageSize
             };
         $.ajax({
             url: api,
@@ -675,15 +668,20 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
                     callback_loadNextPage(data.videos);
                 }
             }else {
-                _noMoreVideos = true;
-                console.warn('获取更多视频数据出错啦', data.msg);
+                if (currentPage > 1) {
+                    currentPage = 1;        //重新从第一页循环播放
+                    getOtherVideos();
+                }else {
+                    _noMoreVideos = true;
+                    console.warn('获取更多视频数据出错啦', data.msg);
+                }
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('获取更多视频数据失败，错误信息：' + errorThrown);
         });
     };
 
-    getOtherVideos(currentPage);
+    getOtherVideos();
 
     //自动播放
     var playNextVideo = function() {
@@ -708,7 +706,7 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
                 playNextVideo();
             };
             currentPage = parseInt(currentPage) + 1;
-            getOtherVideos(currentPage);
+            getOtherVideos();
         }
     });
 

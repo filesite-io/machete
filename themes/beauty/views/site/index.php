@@ -320,7 +320,7 @@ eof;
                     $videoUrl = urlencode($file['path']);
                     $linkUrl = "/site/player?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}";
                     if ($viewData['showType'] == 'video') {
-                        $linkUrl .= "&page={$viewData['page']}";
+                        $linkUrl .= "&page={$viewData['page']}&limit={$viewData['pageSize']}";
                     }
 
                     echo <<<eof

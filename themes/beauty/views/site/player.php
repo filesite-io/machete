@@ -67,6 +67,7 @@
             data-pid="<?php echo $viewData['cateId']; ?>"
             data-cid="<?php echo $viewData['cacheParentDataId']; ?>"
             data-page="<?php echo $viewData['page']; ?>"
+            data-page-size="<?php echo $viewData['pageSize']; ?>"
             class="othervideos">其它视频</div>
     </div>
 </div>
