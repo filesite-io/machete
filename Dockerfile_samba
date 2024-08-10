@@ -21,12 +21,6 @@ RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.n
     && chown apache:apache www/navs/ \
     && chown apache:apache www/girls/ \
     && chown apache:apache www/videos/ \
-    && cd /var/www/downloads/ \
-    && wget "https://git.filesite.io/wen/jialuomaadmin/archive/master.tar.gz" \
-    && tar -zxvf master.tar.gz \
-    && rm -f master.tar.gz \
-    && rm -rf /var/www/machete/www/admin/ \
-    && mv jialuomaadmin/dist/ /var/www/machete/www/admin \
     && rm -f /etc/nginx/nginx.conf \
     && cp /var/www/machete/conf/nginx.conf /etc/nginx/nginx.conf \
     && cp /var/www/machete/conf/nginx_machete.conf /etc/nginx/conf.d/machete.conf \
@@ -58,5 +52,5 @@ EXPOSE 9000/tcp
 EXPOSE 80/tcp
 EXPOSE 445/tcp
 ENTRYPOINT ["/var/www/machete/docker-entrypoint.sh"]
-# 默认使用导航站皮肤：manual
-CMD ["manual"]
+# 默认使用图片展皮肤：beauty
+CMD ["beauty"]

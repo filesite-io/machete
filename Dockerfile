@@ -18,17 +18,20 @@ RUN apk add rsync nginx zlib-dev libpng-dev freetype-dev libjpeg-turbo-dev \
     && chown www-data:www-data www/navs/ \
     && chown www-data:www-data www/girls/ \
     && chown www-data:www-data www/videos/ \
-    && cd /var/www/downloads/ \
-    && wget "https://git.filesite.io/wen/jialuomaadmin/archive/master.tar.gz" \
-    && tar -zxvf master.tar.gz \
-    && rm -f master.tar.gz \
-    && rm -rf /var/www/machete/www/admin/ \
-    && mv jialuomaadmin/dist/ /var/www/machete/www/admin \
     && rm -f /etc/nginx/http.d/default.conf \
     && cp /var/www/machete/conf/nginx_machete.conf /etc/nginx/http.d/machete.conf \
     && ln -s /var/www/machete/bin/upgrade.sh /usr/bin/upgrade_machete
 
 EXPOSE 80/tcp
 ENTRYPOINT ["/var/www/machete/docker-entrypoint.sh"]
-# 默认使用导航站皮肤：manual
-CMD ["manual"]
+# 默认使用图片展皮肤：beauty
+CMD ["beauty"]
+
+
+# 去掉admin后台
+#&& cd /var/www/downloads/ \
+#&& wget "https://git.filesite.io/wen/jialuomaadmin/archive/master.tar.gz" \
+#    && tar -zxvf master.tar.gz \
+#    && rm -f master.tar.gz \
+#    && rm -rf /var/www/machete/www/admin/ \
+#    && mv jialuomaadmin/dist/ /var/www/machete/www/admin \
