@@ -5,9 +5,12 @@ if [ -d "/var/www/machete/themes/${theme}/" ]; then
 
     ## 复制对应皮肤的配置文件
     cd /var/www/machete/runtime/
-    rm -f custom_config.json
-    cp "../conf/custom_config_${theme}.json" ./custom_config.json
-    chmod 777 custom_config.json
+
+    ## 避免容器重启后重新生成配置文件
+    if [ ! -f custom_config.json ]; then
+        cp "../conf/custom_config_${theme}.json" ./custom_config.json
+        chmod 777 custom_config.json
+    fi
 fi
 
 ## 启动samba
