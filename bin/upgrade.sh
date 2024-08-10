@@ -58,6 +58,12 @@ if [ -f "master.tar.gz" ]; then
 
     tar -zxvf master.tar.gz
     rm -f master.tar.gz
+
+    # 兼容gitcode的tar包解压后目录为：machete-master/
+    if [ -d machete-master/ ]; then
+        mv machete-master/ machete/
+    fi
+
     rsync -vrL machete/* /var/www/machete/ \
         --exclude=www/content/ \
         --exclude=www/navs/ \
