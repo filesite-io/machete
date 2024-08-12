@@ -228,21 +228,24 @@ eof;
 
 
         //显示图片、视频筛选链接
-        $arrShowTypes = array(
-            'all' => '所有',
-            'image' => '照片',
-            'video' => '视频',
-        );
+        if ($total > 0) {
+            $arrShowTypes = array(
+                'all' => '所有',
+                'image' => '照片',
+                'video' => '视频',
+            );
 
-        echo '<ul class="nav nav-tabs ml-1">';
-        foreach ($arrShowTypes as $key => $title) {
-            $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
-            $activedClass = $key == $viewData['showType'] ? 'active' : '';
-            echo <<<eof
-            <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
+            echo '<ul class="nav nav-tabs ml-1">';
+            foreach ($arrShowTypes as $key => $title) {
+                $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
+                $activedClass = $key == $viewData['showType'] ? 'active' : '';
+                echo <<<eof
+                <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
 eof;
+            }
+            echo '</ul>';
         }
-        echo '</ul>';
+
 
         //空目录显示提示信息
         if (

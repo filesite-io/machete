@@ -93,7 +93,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
         <?php } ?>
     </div>
 
-    <!--for theme googleimage-->
+    <!--for theme beauty-->
     <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/lazyload.min.js"></script>

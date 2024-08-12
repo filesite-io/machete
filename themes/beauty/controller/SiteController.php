@@ -270,7 +270,7 @@ Class SiteController extends Controller {
 
             if (empty($cachedData)) {
                 //从缓存数据中获取目录的realpath
-                $cachedData = Common::getCacheFromFile($cacheId);
+                $cachedData = Common::getCacheFromFile($cacheId, $expireSeconds);
                 if (!empty($cachedData)) {
                     $realpath = $cachedData[$cateId]['realpath'];
                     $scanner = new DirScanner();
@@ -317,6 +317,24 @@ Class SiteController extends Controller {
                                 //当前目录有缩略图的时候才缓存
                                 $cacheSubDir = 'dir';
                                 Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
+                            }else {
+                                //实时生成缩略图
+                                $img_filepath = $imgFile['realpath'];
+                                $img_data = $this->createSmallJpg($img_filepath);
+                                if (!empty($img_data)) {
+                                    //保存到缓存文件
+                                    $cacheKey_smimg = $this->getCacheKey($imgFile['id'], 'imgsm');
+                                    $cacheSubDir = 'image';
+                                    $base64_img = base64_encode($img_data);
+                                    Common::saveCacheToFile($cacheKey_smimg, "data:image/jpeg;base64,{$base64_img}", $cacheSubDir);
+
+                                    $url = "data:image/jpeg;base64,{$base64_img}";
+                                    $size = 'small';
+
+                                    //缓存目录封面图
+                                    $cacheSubDir = 'dir';
+                                    Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
+                                }
                             }
                         }else if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
                             //如果关闭了缩略图功能则缓存原图
@@ -366,6 +384,80 @@ Class SiteController extends Controller {
         return $this->renderJson(compact('code', 'msg'));
     }
 
+    //借助gd库，获取图片类型、尺寸，并实时生成缩略图
+    protected function createSmallJpg($img_filepath, $min_width = 198, $min_height = 219, $max_width = 600, $max_height = 500) {
+        $img_data = null;
+
+        try {
+            list($naturalWidth, $naturalHeight, $imgTypeIndex, $style) = getimagesize($img_filepath);
+            $imgType = image_type_to_extension($imgTypeIndex);
+
+            //小图片则保持原图尺寸
+            if ($naturalWidth <= $max_width || $naturalHeight <= $max_height) {
+                return false;
+            }
+
+            //生成同比例缩略图尺寸
+            $zoomRate = FSC::$app['config']['small_image_zoom_rate'];        //缩略图在最小尺寸基础上放大比例，为确保清晰度
+            $width = $min_width;
+            $height = $min_height;
+            $aspect = $naturalHeight / $naturalWidth;
+            if ($naturalWidth <= $naturalHeight) {
+                if ($width * $zoomRate >= $naturalWidth) {return false;}        //避免把小图片放大
+                $width = $width * $zoomRate <= $max_width ? (int)($width * $zoomRate) : $max_width;
+                $height = (int)($width * $aspect);
+            }else {
+                if ($height * $zoomRate >= $naturalHeight) {return false;}      //避免把小图片放大
+                $height = $height * $zoomRate <= $max_height ? (int)($height * $zoomRate) : $max_height;
+                $width = (int)($height / $aspect);
+            }
+
+            $imgSource = null;
+            switch ($imgType) {
+                case '.jpeg':
+                    $imgSource = imagecreatefromjpeg($img_filepath);
+                    break;
+                case '.png':
+                    $imgSource = imagecreatefrompng($img_filepath);
+                    break;
+                case '.gif':
+                    $imgSource = imagecreatefromgif($img_filepath);
+                    break;
+                case '.webp':
+                    //php >= 5.4
+                    if (phpversion() >= 5.4) {
+                        $imgSource = imagecreatefromwebp($img_filepath);
+                    }
+                    break;
+                case '.bmp':
+                    //php >= 7.2
+                    if (phpversion() >= 7.2) {
+                        $imgSource = imagecreatefrombmp($img_filepath);
+                    }
+                    break;
+            }
+
+            //保存base64格式的缩略图到缓存文件
+            if (!empty($imgSource)) {
+                $dst_img = imagecreatetruecolor($width, $height);
+                $copy_done = imagecopyresized($dst_img, $imgSource, 0, 0, 0, 0, $width, $height, $naturalWidth, $naturalHeight);
+
+                if ($copy_done) {
+                    ob_start();
+                    imagejpeg($dst_img);
+                    $img_data = ob_get_clean();
+                    ob_end_clean();
+                }
+
+                imagedestroy($dst_img);
+            }
+        }catch(Exception $e) {
+            $this->logError('创建缩略图失败：' . $e->getMessage());
+        }
+
+        return $img_data;
+    }
+
     //优先从缓存获取小尺寸的图片
     //增加父目录封面图缓存更新
     public function actionSmallimg() {
@@ -379,7 +471,27 @@ Class SiteController extends Controller {
         $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
         $cacheSubDir = 'image';
         $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
-        if (!empty($cachedData)) {
+
+        //无缓存，则实时生成缩略图
+        if (empty($cachedData)) {
+            $tmpUrl = parse_url($imgUrl);
+            $img_filepath = __DIR__ . '/../../../www' . $tmpUrl['path'];
+            $img_data = $this->createSmallJpg($img_filepath);
+            if (!empty($img_data)) {
+                //保存到缓存文件
+                $cacheKey = $this->getCacheKey($imgId, 'imgsm');
+                $cacheSubDir = 'image';
+                $base64_img = base64_encode($img_data);
+                Common::saveCacheToFile($cacheKey, "data:image/jpeg;base64,{$base64_img}", $cacheSubDir);
+
+                //返回图片数据
+                header("Content-Type: image/jpeg");
+                header('Cache-Control: max-age=3600');  //缓存 1 小时
+                header("Etag: " . md5($img_data));
+                echo $img_data;
+                exit;
+            }
+        }else {     //有缓存，则返回缓存数据
             $imgType = preg_replace('/^data:(image\/.+);base64,.+$/i', "$1", $cachedData);
             $base64_img = preg_replace('/^data:image\/.+;base64,/i', '', $cachedData);
 
