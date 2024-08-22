@@ -4,8 +4,9 @@ RUN apk add rsync nginx zlib-dev libpng-dev freetype-dev libjpeg-turbo-dev \
     && docker-php-ext-install -j$(nproc) gd \
     && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
     && cd /usr/local/etc/php/ \
-    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 20M/g' php.ini \
-    && sed -i 's/post_max_size = 8M/post_max_size = 20M/g' php.ini \
+    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 100M/g' php.ini \
+    && sed -i 's/post_max_size = 8M/post_max_size = 100M/g' php.ini \
+    && sed -i 's/memory_limit = 128M/memory_limit = 1024M/g' php.ini \
     && mkdir -p /var/www/downloads \
     && cd /var/www/downloads/ \
     && wget "https://git.filesite.io/filesite/machete/archive/master.tar.gz" \

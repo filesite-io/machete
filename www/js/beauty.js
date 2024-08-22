@@ -86,22 +86,37 @@ if ($('#image_site').get(0)) {
     };
 
     // 图片浏览
-    Fancybox.bind('[data-fancybox]', {
-        Toolbar: {
-            display: {
-              left: ["infobar"],
-              middle: [
+    var fancyboxToolbar = {
+        display: {
+            left: ["infobar"],
+            middle: [
                 "zoomIn",
                 "zoomOut",
                 "toggle1to1",
                 "rotateCCW",
                 "rotateCW",
                 "flipX",
-                "flipY",
-              ],
-              right: ["slideshow", "fullscreen", "thumbs", "download", "close"],
-            },
+                "flipY"
+            ],
+            right: ["slideshow", "fullscreen", "thumbs", "download", "close"],
         },
+    };
+    if ($(window).width() < 640) {  //小屏幕只显示部分按钮
+        fancyboxToolbar = {
+            display: {
+                left: ["infobar"],
+                middle: [
+                    "zoomIn",
+                    "zoomOut",
+                    "rotateCCW",
+                    "rotateCW"
+                ],
+                right: ["download", "close"]
+            }
+        };
+    }
+    Fancybox.bind('[data-fancybox]', {
+        Toolbar: fancyboxToolbar,
         loop: true,
         smallBtn: false,
         iframe: {

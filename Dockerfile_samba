@@ -8,8 +8,9 @@ RUN yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.n
     && yum -y install php82-php-fpm php82-php-gd php82-php-mbstring nginx wget rsync samba \
     && ln -s /opt/remi/php82/root/usr/sbin/php-fpm /usr/sbin/php-fpm \
     && cd /etc/opt/remi/php82/ \
-    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 20M/g' php.ini \
-    && sed -i 's/post_max_size = 8M/post_max_size = 20M/g' php.ini \
+    && sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 100M/g' php.ini \
+    && sed -i 's/post_max_size = 8M/post_max_size = 100M/g' php.ini \
+    && sed -i 's/memory_limit = 128M/memory_limit = 1024M/g' php.ini \
     && mkdir -p /var/www/downloads && cd /var/www/downloads/ \
     && wget "https://git.filesite.io/filesite/machete/archive/master.tar.gz" \
     && tar -zxvf master.tar.gz \
