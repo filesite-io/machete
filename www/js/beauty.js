@@ -87,10 +87,23 @@ if ($('#image_site').get(0)) {
 
     // 图片浏览
     Fancybox.bind('[data-fancybox]', {
-        toolbar: true,
+        Toolbar: {
+            display: {
+              left: ["infobar"],
+              middle: [
+                "zoomIn",
+                "zoomOut",
+                "toggle1to1",
+                "rotateCCW",
+                "rotateCW",
+                "flipX",
+                "flipY",
+              ],
+              right: ["slideshow", "fullscreen", "thumbs", "download", "close"],
+            },
+        },
         loop: true,
         smallBtn: false,
-        buttons: ["zoom", "slideShow", "fullScreen", "download", "thumbs", "close"],
         iframe: {
             preload: false
         },

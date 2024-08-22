@@ -294,15 +294,25 @@ eof;
                 }
 
                 if (in_array($file['extension'], $imgExts)) {
+                    //缩略图
                     $imgUrl = urlencode($file['path']);
                     $smallUrl = "/site/smallimg/?id={$file['id']}&url={$imgUrl}";
                     if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
                         $smallUrl = $file['path'];
                     }
+
+                    //大图
+                    $bigUrl = $smallUrl;
+                    if (empty(FSC::$app['config']['enableSmallImageForWan']) || FSC::$app['config']['enableSmallImageForWan'] === 'false') {
+                        $bigUrl = $file['path'];
+                    }
+
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="javascript:;" class="bor_radius" data-fancybox="gallery"
-        data-src="{$file['path']}"
+        data-src="{$bigUrl}"
+        data-download-src="{$file['path']}"
+        data-download-filename="{$file['filename']}.{$file['extension']}"
         data-caption="{$title} - {$file['filename']}"
         data-pid="{$file['pid']}"
         title="{$title} - {$file['filename']}">
