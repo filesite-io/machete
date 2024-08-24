@@ -57,6 +57,8 @@ $configs = array(
     'enableSmallImage' => true,             //列表页面是否开启缩略图，true 为显示缩略图，false 则显示原图
     'enableSmallImageForWan' => false,      //外网使用时，点击图片打开fancybox时是否显示缩略图：true 显示缩略图， false 则显示原图
 
+    'showQRImageInFooter' => true,          //在网页底部显示当前网址二维码
+
     /*
     //视频皮肤配置
     'videoblog' => array(

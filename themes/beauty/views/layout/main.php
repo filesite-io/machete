@@ -32,10 +32,12 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
 
         <!-- 尾部网站信息 -->
         <footer class="web_info vercenter">
+            <?php if (!empty(FSC::$app['config']['showQRImageInFooter']) && FSC::$app['config']['showQRImageInFooter'] !== 'false') { ?>
             <div class="qrcode text-center">
                 <p>用手机扫码打开</p>
                 <div id="qrimg"></div>
             </div>
+            <?php } ?>
             <p class="copyright">
                 <?php
                 if (!empty($viewData['copyright'])) {
