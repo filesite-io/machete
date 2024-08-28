@@ -311,6 +311,7 @@ eof;
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="javascript:;" class="bor_radius" data-fancybox="gallery"
         data-src="{$bigUrl}"
+        data-thumb="{$smallUrl}"
         data-download-src="{$file['path']}"
         data-download-filename="{$file['filename']}.{$file['extension']}"
         data-caption="{$title} - {$file['filename']}"
