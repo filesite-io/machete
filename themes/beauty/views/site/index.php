@@ -6,6 +6,9 @@ $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config
 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
 $supportedExts = array_merge($imgExts, $videoExts);
 
+//需密码授权的目录显示lock图标
+$authConfig = FSC::$app['config']['password_auth'];
+
 $dir_ext_status = !empty($_COOKIE['dir_ext_status']) ? $_COOKIE['dir_ext_status'] : 'opened';
 ?><!-- 顶部导航栏模块 -->
 <nav class="navbar navbar-default navbar-fixed-top navbarJS">
@@ -195,6 +198,14 @@ eof;
                     }
                 }
 
+                //判断是否需要加密访问的目录
+                $lockIcon = '';
+                if (!empty($authConfig['enable']) && !empty($authConfig['allow'][$dir['directory']])) {
+                    $lockIcon = <<<eof
+<div class="locked_dir"><img src="/img/beauty/lock2-fill.svg" alt="加密目录" width="30"></div>
+eof;
+                }
+
                 $title = !empty($dir['title']) ? $dir['title'] : $dir['directory'];
                 echo <<<eof
                 <div class="im_img_title">
@@ -203,6 +214,7 @@ eof;
                         {$title}
                     </span>
                 </div>
+                {$lockIcon}
             </a>
         </div>
 eof;

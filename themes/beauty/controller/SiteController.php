@@ -14,7 +14,7 @@ Class SiteController extends Controller {
         $htmlReadme = array();   //Readme.md 内容，底部网站详细介绍
         $htmlCateReadme = '';   //当前目录下的Readme.md 内容
         $menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
-        
+
         $scanner = new DirScanner();
         $scanner->setWebRoot(FSC::$app['config']['content_directory']);
 
@@ -43,6 +43,10 @@ Class SiteController extends Controller {
         }else {
             $scanResults = $scanner->getScanResults();
             Common::saveCacheToFile($cacheKey, $scanResults);
+        }
+
+        if (!empty($scanResults) && !empty($scanResults[$defaultCateId])) {
+            //TODO: 获取根目录下的txt说明文件内容
         }
 
         //优先从缓存获取目录数据
@@ -638,6 +642,39 @@ Class SiteController extends Controller {
         }
 
         return $this->renderJson(compact('code', 'msg'));
+    }
+
+    //密码授权
+    public function actionPwdauth() {
+        $checkDir = $this->get('dir', '');
+        $goBackUrl = $this->get('back', '');
+        $password = '';
+
+        if (empty($checkDir) || empty($goBackUrl)) {
+            throw new Exception("缺少参数！", 403);
+        }
+
+        $errorMsg = '';
+        $post = $this->post();
+        if (!empty($post)) {
+            $password = $this->post('password', '');
+            $authed = Common::pwdAuthToDir($checkDir, $password);
+            if ($authed == false) {
+                $errorMsg = '密码错误，请仔细检查后重试。';
+            }else {
+                return $this->redirect($goBackUrl);
+            }
+        }
+
+        $pageTitle = '密码授权';
+        $viewName = 'pwdauth';
+        $params = compact(
+            'checkDir',
+            'goBackUrl',
+            'password',
+            'errorMsg'
+        );
+        return $this->render($viewName, $params, $pageTitle);
     }
 
 }

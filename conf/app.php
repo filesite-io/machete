@@ -172,6 +172,16 @@ if (file_exists($customConfigFile)) {
     }catch(Exception $e) {}
 }
 
+//密码配置支持
+$customConfigFile = __DIR__ . '/../runtime/custom_password.json';
+if (file_exists($customConfigFile)) {
+    try {
+        $json = file_get_contents($customConfigFile);
+        $customConfigs = json_decode($json, true);
+        $configs = array_merge($configs, $customConfigs);
+    }catch(Exception $e) {}
+}
+
 
 //用户管理多账号自定义配置
 $customConfigFile = __DIR__ . "/../runtime/custom_config_usermap.json";

@@ -618,4 +618,77 @@ Class Common {
         return $date;
     }
 
+    //从session里获取密码授权身份
+    public static function getPwdAuthDirsFromSession() {
+        if(session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        return !empty($_SESSION['auth_dirs']) ? $_SESSION['auth_dirs'] : array();
+    }
+
+    //保存已通过密码授权的目录
+    public static function savePwdAuthDirToSession($dir) {
+        if(session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        $authDirs = !empty($_SESSION['auth_dirs']) ? $_SESSION['auth_dirs'] : array();
+        if (!in_array($dir, $authDirs)) {
+            array_push($authDirs, $dir);
+
+            $_SESSION['auth_dirs'] = $authDirs;
+        }
+
+        return $authDirs;
+    }
+
+    //判断当前目录是否允许访问
+    public static function isUserAllowedToDir($dir) {
+        if( empty(FSC::$app['config']['password_auth']) ) {
+            return true;
+        }
+
+        $authConfig = FSC::$app['config']['password_auth'];
+        if (empty($authConfig['enable'])) {
+            return true;
+        }
+
+        $allowed = true;
+        $authDirs = self::getPwdAuthDirsFromSession();
+        if (!empty($authConfig['default']) && empty($authConfig['allow'][$dir]) && !in_array('default', $authDirs)) {
+            //所有目录都需要授权
+            $allowed = false;
+        }else if (empty($authConfig['default']) && !empty($authConfig['allow'][$dir]) && !in_array($dir, $authDirs)) {
+            //只有部分目录需要授权
+            $allowed = false;
+        }
+
+        return $allowed;
+    }
+
+    //密码授权检查，如果密码正确，则增加目录到已授权列表
+    public static function pwdAuthToDir($dir, $userPassword) {
+        if( empty(FSC::$app['config']['password_auth']) ) {
+            return true;
+        }
+
+        $authConfig = FSC::$app['config']['password_auth'];
+        if (empty($authConfig['enable'])) {
+            return true;
+        }
+
+        $authed = false;
+        $authDirs = self::getPwdAuthDirsFromSession();
+        if (!empty($authConfig['default']) && empty($authConfig['allow'][$dir]) && $userPassword == $authConfig['default']) {
+            self::savePwdAuthDirToSession($dir);
+            $authed = true;
+        }else if (empty($authConfig['default']) && !empty($authConfig['allow'][$dir]) && $authConfig['allow'][$dir] == $userPassword) {
+            self::savePwdAuthDirToSession($dir);
+            $authed = true;
+        }
+
+        return $authed;
+    }
+
 }

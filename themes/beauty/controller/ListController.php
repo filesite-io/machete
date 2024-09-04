@@ -15,7 +15,6 @@ Class ListController extends Controller {
             throw new Exception("参数缺失！", 403);
         }
 
-
         //获取数据
         $menus = array();        //菜单，一级目录
         $htmlReadme = '';   //Readme.md 内容，底部网站详细介绍
@@ -38,6 +37,13 @@ Class ListController extends Controller {
             $currentDir = $cachedParentData;
         }
 
+        //密码授权检查
+        $isAllowed = Common::isUserAllowedToDir($currentDir['directory']);
+        if (!$isAllowed) {
+            $goUrl = "/site/pwdauth/?dir=" . urlencode($currentDir['directory']) . "&back=" . urlencode(FSC::$app['requestUrl']);
+            return $this->redirect($goUrl);
+        }
+
         $scanner->setWebRoot($this->getCurrentWebroot($currentDir['realpath']));
         $scanner->setRootDir($currentDir['realpath']);
 
@@ -45,6 +51,7 @@ Class ListController extends Controller {
         $maxScanDeep = 0;       //最大扫描目录级数
         $cacheKey = $this->getCacheKey($cateId, 'tree', $maxScanDeep);
         $cachedData = Common::getCacheFromFile($cacheKey, $cacheSeconds);
+
         if (!empty($cachedData)) {
             $dirTree = $cachedData;
             $scanner->setTreeData($cachedData);
@@ -68,11 +75,14 @@ Class ListController extends Controller {
         if (!empty($scanResults)) {
             $dirs = array();
             $files = array();
+            $dir_exts = array();
             foreach ($scanResults as $id => $item) {
                 if (!empty($item['directory'])) {
                     array_push($dirs, $item);
-                }else {
+                }else if (!empty($item['filename'])) {
                     array_push($files, $item);
+                }else {
+                    $dir_exts = array_merge($item, $dir_exts);
                 }
             }
 
@@ -82,6 +92,12 @@ Class ListController extends Controller {
 
             if (!empty($files)) {
                 $currentDir['files'] = $files;
+            }
+
+            if (!empty($dir_exts)) {    //合并目录的说明文件
+                foreach ($dir_exts as $key => $val) {
+                    $currentDir[$key] = $val;
+                }
             }
     
             $scanResults = array($cateId => $currentDir);       //重新组装数据

@@ -86,6 +86,8 @@ a:link{text-decoration:none}
 .im_item .btn-set-snap{display:none;position:absolute;top:5px;right:5px;opacity:0.8}
 .im_item:hover .btn-set-snap{display:inline-block}
 
+.locked_dir{position:absolute;right:3px;top:5px}
+
 .web_info{padding:10px 0 42px 0;margin-top:75px;border-top:solid 1px #f5f5f5}
 .web_info p{color:#808080;font-size:13px;margin:5px 0}
 .web_info a{text-decoration: underline;color:#808080}
@@ -146,6 +148,8 @@ a:link{text-decoration:none}
 .mr-1{margin-right:1em}
 .ml-1{margin-left:1em}
 .mb-1{margin-bottom:1em}
+
+.simple-form{max-width:480px;margin:0 auto}
 
 @media screen and (max-width: 1199px) {
     .im_item {
