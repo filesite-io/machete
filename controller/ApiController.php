@@ -22,8 +22,24 @@ Class ApiController extends Controller {
     protected $maxDirLen = 50;
     protected $maxFileLen = 60;
 
+    //判断是否关闭了后台功能
+    protected function checkAdminDisabled() {
+        $admConfig = FSC::$app['config']['admin'];
+
+        if (!empty($admConfig['disabled']) && $admConfig['disabled'] !== 'false') {
+            $code = 0;
+            $msg = '';
+            $err = '后台功能已关闭，如需打开，请修改配置文件，设置admin配置项里的disabled = true！';
+            return $this->renderJson(compact('code', 'msg', 'err'), $this->httpStatus['notAllowed']);
+        }
+
+        return false;
+    }
+
     //show api list
     public function actionIndex() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $params = array(
             'version' => $this->version,
             'list' => array(
@@ -45,6 +61,7 @@ Class ApiController extends Controller {
                 '切换皮肤' => '/api/switchtheme/',
             ),
         );
+
         return $this->renderJson($params);
     }
 
@@ -95,6 +112,8 @@ Class ApiController extends Controller {
 
     //目录、文件列表
     public function actionLs() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -154,6 +173,8 @@ Class ApiController extends Controller {
     //创建目录
     //创建成功则在data中返回父目录数据结构
     public function actionMkdir() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -204,6 +225,8 @@ Class ApiController extends Controller {
 
     //删除目录
     public function actionRmdir() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -253,6 +276,8 @@ Class ApiController extends Controller {
 
     //移动目录或文件
     public function actionMove() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -319,6 +344,8 @@ Class ApiController extends Controller {
 
     //重命名目录或文件
     public function actionRename() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -368,6 +395,8 @@ Class ApiController extends Controller {
 
     //删除文件
     public function actionDelete() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -417,6 +446,8 @@ Class ApiController extends Controller {
 
     //验证码图片，data属性里返回图片base64编码格式
     public function actionCaptcha() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -503,6 +534,8 @@ Class ApiController extends Controller {
 
     //登陆
     public function actionLogin() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -640,6 +673,8 @@ Class ApiController extends Controller {
     //@file - 单个文件base64内容
     //@name - 单个文件文件名
     public function actionUploadBase64() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -712,6 +747,8 @@ Class ApiController extends Controller {
 
     //切换皮肤
     public function actionSwitchTheme() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();
@@ -784,6 +821,8 @@ Class ApiController extends Controller {
 
     //config，获取系统配置信息
     public function actionConfig() {
+        $this->checkAdminDisabled();    //支持默认关闭后台api
+
         $code = 0;
         $msg = $err = '';
         $data = array();

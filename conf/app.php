@@ -100,6 +100,8 @@ $configs = array(
 
     //后台管理相关配置
     'admin' => array(
+        'disabled' => true,         //关闭后台相关功能
+
         'username' => 'filesite',
         'password' => '88888888',
         'captcha' => true,      //后台登陆是否开启验证码
