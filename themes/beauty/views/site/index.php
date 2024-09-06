@@ -59,13 +59,12 @@ eof;
                     }
                 }
                 ?>
-                <li><hr></li>
-                <li class="vercenter">
-                    版本 <strong><?php echo FSC::$app['config']['version']; ?></strong>
-                    <br>
-                    发布@<strong><?php echo FSC::$app['config']['releaseDate']; ?></strong>
-                </li>
             </ul>
+            <div class="versioninfo vercenter">
+                版本 <em><?php echo FSC::$app['config']['version']; ?></em>
+                <br>
+                发布@<?php echo FSC::$app['config']['releaseDate']; ?>
+            </div>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>

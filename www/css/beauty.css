@@ -32,7 +32,7 @@ a:link{text-decoration:none}
 .navbar .navbar-brand {
     font-family: Brush Script MT;
     font-weight: normal;
-    color:#b1afaf;
+    color: #c7b9b9;
     font-size: 21px;
     line-height: 21px;
     padding:0 14px 0 13px;
@@ -60,7 +60,7 @@ a:link{text-decoration:none}
     width: 160px;
     background-color: #FFF;
     overflow-y: auto;
-    bottom: 0;
+    bottom: 90px;
     z-index: 1000;
     padding-bottom:3em;
 }
@@ -69,6 +69,8 @@ a:link{text-decoration:none}
 .lampshow .navbar-fixed-left a{color:#DDD}
 .lampshow .navbar-fixed-left .active a{background-color:#e7e7e7;color:#555}
 .lampshow .navbar-fixed-left a:hover{background-color:#CCC;color:#444}
+
+.versioninfo{position:fixed;left:0;bottom:0;width:160px;padding-top:10px;padding-bottom:5px;border-top:1px solid #EEE}
 
 .img_main{min-height:510px;margin-left:160px}
 .im_mainl{margin:0 10px 12px 10px}
@@ -143,6 +145,7 @@ a:link{text-decoration:none}
 .othervideos{max-height:560px;overflow-y:auto}
 .btn_autoplay{margin:5px}
 
+.mt-3{margin-top:3em}
 .mt-2{margin-top:2em}
 .mt-1{margin-top:1em}
 .mr-1{margin-right:1em}
@@ -168,7 +171,7 @@ a:link{text-decoration:none}
         height: 45vw;
     }
     .hidden-xs{display:none}
-    .navbar-fixed-left{position:static;width:100%}
+    .navbar-fixed-left, .versioninfo{position:static;width:100%}
     .img_main{margin-left:0}
 
     .pagination>li>a, .pagination>li>span{padding:3px 7px}
