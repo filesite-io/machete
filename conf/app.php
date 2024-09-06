@@ -3,7 +3,7 @@
  * Config
  */
 $configs = array(
-    'version' => '0.2.1',
+    'version' => '0.2.2',
     'releaseDate' => '2024-9-7',
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
@@ -56,8 +56,13 @@ $configs = array(
     'screenshot_start' => 1000,     //视频播放页快照截取开始时间，单位：毫秒
     'screenshot_expire_seconds' => 315360000,   //视频封面图缓存3650天
     'small_image_zoom_rate' => 2.5,   //缩略图在最小尺寸基础上的放大倍数，以确保清晰度
+
     'enableSmallImage' => true,             //列表页面是否开启缩略图，true 为显示缩略图，false 则显示原图
     'enableSmallImageForWan' => false,      //外网使用时，点击图片打开fancybox时是否显示缩略图：true 显示缩略图， false 则显示原图
+
+    //关闭服务器端生成缩略图，如果在cpu性能较低的设备（如路由器）里运行，开启此配置可以减少cpu消耗
+    //如果在外网运行，开启此配置，则可能会因为服务器带宽较小导致图片加载缓慢
+    'disableGenerateSmallImageInServer' => false,
 
     'showQRImageInFooter' => true,          //在网页底部显示当前网址二维码
 

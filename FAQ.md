@@ -3,8 +3,10 @@
 
 ## 系统配置文件在哪里？
 
-全局配置文件：conf/app.php
-自定义配置文件：runtime/custom_config.json
+* 全局配置文件：conf/app.php
+* 自定义配置文件：runtime/custom_config.json
+
+系统默认从全局配置文件里读取数据，如果有自定义配置，则优先使用自定义配置文件中的数据。
 
 推荐使用自定义配置文件，以免系统升级后配置被覆盖。
 
@@ -74,6 +76,24 @@ machete家庭相册默认为局域网使用，配置**enableSmallImageForWan**�
 在自定义配置：runtime/custom_config.json里增加以下配置即可：
 ```
 "enableSmallImageForWan": true
+```
+
+
+## 在局域网内使用，能否所有图片使用原图而不是缩略图？
+
+系统配置**enableSmallImage**默认为true打开的，在自定义配置文件中，加入以下配置保存即可关闭所有缩略图功能：
+```
+"enableSmallImage": false
+```
+
+
+## 我的设备cpu性能较差，缩略图显示有点慢且cpu占用较高怎么解决？
+
+machete家庭相册在设计的时候考虑到在嵌入式设备中运行，缩略图功能可由用户的浏览器完成。
+
+在自定义配置中把**disableGenerateSmallImageInServer**开关打开即可关闭服务器端生成缩略图，从而节省cpu消耗：
+```
+"disableGenerateSmallImageInServer": true
 ```
 
 

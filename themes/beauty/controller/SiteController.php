@@ -390,6 +390,11 @@ Class SiteController extends Controller {
 
     //借助gd库，获取图片类型、尺寸，并实时生成缩略图
     protected function createSmallJpg($img_filepath, $min_width = 198, $min_height = 219, $max_width = 600, $max_height = 500) {
+        //如果服务器端生成缩略图关闭
+        if (!empty(FSC::$app['config']['disableGenerateSmallImageInServer']) && FSC::$app['config']['disableGenerateSmallImageInServer'] !== 'false') {
+            return false;
+        }
+
         $img_data = null;
 
         try {
