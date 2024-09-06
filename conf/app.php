@@ -3,7 +3,9 @@
  * Config
  */
 $configs = array(
-    'version' => '0.1.0',
+    'version' => '0.2.1',
+    'releaseDate' => '2024-9-7',
+
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
     'site_name' => 'Machete from FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统',
 

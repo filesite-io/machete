@@ -55,14 +55,14 @@
 
 ## 怎么修改底部的版权信息？
 
-请编辑目录下的php文件：
-```
-themes/beauty/views/layout/
-```
+请在图片根目录下，创建文件**README_copyright.txt**，内容参考下面示例代码：
 
-找到“尾部网站信息”，按自己的需要修改并保存。
-
-注意本地保存相关文件存档，machete升级系统时会覆盖此目录下的文件。
+```
+<span>&copy;2022 - 2024</span>
+by <a href="https://filesite.io/" target="_blank">FileSite.io</a>
+<br>
+执行耗时: {page_time_cost} ms
+```
 
 
 ## 相册部署到外网了，点击图片打开有点慢怎么办？
