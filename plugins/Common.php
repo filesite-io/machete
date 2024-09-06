@@ -650,7 +650,7 @@ Class Common {
         }
 
         $authConfig = FSC::$app['config']['password_auth'];
-        if (empty($authConfig['enable'])) {
+        if (empty($authConfig['enable']) || $authConfig['enable'] === 'false') {
             return true;
         }
 
@@ -674,7 +674,7 @@ Class Common {
         }
 
         $authConfig = FSC::$app['config']['password_auth'];
-        if (empty($authConfig['enable'])) {
+        if (empty($authConfig['enable']) || $authConfig['enable'] === 'false') {
             return true;
         }
 

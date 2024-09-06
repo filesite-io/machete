@@ -200,7 +200,7 @@ eof;
 
                 //判断是否需要加密访问的目录
                 $lockIcon = '';
-                if (!empty($authConfig['enable']) && !empty($authConfig['allow'][$dir['directory']])) {
+                if (!empty($authConfig['enable']) && $authConfig['enable'] !== 'false' && !empty($authConfig['allow'][$dir['directory']])) {
                     $lockIcon = <<<eof
 <div class="locked_dir"><img src="/img/beauty/lock2-fill.svg" alt="加密目录" width="30"></div>
 eof;
