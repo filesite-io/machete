@@ -30,22 +30,25 @@ Class ListController extends Controller {
             return $this->redirect('/');
         }
 
-        $currentDir = $cachedParentData[$cateId];
-        if (strpos($cacheParentDataId, $cateId) === false && empty($currentDir)) {
+        if (strpos($cacheParentDataId, $cateId) === false && empty($cachedParentData[$cateId])) {
             throw new Exception("缓存数据中找不到当前目录，请返回上一页重新进入！", 404);
-        }else if (strpos($cacheParentDataId, $cateId) !== false) {
+        }else if (strpos($cacheParentDataId, $cateId) !== false) {      //为播放页面查询当前目录下所有视频
             $currentDir = $cachedParentData;
+        }else if (!empty($cachedParentData)) {
+            $currentDir = $cachedParentData[$cateId];
+
+            //密码授权检查
+            $isAllowed = Common::isUserAllowedToDir($currentDir['directory']);
+            if (!$isAllowed) {
+                $goUrl = "/site/pwdauth/?dir=" . urlencode($currentDir['directory']) . "&back=" . urlencode(FSC::$app['requestUrl']);
+                return $this->redirect($goUrl);
+            }
+
+            //扫描当前目录
+            $scanner->setWebRoot($this->getCurrentWebroot($currentDir['realpath']));
+            $scanner->setRootDir($currentDir['realpath']);
         }
 
-        //密码授权检查
-        $isAllowed = Common::isUserAllowedToDir($currentDir['directory']);
-        if (!$isAllowed) {
-            $goUrl = "/site/pwdauth/?dir=" . urlencode($currentDir['directory']) . "&back=" . urlencode(FSC::$app['requestUrl']);
-            return $this->redirect($goUrl);
-        }
-
-        $scanner->setWebRoot($this->getCurrentWebroot($currentDir['realpath']));
-        $scanner->setRootDir($currentDir['realpath']);
 
         //优先从缓存读取数据
         $maxScanDeep = 0;       //最大扫描目录级数
@@ -130,10 +133,6 @@ Class ListController extends Controller {
             });
         }
 
-        //获取目录面包屑
-        $subcate = !empty($scanResults[$cateId]) ? $scanResults[$cateId] : array();
-        $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
-
         //获取当前目录下的readme
         $cateReadmeFile = $scanner->getDefaultReadme();
         if (!empty($cateReadmeFile)) {
@@ -149,6 +148,8 @@ Class ListController extends Controller {
         $expireSeconds = 86400;
         $mp3File = Common::getCacheFromFile($cacheKey, $expireSeconds);
 
+        //当前目录数据
+        $subcate = !empty($scanResults[$cateId]) ? $scanResults[$cateId] : array();
 
         //翻页支持
         $page = $this->get('page', 1);
@@ -219,6 +220,10 @@ Class ListController extends Controller {
             }
             return $this->renderJson(compact('page', 'pageSize', 'videos'));
         }
+
+
+        //获取目录面包屑
+        $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
 
 
         $viewName = '//site/index';     //共享视图

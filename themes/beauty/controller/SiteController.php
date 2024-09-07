@@ -433,14 +433,12 @@ Class SiteController extends Controller {
                     $imgSource = imagecreatefromgif($img_filepath);
                     break;
                 case '.webp':
-                    //php >= 5.4
-                    if (phpversion() >= 5.4) {
+                    if (function_exists('imagecreatefromwebp')) {
                         $imgSource = imagecreatefromwebp($img_filepath);
                     }
                     break;
                 case '.bmp':
-                    //php >= 7.2
-                    if (phpversion() >= 7.2) {
+                    if (function_exists('imagecreatefrombmp')) {
                         $imgSource = imagecreatefrombmp($img_filepath);
                     }
                     break;
@@ -576,7 +574,7 @@ Class SiteController extends Controller {
             $copyright = $readmeFile['copyright'];
         }
 
-        $pageTitle = "视频播放器";
+        $pageTitle = "正在播放：{$videoFilename}";
         $this->layout = 'player';
         $viewName = 'player';
         $params = compact(

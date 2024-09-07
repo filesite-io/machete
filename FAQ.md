@@ -1,6 +1,18 @@
 # Machete家庭相册系统使用FAQ常见问题
 
 
+## 怎么升级machete家庭相册代码？
+
+执行容器命令即可：
+
+```
+docker exec -it machete_album /var/www/machete/bin/upgrade.sh
+```
+
+说明：
+其中容器名称**machete_album**请更换为你所启动的machete容器名字。
+
+
 ## 系统配置文件在哪里？
 
 * 全局配置文件：conf/app.php
@@ -41,10 +53,12 @@
 
 ## 怎么修改浏览器地址栏左侧的小图标？
 
-请创建自己的icon文件，命名为favicon.ico，替换根目录下的这个图标即可；
+请创建自己的icon文件，命名为favicon.ico，把它复制到你的图片根目录即可；
 
-**注意：**
-请清空浏览器缓存后验证新图标，否则可能因为浏览器缓存而看到老的图标。
+**以容器目录为例：**
+```
+/var/www/machete/www/girls/favico.ico
+```
 
 
 ## 怎么关闭网页底部的二维码？

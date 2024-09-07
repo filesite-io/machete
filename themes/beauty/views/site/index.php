@@ -60,11 +60,13 @@ eof;
                 }
                 ?>
             </ul>
+            <?php if (!empty(FSC::$app['config']['showVersion']) && FSC::$app['config']['showVersion'] !== 'false') { ?>
             <div class="versioninfo vercenter">
                 版本 <em><?php echo FSC::$app['config']['version']; ?></em>
                 <br>
                 发布@<?php echo FSC::$app['config']['releaseDate']; ?>
             </div>
+            <?php } ?>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
@@ -214,7 +216,7 @@ eof;
                 $title = !empty($dir['title']) ? $dir['title'] : $dir['directory'];
                 echo <<<eof
                 <div class="im_img_title">
-                    <span>
+                    <span class="folder_title">
                         <img src="/img/beauty/folder.svg" alt="folder" width="20">
                         {$title}
                     </span>

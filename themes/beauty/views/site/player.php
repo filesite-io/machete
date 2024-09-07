@@ -12,7 +12,7 @@
             </div>
 
             <a class="navbar-brand" href="/">
-                <span class="verMiddle"><?php echo $pageTitle; ?></span>
+                <span class="verMiddle">正在播放</span>
             </a>
             <span class="navbar-text videotitle"><?php echo $viewData['videoFilename']; ?></span>
         </div>
@@ -68,7 +68,7 @@
             data-cid="<?php echo $viewData['cacheParentDataId']; ?>"
             data-page="<?php echo $viewData['page']; ?>"
             data-page-size="<?php echo $viewData['pageSize']; ?>"
-            class="othervideos">其它视频</div>
+            class="othervideos"><div class="ml-1">...</div></div>
     </div>
 </div>
 

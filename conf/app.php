@@ -3,8 +3,9 @@
  * Config
  */
 $configs = array(
-    'version' => '0.2.2',
+    'version' => '0.2.4',
     'releaseDate' => '2024-9-7',
+    'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
     'site_name' => 'Machete from FileSite.io - 无数据库、基于文件和目录的Markdown文档、网址导航、图书、图片、视频网站PHP开源系统',
@@ -48,10 +49,10 @@ $configs = array(
     'googleimage' => array(
         'imageHeight' => 350,           //图片高度，单位：px
         'contact' => 'FileSite图片网站订制联系：<a href="https://filesite.io" target="_blank">FileSite.io</a>',
-        'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif'),
+        'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'),
     ),
 
-    'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif'),
+    'supportedImageExts' => array('jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'),
     'supportedVideoExts' => array('mp4', 'mov', 'm3u8'),
     'screenshot_start' => 1000,     //视频播放页快照截取开始时间，单位：毫秒
     'screenshot_expire_seconds' => 315360000,   //视频封面图缓存3650天

@@ -4,48 +4,149 @@
 
 可以用它快速搭建：
 
-* 文档/文章/博客网站
-* 导航网站，视频收藏/分享网站
 * 图片网站
 * 视频网站
+* 文档/文章/博客网站
+* 导航网站，视频收藏/分享网站
 
 
 ## 在线体验
 
 Machete是单入口模式PHP源码，**不支持子目录方式访问**，以下示例都是以子域名或根域名配置nginx根目录指向代码目录下的www/index.php。
 
-1. 文档站
 
-  | 名称 | 网址 |
-| ---- | ---- |
-| FileSite | <a href="https://filesite.io" target="_blank">Filesite.io</a> |
-
-2. 导航站
-
-  | 名称 | 网址 |
-| ---- | ---- |
-| 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory.FileSite.io</a> |
-| Web3速查手册 | <a href="https://web3.filesite.io" target="_blank">Web3.FileSite.io</a> |
+  | 类型 | 名称 | 网址 |
+| ---- | ---- | ---- |
+| 图片站 | 家庭相册演示 | <a href="https://demo.jialuoma.cn" target="_blank">demo.jialuoma.cn</a> |
+| 视频分享站 | Ta荐 | <a href="https://tajian.tv" target="_blank">TaJian.tv</a> |
+| 文档站 | FileSite | <a href="https://filesite.io" target="_blank">Filesite.io</a> |
+| 导航站 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory.FileSite.io</a> |
 
 
-3. 图片站
+## 用Docker部署
 
-  | 名称 | 网址 |
-| ---- | ---- |
-| 看美女 | <a href="https://googleimage.filesite.io" target="_blank">GoogleImage.Filesite.io</a> |
-| 在线演示 | <a href="https://demo.jialuoma.cn" target="_blank">带后台版Machete在线演示</a> |
+在Docker中如何用filesite/machete源码快速搭建支持文件共享方式管理内容的图片网站、视频网站、导航网站和文档站的视频教程。
 
-4. 视频站
+主要步骤：
+1. docker pull filesite/machete
+2. docker run ...
+3. 本地测试网站和后台
+4. 在docker容器中升级最新版
+5. 如何在macos中挂载远程磁盘来管理图片等内容
 
-  | 名称 | 网址 |
-| ---- | ---- |
-| 在线学 | <a href="https://duan.filesite.io" target="_blank">Duan.Filesite.io</a> |
+视频教程：
 
-5. 视频收藏/分享站
+[![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
 
-  | 名称 | 网址 |
-| ---- | ---- |
-| Ta荐 | <a href="https://tajian.tv" target="_blank">TaJian.tv</a> |
+
+## Docker使用
+
+### 下载镜像
+
+从dockerhub下载：
+```
+docker pull filesite/machete
+```
+
+如果不能直接访问dockerhub，可从备用网址下载镜像后导入：
+```
+wget https://static.jialuoma.cn/docker_images/machete.tar
+docker image load -i machete.tar
+```
+
+
+### 启动machete容器
+
+```
+docker run --name machete -p 1080:80 -itd filesite/machete [皮肤名]
+```
+
+
+其中皮肤名称可选值：
+
+```
+[
+    'beauty',           //图片网站，设计精美
+    'tajian',           //视频分享网站
+    'manual',           //文档网站
+    'webdirectory',     //导航网站
+]
+```
+
+本地监听端口``1080``请根据自己需要修改。
+
+
+machete在容器中的目录：
+
+```
+/var/www/machete/
+```
+
+可根据自己的需要，通过``-v``参数映射本地内容目录到容器目录，
+示例如下：
+```
+docker run --name machete -p 1080:80 \
+    -v /d/图片目录/:/var/www/machete/www/girls/ \
+    -itd filesite/machete \
+    beauty
+```
+
+这样可以通过更新本地内容目录```/d/图片目录/```的文件来实时更新网站内容。
+
+不同皮肤对应的容器目录如下：
+
+| 皮肤名 | 容器目录 | 共享目录 |
+| ---- | ---- | ---- |
+| beauty | /var/www/machete/www/girls/ | girls |
+| tajian | /var/www/machete/www/tajian/ | tajian |
+| manual | /var/www/machete/www/content/ | content |
+| webdirectory | /var/www/machete/www/navs/ | navs |
+
+
+### 查看容器
+
+```
+docker ps
+```
+
+如果看到名字为``machete``的容器正在运行，说明容器启动完成，访问本地网址测试：
+
+```
+http://127.0.0.1:1080
+```
+
+
+### 升级容器代码
+
+```
+docker exec -it machete /var/www/machete/bin/upgrade.sh
+```
+
+
+### 配置修改
+
+修改配置有两种方式：
+1. 进入容器目录：/var/www/machete/runtime/，修改**custom_config.json**后保存即可；
+2. 命令行修改
+```
+docker exec -it machete php /var/www/machete/bin/command.php config "do=set&key=screenshot_start&val=1000"
+```
+
+上述命令为修改配置项**screenshot_start**的示例。
+
+配置读取、修改、删除命令：
+```
+php /var/www/machete/bin/command.php config "参数"
+```
+
+参数说明：
+* do  - 操作，可选值：get, all, set, del（分别对应获取单个配置项、所有配置项、设置单个配置项、删除单个配置项）
+* key - 配置项名称
+* val - 配置项值
+
+
+说明：
+不支持数组类型的配置修改，可用配置项明细参考：**conf/app.php**。
 
 
 ## 手动部署
@@ -93,198 +194,6 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 有了Machete，你可以保留现有的本地内容创作习惯，并非常容易地把它们制作成一个网站分享给他人。
 
 
-## 用Docker部署
+## 常见问题与解答
 
-在Docker中如何用filesite/machete源码快速搭建支持文件共享方式管理内容的图片网站、视频网站、导航网站和文档站的视频教程。
-
-主要步骤：
-1. docker pull filesite/machete
-2. docker run ...
-3. 本地测试网站和后台
-4. 在docker容器中升级最新版
-5. 如何在macos中挂载远程磁盘来管理图片等内容
-
-视频教程：
-
-[![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
-
-
-## Docker使用
-
-从dockerhub下载镜像：
-
-```
-docker pull filesite/machete
-```
-
-支持samba文件共享管理内容的版本：
-```
-docker pull filesite/machete:samba
-```
-
-
-启动machete容器：
-
-```
-docker run --name machete -p 1080:80 -itd filesite/machete [皮肤名]
-```
-
-samba文件共享版本容器启动：
-```
-docker run --name machete_samba -p 1081:80 -p 445:445 -itd filesite/machete:samba [皮肤名]
-```
-
-
-其中皮肤名称可选值：
-
-```
-[
-    'manual',           //文档网站
-    'webdirectory',     //导航网站
-    'googleimage',      //图片网站
-    'beauty',           //图片网站，设计精美
-    'videoblog'         //视频网站
-]
-```
-
-本地监听端口``1080``请根据自己需要修改。
-
-
-machete在容器中的目录：
-
-```
-/var/www/machete/
-```
-
-可根据自己的需要，通过``-v``参数映射本地内容目录到容器目录，
-示例如下：
-```
-docker run --name machete -p 1080:80 \
-    -v /d/图片目录/:/var/www/machete/www/girls/ \
-    -itd filesite/machete \
-    beauty
-```
-
-这样可以通过更新本地内容目录```/d/图片目录/```的文件来实时更新网站内容。
-
-不同皮肤对应的容器目录如下：
-
-| 皮肤名 | 容器目录 | 共享目录 |
-| ---- | ---- | ---- |
-| manual | /var/www/machete/www/content/ | content |
-| webdirectory | /var/www/machete/www/navs/ | navs |
-| googleimage | /var/www/machete/www/girls/ | girls |
-| beauty | /var/www/machete/www/girls/ | girls |
-| videoblog | /var/www/machete/www/videos/ | videos |
-
-
-查看容器：
-
-```
-docker ps
-```
-
-如果看到名字为``machete``的容器正在运行，说明容器启动完成，访问本地网址测试：
-
-```
-http://127.0.0.1:1080
-```
-
-samba文件共享版本本地网址访问：
-```
-http://127.0.0.1:1081
-```
-
-
-升级容器中的代码：
-```
-docker exec -it machete /var/www/machete/bin/upgrade.sh
-```
-
-
-### 配置修改
-
-修改配置有两种方式：
-1. 进入容器目录：/var/www/machete/runtime/，修改**custom_config.json**后保存即可；
-2. 命令行修改
-```
-docker exec -it machete php /var/www/machete/bin/command.php config "do=set&key=screenshot_start&val=1000"
-```
-
-上述命令为修改配置项**screenshot_start**的示例。
-
-配置读取、修改、删除命令：
-```
-php /var/www/machete/bin/command.php config "参数"
-```
-
-参数说明：
-* do  - 操作，可选值：get, all, set, del（分别对应获取单个配置项、所有配置项、设置单个配置项、删除单个配置项）
-* key - 配置项名称
-* val - 配置项值
-
-
-说明：
-不支持数组类型的配置修改，可用配置项明细参考：**conf/app.php**。
-
-
-## 后台管理内容
-
-最新版本已经支持网页版后台和samba文件共享方式管理内容。
-
-说明：
-由于本项目是针对小型网站设计的，后台只支持目录级数不超过4级，文件数量不超过 1 万的目录，
-**如果你所映射的目录文件数量超过1万，不建议使用后台来管理文件内容**。
-
-
-### 网页版后台
-
-网址为域名后面加/admin/来访问，
-网址格式为：
-```
-http://服务器ip或域名/admin/
-```
-
-默认账号密码：
-> 账号：filesite
-> 密码：88888888
-
-账号密码可在```conf/app.php```里修改。
-
-
-### samba文件共享
-
-同时支持windows、macos和linux，
-文件共享网址格式为：
-```
-//filesite:88888888@服务器ip或域名/machete
-```
-
-默认账号密码：
-> 账号：filesite
-> 密码：88888888
-
-账号密码可在容器中执行命令修改：
-```
-smbpwd 新密码
-```
-
-
-### 文件共享使用方法
-
-
-windows下在**运行**里输入：
-```
-\\服务器ip或域名\machete
-```
-
-然后在弹出的登陆框里输入账号密码就可以完成远程磁盘挂载。
-
-
-macos下挂载共享目录的命令：
-```
-mount_smbfs //filesite:88888888@服务器ip或域名/machete 本地目录
-```
-
-挂载好之后就可以打开Finder看到共享目录了，
-点击进去就可以跟管理本地文件和目录一样操作了。
+请参考文档[FAQ.md](./FAQ.md)。

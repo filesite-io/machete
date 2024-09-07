@@ -29,6 +29,29 @@ Class Html {
         return $ver;
     }
 
+    //优先获取皮肤目录下的favicon.ico
+    public static function getFaviconUrl() {
+        $filename = 'favicon.ico';
+        $filepath = __DIR__ . '/../www/' . FSC::$app['config']['content_directory'] . $filename;
+        $url = '/' . FSC::$app['config']['content_directory'] . $filename;
+
+        if (file_exists($filepath) == false) {
+            $filepath = __DIR__ . '/../www/' . $filename;
+            $url = '/favicon.ico';
+        }
+
+        if (file_exists($filepath)) {
+            $fp = fopen($filepath, 'r');
+            $fstat = fstat($fp);
+            fclose($fp);
+
+            $ver = $fstat['mtime'];
+            $url .= "?v{$ver}";
+        }
+
+        return $url;
+    }
+
     public static function mb_substr($string, $start, $length) {
         if (mb_strlen($string, 'utf-8') <= $length) {return $string;}
 

@@ -43,6 +43,7 @@ Class DirScanner {
         'jpeg',    //图片
         'png',     //图片
         'webp',    //图片
+        'svg',     //图片
         'gif',     //图片
         'ico',     //图标
         'mp3',     //音乐
@@ -398,6 +399,7 @@ Class DirScanner {
             'jpeg' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'png' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'webp' => "{$webRoot}{$directory}{$filename}.{$extension}",
+            'svg' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'gif' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'ico' => "{$webRoot}{$directory}{$filename}.{$extension}",
             'mp3' => "{$webRoot}{$directory}{$filename}.{$extension}",
@@ -809,7 +811,7 @@ Class DirScanner {
     }
 
     //获取目录下第一个图片作为封面图返回
-    public function getSnapshotImage($realpath, $imgExts = array('jpg', 'jpeg', 'png', 'webp', 'gif')) {
+    public function getSnapshotImage($realpath, $imgExts = array('jpg', 'jpeg', 'png', 'webp', 'gif', 'svg')) {
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($realpath, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::SELF_FIRST
