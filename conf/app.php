@@ -3,7 +3,7 @@
  * Config
  */
 $configs = array(
-    'version' => '0.2.4',
+    'version' => '0.2.5',
     'releaseDate' => '2024-9-7',
     'showVersion' => false,     //默认不显示版本号和发布日期
 

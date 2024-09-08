@@ -1,6 +1,6 @@
-# Machete
+# Filesite/Machete
 
-一个实现了FileSite.io “基于文件和目录管理网址、文章、图片、视频标准”的PHP源码。
+一个实现了FileSite.io “基于文件和目录管理网址、文章、图片、视频标准”的开源PHP源码。
 
 可以用它快速搭建：
 
@@ -8,6 +8,20 @@
 * 视频网站
 * 文档/文章/博客网站
 * 导航网站，视频收藏/分享网站
+
+
+## 目录
+
+* [在线体验](#在线体验)
+* [基于Docker部署](#基于Docker部署)
+    * [下载镜像](#下载镜像)
+    * [启动machete容器](#启动machete容器)
+    * [查看容器](#查看容器)
+    * [升级容器代码](#升级容器代码)
+    * [配置修改](#配置修改)
+* [基于Docker使用](#基于Docker使用)
+* [手动部署](#手动部署)
+* [常见问题与解答](#常见问题与解答)
 
 
 ## 在线体验
@@ -20,26 +34,26 @@ Machete是单入口模式PHP源码，**不支持子目录方式访问**，以下
 | 图片站 | 家庭相册演示 | <a href="https://demo.jialuoma.cn" target="_blank">demo.jialuoma.cn</a> |
 | 视频分享站 | Ta荐 | <a href="https://tajian.tv" target="_blank">TaJian.tv</a> |
 | 文档站 | FileSite | <a href="https://filesite.io" target="_blank">Filesite.io</a> |
-| 导航站 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory.FileSite.io</a> |
+| 导航站 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory</a> |
 
 
-## 用Docker部署
+## 基于Docker部署
 
-在Docker中如何用filesite/machete源码快速搭建支持文件共享方式管理内容的图片网站、视频网站、导航网站和文档站的视频教程。
+在Docker中如何用filesite/machete源码快速搭建支持文件/目录管理内容的图片网站、视频网站、导航网站和文档站的视频教程。
 
 主要步骤：
 1. docker pull filesite/machete
 2. docker run ...
 3. 本地测试网站和后台
 4. 在docker容器中升级最新版
-5. 如何在macos中挂载远程磁盘来管理图片等内容
+
 
 视频教程：
 
 [![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
 
 
-## Docker使用
+## 基于Docker使用
 
 ### 下载镜像
 
@@ -95,12 +109,12 @@ docker run --name machete -p 1080:80 \
 
 不同皮肤对应的容器目录如下：
 
-| 皮肤名 | 容器目录 | 共享目录 |
+| 皮肤名 | 容器目录 |
 | ---- | ---- | ---- |
-| beauty | /var/www/machete/www/girls/ | girls |
-| tajian | /var/www/machete/www/tajian/ | tajian |
-| manual | /var/www/machete/www/content/ | content |
-| webdirectory | /var/www/machete/www/navs/ | navs |
+| beauty | /var/www/machete/www/girls/ |
+| tajian | /var/www/machete/www/tajian/ |
+| manual | /var/www/machete/www/content/ |
+| webdirectory | /var/www/machete/www/navs/ |
 
 
 ### 查看容器
@@ -196,4 +210,6 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 
 ## 常见问题与解答
 
-请参考文档[FAQ.md](./FAQ.md)。
+请参考文档：
+* [Machete家庭相册系统使用FAQ常见问题](./FAQ.md)
+
