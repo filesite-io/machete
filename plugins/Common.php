@@ -657,10 +657,10 @@ Class Common {
         $allowed = true;
         $authDirs = self::getPwdAuthDirsFromSession();
         if (!empty($authConfig['default']) && empty($authConfig['allow'][$dir]) && !in_array('default', $authDirs)) {
-            //所有目录都需要授权
+            //所有目录都需要授权，且没有单独配置此目录需要密码
             $allowed = false;
-        }else if (empty($authConfig['default']) && !empty($authConfig['allow'][$dir]) && !in_array($dir, $authDirs)) {
-            //只有部分目录需要授权
+        }else if (!empty($authConfig['allow'][$dir]) && !in_array($dir, $authDirs)) {
+            //当前目录需要授权
             $allowed = false;
         }
 

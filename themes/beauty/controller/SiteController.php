@@ -123,6 +123,10 @@ Class SiteController extends Controller {
         }
 
 
+        //提示信息支持
+        $alertWarning = $this->get('err', '');
+
+
         //翻页支持
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', 24);
@@ -214,7 +218,8 @@ Class SiteController extends Controller {
         $viewName = 'index';
         $params = compact(
             'page', 'pageSize', 'cacheDataId', 'showType',
-            'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright'
+            'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright',
+            'alertWarning'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

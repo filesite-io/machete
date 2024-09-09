@@ -99,6 +99,13 @@ if ($total > 0) {
 eof;
 }
 
+
+if (!empty($viewData['alertWarning'])) {
+    echo <<<eof
+    <div class="alert alert-warning">{$viewData['alertWarning']}</div>
+eof;
+}
+
 echo <<<eof
     <div class="breadcrumbs text_dark">
         {$totalNum}
@@ -207,7 +214,13 @@ eof;
 
                 //判断是否需要加密访问的目录
                 $lockIcon = '';
-                if (!empty($authConfig['enable']) && $authConfig['enable'] !== 'false' && !empty($authConfig['allow'][$dir['directory']])) {
+                if (!empty($authConfig['enable']) && $authConfig['enable'] !== 'false'
+                    && (
+                        ( empty($authConfig['default']) && !empty($authConfig['allow'][$dir['directory']]) )
+                        ||
+                        !empty($authConfig['default'])       //如果所有目录都需要密码
+                    )
+                ) {
                     $lockIcon = <<<eof
 <div class="locked_dir"><img src="/img/beauty/lock2-fill.svg" alt="加密目录" width="30"></div>
 eof;

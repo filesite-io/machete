@@ -27,7 +27,8 @@ Class ListController extends Controller {
         $cacheSeconds = 86400;
         $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
         if (empty($cachedParentData)) {
-            return $this->redirect('/');
+            $err = '缓存数据已失效，如果重新点击目录依然打不开，请联系管理员。';
+            return $this->redirect('/?err=' . urlencode($err));
         }
 
         if (strpos($cacheParentDataId, $cateId) === false && empty($cachedParentData[$cateId])) {
