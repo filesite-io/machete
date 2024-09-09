@@ -113,6 +113,5 @@ machete家庭相册在设计的时候考虑到在嵌入式设备中运行，缩�
 
 ## 更多问题如何联系？
 
-请查看README.md里的联系方式，
-或者进官方网站查看QQ群：
-https://filesite.io
+请打开官方网站查看底部QQ群和微信：
+<a href="https://filesite.io" target="_blank">FileSite.io</a>

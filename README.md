@@ -14,14 +14,15 @@
 
 * [在线体验](#在线体验)
 * [基于Docker部署](#基于Docker部署)
+    * [视频教程](#视频教程)
     * [下载镜像](#下载镜像)
     * [启动machete容器](#启动machete容器)
     * [查看容器](#查看容器)
     * [升级容器代码](#升级容器代码)
     * [配置修改](#配置修改)
-* [基于Docker使用](#基于Docker使用)
 * [手动部署](#手动部署)
 * [常见问题与解答](#常见问题与解答)
+* [联系方式](#联系方式)
 
 
 ## 在线体验
@@ -31,10 +32,10 @@ Machete是单入口模式PHP源码，**不支持子目录方式访问**，以下
 
   | 类型 | 名称 | 网址 |
 | ---- | ---- | ---- |
-| 图片站 | 家庭相册演示 | <a href="https://demo.jialuoma.cn" target="_blank">demo.jialuoma.cn</a> |
+| 图片站 | 家庭相册演示 | <a href="https://demo.jialuoma.cn" target="_blank">Demo</a> |
 | 视频分享站 | Ta荐 | <a href="https://tajian.tv" target="_blank">TaJian.tv</a> |
 | 文档站 | FileSite | <a href="https://filesite.io" target="_blank">Filesite.io</a> |
-| 导航站 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDirectory</a> |
+| 导航站 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDir</a> |
 
 
 ## 基于Docker部署
@@ -48,12 +49,12 @@ Machete是单入口模式PHP源码，**不支持子目录方式访问**，以下
 4. 在docker容器中升级最新版
 
 
-视频教程：
+### 视频教程
+
+点击下面图片观看如何使用Docker部署安装machete的视频教程。
 
 [![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
 
-
-## 基于Docker使用
 
 ### 下载镜像
 
@@ -213,3 +214,8 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 请参考文档：
 * [Machete家庭相册系统使用FAQ常见问题](./FAQ.md)
 
+
+## 联系方式
+
+请打开官方网站查看底部QQ群和微信：
+<a href="https://filesite.io" target="_blank">FileSite.io</a>
