@@ -60,13 +60,6 @@ eof;
                 }
                 ?>
             </ul>
-            <?php if (!empty(FSC::$app['config']['showVersion']) && FSC::$app['config']['showVersion'] !== 'false') { ?>
-            <div class="versioninfo vercenter">
-                版本 <em><?php echo FSC::$app['config']['version']; ?></em>
-                <br>
-                发布@<?php echo FSC::$app['config']['releaseDate']; ?>
-            </div>
-            <?php } ?>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>

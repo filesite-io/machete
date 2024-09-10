@@ -68,6 +68,14 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
             <div class="modal-body markdown-body">
                 <?php echo !empty($viewData['htmlReadme']) ? $viewData['htmlReadme'] : ''; ?>
             </div>
+            <?php if (!empty(FSC::$app['config']['showVersion']) && FSC::$app['config']['showVersion'] !== 'false') { ?>
+            <div class="vercenter">
+                <hr>
+                版本 <em><?php echo FSC::$app['config']['version']; ?></em>
+                <br>
+                发布@<?php echo FSC::$app['config']['releaseDate']; ?>
+            </div>
+            <?php } ?>
         </div>
 
         <!-- 右下角回到顶部悬浮块 -->

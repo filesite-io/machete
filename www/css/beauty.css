@@ -57,10 +57,10 @@ a:link{text-decoration:none}
     position: fixed;
     left: 0;
     top: 52px;
+    bottom: 0;
     width: 160px;
     background-color: #FFF;
     overflow-y: auto;
-    bottom: 80px;
     z-index: 1000;
     padding-bottom:3em;
     padding-top:10px;
@@ -70,8 +70,6 @@ a:link{text-decoration:none}
 .lampshow .navbar-fixed-left a{color:#DDD}
 .lampshow .navbar-fixed-left .active a{background-color:#e7e7e7;color:#555}
 .lampshow .navbar-fixed-left a:hover{background-color:#CCC;color:#444}
-
-.versioninfo{position:fixed;left:0;bottom:0;width:160px;padding-top:10px;padding-bottom:5px;border-top:1px solid #EEE}
 
 .img_main{min-height:510px;margin-left:160px}
 .im_mainl{margin:0 10px 12px 10px}

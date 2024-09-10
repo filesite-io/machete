@@ -674,9 +674,27 @@ Class SiteController extends Controller {
             }
         }
 
+        $maxScanDeep = 0;
+
+        //获取根目录下的readme
+        $htmlReadme = '';
+        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $expireSeconds = 86400;
+        $readmeFile = Common::getCacheFromFile($cacheKey, $expireSeconds);
+        if (!empty($readmeFile)) {
+            $htmlReadme = $readmeFile['htmlReadme'];
+        }
+
+        $copyright = '';
+        if (!empty($readmeFile['copyright'])) {
+            $copyright = $readmeFile['copyright'];
+        }
+
         $pageTitle = '密码授权';
         $viewName = 'pwdauth';
         $params = compact(
+            'htmlReadme',
+            'copyright',
             'checkDir',
             'goBackUrl',
             'password',
