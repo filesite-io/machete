@@ -133,7 +133,7 @@ Articles, pictures, and video files other than URLs.
 ```
 
 .txt, .md and .url 3 file descriptions:
-*.txt files are description files for all other files and will not appear in the file list;
+* .txt files are description files for all other files and will not appear in the file list;
 * .md will read the file content and store it in the attribute content;
 * .url reads the file content and stores it in the attribute shortcut;
 
@@ -188,7 +188,7 @@ machete@filesite.io
 
 * Join QQ group:
 
-  <a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">Website navigation, picture, video website exchange group</a>
+  <a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">QQ group of Filesite/Machete: 44123711</a>
 
 * Scan the QR code to add WeChat friends:
 

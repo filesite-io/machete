@@ -183,7 +183,7 @@ https://github.com/filesite-io/machete/
 
 * 加入QQ群：
 
-  <a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">网址导航、图片、视频网站交流群</a>
+  <a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank">Machete图片、视频源码交流群：44123711</a>
 
 * 扫码加微信好友：
 

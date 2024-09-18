@@ -10,10 +10,10 @@
 
 ## 示例
 
-皮肤名：**night**，默认首页SiteController使用的视图名：**site**，
+皮肤名：**beauty**，默认首页SiteController使用的视图名：**site**，
 其目录结构为：
 ```
-night/controller/SiteController.php
-night/views/layout/main.php
-night/views/site/index.php
+beauty/controller/SiteController.php
+beauty/views/layout/main.php
+beauty/views/site/index.php
 ```

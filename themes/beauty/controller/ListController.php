@@ -226,11 +226,12 @@ Class ListController extends Controller {
         //获取目录面包屑
         $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
 
+        $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
 
         $viewName = '//site/index';     //共享视图
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
-            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType'
+            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType', 'isAdminIp'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

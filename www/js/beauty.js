@@ -789,3 +789,24 @@ $('.btn-dir-ext').click(function(evt) {
         Cookies.set(cookieKey, 'opened', { expires: 1 });
     }
 });
+
+$('.expand-icon').click(function(evt) {
+    var cookieKey = 'menu_ext_status';
+    var status = $('.expand-icon').attr('data-status');
+
+    if (!status || status == 'opened') {
+        $('.expand-icon').attr('data-status', 'closed');
+        $('.img_main').addClass('full');
+        $('.expand-icon img').attr('src', '/img/beauty/arrow-right-circle.svg');
+        $('.navbar-fixed-left').addClass('closed');
+
+        Cookies.set(cookieKey, 'closed', { expires: 1 });
+    }else {
+        $('.expand-icon').attr('data-status', 'opened');
+        $('.img_main').removeClass('full');
+        $('.expand-icon img').attr('src', '/img/beauty/arrow-left-circle.svg');
+        $('.navbar-fixed-left').removeClass('closed');
+
+        Cookies.set(cookieKey, 'opened', { expires: 1 });
+    }
+});

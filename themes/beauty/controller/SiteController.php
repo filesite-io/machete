@@ -214,12 +214,13 @@ Class SiteController extends Controller {
             return $this->renderJson(compact('page', 'pageSize', 'videos'));
         }
 
+        $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
 
         $viewName = 'index';
         $params = compact(
             'page', 'pageSize', 'cacheDataId', 'showType',
             'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright',
-            'alertWarning'
+            'alertWarning', 'isAdminIp'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -230,12 +231,17 @@ Class SiteController extends Controller {
         $msg = 'OK';
 
         try {
-            $cacheDir = __DIR__ . '/../../../runtime/cache/';
-            $files = scandir($cacheDir);
-            foreach($files as $file) {
-                if (!preg_match('/\.json$/i', $file)) {continue;}
+            if (Common::isAdminIp($this->getUserIp()) == false) {
+                $code = 0;
+                $msg = '403 Forbidden，禁止访问';
+            }else {
+                $cacheDir = __DIR__ . '/../../../runtime/cache/';
+                $files = scandir($cacheDir);
+                foreach($files as $file) {
+                    if (!preg_match('/\.json$/i', $file)) {continue;}
 
-                unlink("{$cacheDir}{$file}");
+                    unlink("{$cacheDir}{$file}");
+                }
             }
         }catch(Exception $e) {
             $code = 0;
@@ -373,6 +379,9 @@ Class SiteController extends Controller {
         if (empty($cateId) || empty($url)) {
             $code = 0;
             $msg = '参数不能为空';
+        }else if (Common::isAdminIp($this->getUserIp()) == false) {
+            $code = 0;
+            $msg = '403 Forbidden，禁止访问';
         }else {
             $cacheKey = $this->getCacheKey($cateId, 'snap');
             $img_id = '';   //为保持数据格式一致，图片id传空
@@ -579,13 +588,15 @@ Class SiteController extends Controller {
             $copyright = $readmeFile['copyright'];
         }
 
+        $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
+
         $pageTitle = "正在播放：{$videoFilename}";
         $this->layout = 'player';
         $viewName = 'player';
         $params = compact(
             'videoUrl', 'videoId', 'videoFilename',
             'cateId', 'cacheParentDataId', 'page', 'pageSize',
-            'copyright'
+            'copyright', 'isAdminIp'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -628,6 +639,9 @@ Class SiteController extends Controller {
         if (empty($videoId) || empty($metaData)) {
             $code = 0;
             $msg = '参数不能为空';
+        }else if (Common::isAdminIp($this->getUserIp()) == false) {
+            $code = 0;
+            $msg = '403 Forbidden，禁止访问';
         }else {
             $cacheKey = $this->getCacheKey($videoId, 'vmeta');
             $cacheSubDir = 'video';

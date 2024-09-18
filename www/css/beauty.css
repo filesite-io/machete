@@ -87,6 +87,14 @@ a:link{text-decoration:none}
 .im_item .btn-set-snap{display:none;position:absolute;top:5px;right:5px;opacity:0.8}
 .im_item:hover .btn-set-snap{display:inline-block}
 
+
+.navbar-fixed-left .expand-icon{position:fixed;top:58px;left:130px;cursor:pointer;padding:5px}
+.navbar-fixed-left.closed{width:28px;overflow:hidden}
+.navbar-fixed-left.closed li{display:none}
+.navbar-fixed-left.closed li.expand-icon{display:block;left:5px}
+.expand-icon img{background-color:#FFF;border-radius:9px}
+.img_main.full{margin-left:28px}
+
 .locked_dir{position:absolute;right:3px;top:5px}
 
 .web_info{padding:10px 0 42px 0;margin-top:75px;border-top:solid 1px #f5f5f5}
@@ -174,9 +182,9 @@ a:link{text-decoration:none}
         height: 45vw;
     }
     .hidden-xs{display:none}
-    .navbar-fixed-left, .versioninfo{position:static;width:100%}
-    .img_main{margin-left:0}
-
+    .navbar-fixed-left,.navbar-fixed-left.closed,.versioninfo{position:static;width:100%}
+    .navbar-fixed-left.closed li{display:block}
+    .img_main, .img_main.full{margin-left:0}
     .pagination>li>a, .pagination>li>span{padding:3px 7px}
     .videotitle{max-width:52%}
     .othervideos{max-height:inherit}

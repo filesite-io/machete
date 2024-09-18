@@ -10,13 +10,20 @@ $supportedExts = array_merge($imgExts, $videoExts);
 $authConfig = FSC::$app['config']['password_auth'];
 
 $dir_ext_status = !empty($_COOKIE['dir_ext_status']) ? $_COOKIE['dir_ext_status'] : 'opened';
+$menu_ext_status = !empty($_COOKIE['menu_ext_status']) ? $_COOKIE['menu_ext_status'] : FSC::$app['config']['defaultMenuStatusInPC'];
+
+$menu_expand_icon_cls = $menu_ext_status == 'opened' ? '' : 'closed';
+$menu_expand_icon_url = $menu_ext_status == 'opened' ? 'arrow-left-circle.svg' : 'arrow-right-circle.svg';
+$main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
 ?><!-- 顶部导航栏模块 -->
 <nav class="navbar navbar-default navbar-fixed-top navbarJS">
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display navbar-inverse-->
         <div class="navbar-header">
             <div class="navbar-toggle">
+                <?php if (!empty($viewData['isAdminIp'])) { ?>
                 <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
+                <?php } ?>
                 <img class="svg icon1 svgimg lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
                 <button type="button" class="collapsed mr_button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
@@ -33,7 +40,9 @@ $dir_ext_status = !empty($_COOKIE['dir_ext_status']) ? $_COOKIE['dir_ext_status'
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <div class="nb_right nav navbar-nav navbar-right hidden-xs">
+                <?php if (!empty($viewData['isAdminIp'])) { ?>
                 <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
+                <?php } ?>
                 <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
             </div>
@@ -47,7 +56,7 @@ $dir_ext_status = !empty($_COOKIE['dir_ext_status']) ? $_COOKIE['dir_ext_status'
             </form>
             */ ?>
 
-            <ul class="nav navbar-fixed-left">
+            <ul class="nav navbar-fixed-left <?=$menu_expand_icon_cls?>">
                 <?php
                 $breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
                 if (!empty($viewData['menus'])) {        //只显示第一级目录
@@ -59,13 +68,14 @@ eof;
                     }
                 }
                 ?>
+                <li class="expand-icon hidden-xs" data-status="<?=$menu_ext_status?>"><img src="/img/beauty/<?=$menu_expand_icon_url?>" width="18" alt="arrow"></li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
 </nav>
 
 <!-- 内容主题 -->
-<div class="img_main">
+<div class="img_main <?=$main_view_cls?>">
 
 <?php
 $category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
@@ -77,6 +87,10 @@ if (empty($selectedId) && !empty($viewData['menus'])) {
         'directories' => $viewData['menus'],
         'files' => $viewData['scanResults'],
     );
+    $btnSetSnap = '';
+}
+
+if (empty($viewData['isAdminIp'])) {
     $btnSetSnap = '';
 }
 

@@ -691,4 +691,27 @@ Class Common {
         return $authed;
     }
 
+    //判断当前用户IP是否拥有管理权限
+    public static function isAdminIp($ip) {
+        $admin = false;
+
+        $localhostIps = array(
+            '127.0.0.1',
+            'localhost',
+        );
+
+        if ( !empty(FSC::$app['config']['adminForLanIps']) && (
+                preg_match("/^(10|172\.16|192\.168)\./", $ip)
+                ||
+                in_array($ip, $localhostIps)
+            )
+        ) {
+            $admin = true;
+        }else if (!empty(FSC::$app['config']['adminWhiteIps']) && in_array($ip, FSC::$app['config']['adminWhiteIps'])) {
+            $admin = true;
+        }
+
+        return $admin;
+    }
+
 }
