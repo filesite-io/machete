@@ -92,7 +92,7 @@ a:link{text-decoration:none}
 .navbar-fixed-left.closed{width:28px;overflow:hidden}
 .navbar-fixed-left.closed li{display:none}
 .navbar-fixed-left.closed li.expand-icon{display:block;left:5px}
-.expand-icon img{background-color:#FFF;border-radius:9px}
+.expand-icon img{background-color:#FFF;border-radius:9px;border:1px solid #FFF}
 .img_main.full{margin-left:28px}
 
 .locked_dir{position:absolute;right:3px;top:5px}
