@@ -478,18 +478,27 @@ if ($('#pr-player').length > 0 && typeof(videojs) != 'undefined') {
         myPlayer.pause();
 
         if (typeof(mc_video_id) != 'undefined' && mc_video_id) {
-            var height = myPlayer.videoHeight(), width = myPlayer.videoWidth(),
-                aspect = height / width;
-            var canvas = document.createElement('canvas');
-            var video = $('video.vjs-tech').get(0);
+            var snapshotImg = '';
 
-            canvas.width = Math.ceil(360/aspect);
-            canvas.height = 360;    //360p
+            //区分media类型，视频生成快照，音乐只获取时长
+            var mediaType = myPlayer.currentType();
+            if (mediaType.indexOf('mp3') > -1) {
+                console.log('media type', mediaType);
+            }else {
+                var height = myPlayer.videoHeight(), width = myPlayer.videoWidth(),
+                    aspect = height / width;
+                var canvas = document.createElement('canvas');
+                var video = $('video.vjs-tech').get(0);
 
-            var ctx = canvas.getContext('2d');
-            ctx.drawImage( video, 0, 0, canvas.width, canvas.height );
+                canvas.width = Math.ceil(360/aspect);
+                canvas.height = 360;    //360p
 
-            var snapshotImg = canvas.toDataURL('image/jpeg');
+                var ctx = canvas.getContext('2d');
+                ctx.drawImage( video, 0, 0, canvas.width, canvas.height );
+
+                snapshotImg = canvas.toDataURL('image/jpeg');
+            }
+
             var duration = myPlayer.duration();
 
             //更新视频封面图和视频时长
@@ -501,6 +510,10 @@ if ($('#pr-player').length > 0 && typeof(videojs) != 'undefined') {
                 saveVideoMeta(mc_video_id, {
                     duration: duration,
                     snapshot: snapshotImg
+                });
+            }else if (duration) {       //保存音乐时长
+                saveVideoMeta(mc_video_id, {
+                    duration: duration
                 });
             }
 
@@ -522,7 +535,7 @@ var getVideoMetaAndShowIt = function(videoId, videoUrl) {
         }
     }).done(function(data) {
         if (data.code != 1) {
-            console.warn(data.msg);
+            console.warn('no meta data', data.msg);
             noSnapVideos.push({id: videoId, url: videoUrl});
         }else {
             $('#poster_'+videoId).attr('src', data.meta.snapshot);
@@ -607,8 +620,30 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
             screenshot_start = 1000;
         }
 
-        setTimeout(takeScreenshot, screenshot_start);
+        //区分media类型，视频生成快照，音乐只获取时长
+        var mediaType = myPlayer.currentType();
+        if (mediaType.indexOf('mp3') > -1) {
+            saveVideoMeta($('video.vjs-tech').attr('data-id'), {
+                duration: myPlayer.duration()
+            });
+        }else {
+            setTimeout(takeScreenshot, screenshot_start);
+        }
     });
+
+    //自动播放
+    try{
+        var videoSrc = $('#my-player').attr('data-src'),
+            videoType = $('#my-player').attr('data-type');
+        myPlayer.src({
+            src: videoSrc,
+            type: videoType
+        });
+        myPlayer.muted(false);
+        myPlayer.play();
+    }catch(err) {
+        console.error('自动播放视频失败！', err);
+    }
 
     //生成封面图
     $('.btn-snapshot').click(function(e) {
@@ -659,7 +694,11 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
     //加载更多视频
     var currentPage = $('.othervideos').attr('data-page'),
         currentPageSize = $('.othervideos').attr('data-page-size'),
-        currentVideoId = $('.othervideos').attr('data-id');
+        currentVideoId = $('.othervideos').attr('data-id'),
+        currentMediaType = $('.othervideos').attr('data-type');
+    if (!currentMediaType) {
+        currentMediaType = 'video';
+    }
     var callback_loadNextPage = null;
     var getOtherVideos = function() {
         if (_noMoreVideos) {return false;}
@@ -670,8 +709,8 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
             params = {
                 id: cateId,
                 cid: cacheId,
-                show: 'video',
-                dataType: 'video',
+                show: currentMediaType,
+                dataType: currentMediaType,
                 page: currentPage,
                 limit: currentPageSize
             };
@@ -694,6 +733,20 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
 
                 if (callback_loadNextPage) {
                     callback_loadNextPage(data.videos);
+                }
+            }else if (typeof(data.audios) != 'undefined' && data.audios.length > 0) {
+                moreVideos = data.audios;
+                $('.othervideos').html(renderVideos(videoId, data.audios));
+                setTimeout(function() {
+                    $('.othervideos .video-poster').each(function(index, el) {
+                        var videoId = $(el).attr('data-video-id'),
+                            videoUrl = $(el).attr('data-video-url');
+                        getVideoMetaAndShowIt(videoId, videoUrl);
+                    });
+                }, 50);
+
+                if (callback_loadNextPage) {
+                    callback_loadNextPage(data.audios);
                 }
             }else {
                 if (currentPage > 1) {
@@ -719,8 +772,12 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         }
 
         if (nextVideo) {
-            myPlayer.src(nextVideo.path);
-            $('.navbar-header .videotitle').text(nextVideo.filename);
+            //支持其它格式，fix /m3u8/这种路径
+            myPlayer.src({
+                src: nextVideo.path,
+                type: nextVideo.videoType
+            });
+            $('.navbar-header .videotitle').text(nextVideo.filename + '.' + nextVideo.extension);
         }
     };
     myPlayer.on('ended', function() {

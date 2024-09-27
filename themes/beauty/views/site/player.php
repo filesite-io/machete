@@ -36,21 +36,24 @@
                 class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
                 controls
                 playsinline
-                poster="" 
+                poster=""
+                data-src="<?php echo $viewData['videoUrl']; ?>"
+                data-type="<?php echo $viewData['videoSourceType']; ?>"
                 id="my-player">
-                <source src="<?php echo $viewData['videoUrl']; ?>" type="video/mp4">
             </video>
             <div class="text-right mt-2 mr-1">
                 <?php if (!empty($viewData['isAdminIp'])) { ?>
-                <button class="btn btn-default mr-1 btn-snapshot">
+                <button class="btn btn-default btn-snapshot">
                     <img src="/img/beauty/video_dir.png" alt="download icon" width="20">
                     生成封面图
                 </button>
                 <?php } ?>
-                <a class="btn btn-default" href="<?php echo $viewData['videoUrl']; ?>&download=1">
+                <?php if ($viewData['videoExtension'] != 'm3u8') { ?>
+                <a class="btn btn-default ml-1" href="<?php echo $viewData['videoUrl']; ?>&download=1">
                     <img src="/img/download.png" alt="download icon" width="20">
-                    下载视频
+                    下载
                 </a>
+                <?php } ?>
             </div>
         </div>
     </div>

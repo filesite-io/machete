@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../../../lib/DirScanner.php';
 require_once __DIR__ . '/../../../plugins/Parsedown.php';
 require_once __DIR__ . '/../../../plugins/Common.php';
+require_once __DIR__ . '/../../../plugins/Html.php';
 
 Class ListController extends Controller {
 
@@ -132,6 +133,11 @@ Class ListController extends Controller {
                 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
                 return !empty($item['extension']) && in_array($item['extension'], $videoExts);
             });
+        }else if ($showType == 'audio' && !empty($scanResults[$cateId]['files'])) {
+            $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
+                $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+                return !empty($item['extension']) && in_array($item['extension'], $audioExts);
+            });
         }
 
         //获取当前目录下的readme
@@ -215,11 +221,37 @@ Class ListController extends Controller {
                 }
 
                 if (!empty($item['extension']) && in_array($item['extension'], $videoExts)) {
+                    if ($item['extension'] == 'm3u8') {
+                        $item['path'] .= "&cid={$cacheParentDataId}";
+                    }
+
+                    $item['videoType'] = Html::getMediaSourceType($item['extension']);
+
                     array_push($videos, $item);
                     $index ++;
                 }
             }
             return $this->renderJson(compact('page', 'pageSize', 'videos'));
+        }else if ($dataType == 'audio' && !empty($subcate['files'])) {
+            $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+            $audios = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($subcate['files'] as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                    array_push($audios, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'audios'));
         }
 
 

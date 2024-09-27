@@ -355,7 +355,7 @@ Class DirScanner {
     //根据文件生成防盗链网址
     //参考：https://nginx.org/en/docs/http/ngx_http_secure_link_module.html#secure_link
     //防盗链参数名：md5, expires
-    protected function getSecureLink($path) {
+    public function getSecureLink($path) {
         $expires = time() + $this->nginxSecureTimeout;
         $originStr = str_replace([
                 '{secure_link_expires}',

@@ -277,4 +277,18 @@ eof;
         return $html;
     }
 
+    public static function getMediaSourceType($fileExtension) {
+        $sourceType = 'video/mp4';
+
+        if ($fileExtension == 'mov') {
+            $sourceType = 'video/mp4';
+        }else if ($fileExtension == 'm3u8') {
+            $sourceType = 'application/x-mpegURL';
+        }else if ($fileExtension == 'mp3') {
+            $sourceType = 'audio/mp3';
+        }
+
+        return $sourceType;
+    }
+
 }

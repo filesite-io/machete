@@ -4,7 +4,8 @@ $total = 0;     //翻页支持
 
 $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
-$supportedExts = array_merge($imgExts, $videoExts);
+$audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+$supportedExts = array_merge($imgExts, $videoExts, $audioExts);
 
 //需密码授权的目录显示lock图标
 $authConfig = FSC::$app['config']['password_auth'];
@@ -266,24 +267,23 @@ eof;
         }
 
 
-        //显示图片、视频筛选链接
-        if ($total > 0) {
-            $arrShowTypes = array(
-                'all' => '所有',
-                'image' => '照片',
-                'video' => '视频',
-            );
+        //显示图片、视频、音乐筛选链接
+        $arrShowTypes = array(
+            'all' => '所有',
+            'image' => '照片',
+            'video' => '视频',
+            'audio' => '音乐',
+        );
 
-            echo '<ul class="nav nav-tabs ml-1">';
-            foreach ($arrShowTypes as $key => $title) {
-                $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
-                $activedClass = $key == $viewData['showType'] ? 'active' : '';
-                echo <<<eof
-                <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
+        echo '<ul class="nav nav-tabs ml-1 mb-1">';
+        foreach ($arrShowTypes as $key => $title) {
+            $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
+            $activedClass = $key == $viewData['showType'] ? 'active' : '';
+            echo <<<eof
+            <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
 eof;
-            }
-            echo '</ul>';
         }
+        echo '</ul>';
 
 
         //空目录显示提示信息
@@ -370,7 +370,13 @@ eof;
 </div>
 eof;
                 }else if (in_array($file['extension'], $videoExts)) {       //输出视频
-                    $videoUrl = urlencode($file['path']);
+                    //m3u8支持
+                    if ($file['extension'] == 'm3u8') {
+                        $videoUrl = urlencode("{$file['path']}&cid={$viewData['cacheDataId']}");
+                    }else {
+                        $videoUrl = urlencode($file['path']);
+                    }
+
                     $linkUrl = "/site/player?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}";
                     if ($viewData['showType'] == 'video') {
                         $linkUrl .= "&page={$viewData['page']}&limit={$viewData['pageSize']}";
@@ -389,6 +395,27 @@ eof;
             </span>
         </div>
         <img src="/img/video-play.svg" class="playbtn hide" alt="video play button">
+        <span class="duration">00:00:00</span>
+    </a>
+</div>
+eof;
+                }else if (in_array($file['extension'], $audioExts)) {       //输出音乐
+                    $title = !empty($file['title']) ? $file['title'] : $file['filename'];
+                    $videoUrl = urlencode($file['path']);
+                    $linkUrl = "/site/audioplayer?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}";
+                    if ($viewData['showType'] == 'audio') {
+                        $linkUrl .= "&page={$viewData['page']}&limit={$viewData['pageSize']}";
+                    }
+
+                    echo <<<eof
+<div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2 audio-list-item">
+    <a href="{$linkUrl}" target="_blank" class="bor_radius vercenter" title="{$title} - {$file['filename']}">
+        <img src="/img/beauty/audio_icon.jpeg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
+            data-video-id="{$file['id']}"
+            data-video-url="{$file['path']}"
+            alt="{$file['filename']}">
+        <span class="title">{$title}</span>
+        <!--img src="/img/video-play.svg" class="playbtn hide" alt="video play button"-->
         <span class="duration">00:00:00</span>
     </a>
 </div>

@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../../../lib/DirScanner.php';
 require_once __DIR__ . '/../../../plugins/Parsedown.php';
 require_once __DIR__ . '/../../../plugins/Common.php';
+require_once __DIR__ . '/../../../plugins/Html.php';
 
 Class SiteController extends Controller {
 
@@ -151,6 +152,9 @@ Class SiteController extends Controller {
         $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
         $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
 
+        //mp3支持
+        $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+
         $showType = $this->get('show', 'all');
         if ($showType == 'image') {
             $scanResults = array_filter($scanResults, function($item) {
@@ -161,6 +165,11 @@ Class SiteController extends Controller {
             $scanResults = array_filter($scanResults, function($item) {
                 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
                 return !empty($item['extension']) && in_array($item['extension'], $videoExts);
+            });
+        }else if ($showType == 'audio') {
+            $scanResults = array_filter($scanResults, function($item) {
+                $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+                return !empty($item['extension']) && in_array($item['extension'], $audioExts);
             });
         }
 
@@ -212,7 +221,27 @@ Class SiteController extends Controller {
                 }
             }
             return $this->renderJson(compact('page', 'pageSize', 'videos'));
+        }else if ($dataType == 'audio') {
+            $audios = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($scanResults as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                    array_push($audios, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'audios'));
         }
+
 
         $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
 
@@ -295,7 +324,7 @@ Class SiteController extends Controller {
                     $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
                     $imgFile = $scanner->getSnapshotImage($realpath, $imgExts);
 
-                    //支持视频目录
+                    //支持视频、音乐目录
                     if (empty($imgFile)) {
                         $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
                         $firstVideo = $scanner->getSnapshotImage($realpath, $videoExts);
@@ -312,6 +341,12 @@ Class SiteController extends Controller {
                                 $cacheSubDir = 'dir';
                                 $size = 'vm';
                                 Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
+                            }
+                        }else {
+                            $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+                            $firstVideo = $scanner->getSnapshotImage($realpath, $audioExts);
+                            if (!empty($firstVideo)) {
+                                $url = '/img/beauty/audio_icon.jpeg';
                             }
                         }
                     }else {
@@ -560,14 +595,15 @@ Class SiteController extends Controller {
         return $this->renderJson(compact('code', 'msg'));
     }
 
-    public function actionPlayer() {
+    //TODO: 增加mp3播放器，以及mp3时长获取
+    public function actionAudioplayer() {
         $videoUrl = $this->get('url', '');
         $videoId = $this->get('id', '');
 
         $cateId = $this->get('pid', '');
         $cacheParentDataId = $this->get('cid', '');
         $page = $this->get('page', 1);
-        $pageSize = $this->get('limit', 24);
+        $pageSize = $this->get('limit', 100);
 
         if (empty($videoUrl) || empty($videoId) || empty($cateId) || empty($cacheParentDataId)) {
             throw new Exception("缺少参数！", 403);
@@ -576,6 +612,70 @@ Class SiteController extends Controller {
         $arr = parse_url($videoUrl);
         $videoFilename = basename($arr['path']);
 
+        //增加文件后缀格式检查，区分：mp4, mov, m3u8
+        $videoExtension = pathinfo($arr['path'], PATHINFO_EXTENSION);
+        $videoSourceType = Html::getMediaSourceType($videoExtension);
+
+
+        //获取联系方式
+        $maxScanDeep = 0;       //最大扫描目录级数
+        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $readmeFile = Common::getCacheFromFile($cacheKey);
+
+        //底部版权申明配置支持
+        $copyright = '';
+        if (!empty($readmeFile['copyright'])) {
+            $copyright = $readmeFile['copyright'];
+        }
+
+        $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
+
+
+        $pageTitle = "正在播放：{$videoFilename}";
+        $this->layout = 'player';
+        $viewName = 'mp3player';
+        $params = compact(
+            'videoUrl', 'videoId', 'videoFilename',
+            'cateId', 'cacheParentDataId', 'page', 'pageSize',
+            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType'
+        );
+        return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //视频播放器
+    public function actionPlayer() {
+        $videoUrl = $this->get('url', '');
+        $videoId = $this->get('id', '');
+
+        $cateId = $this->get('pid', '');
+        $cacheParentDataId = $this->get('cid', '');
+        $page = $this->get('page', 1);
+        $pageSize = $this->get('limit', 100);
+
+        if (empty($videoUrl) || empty($videoId) || empty($cateId) || empty($cacheParentDataId)) {
+            throw new Exception("缺少参数！", 403);
+        }
+
+        $arr = parse_url($videoUrl);
+        $videoFilename = basename($arr['path']);
+
+        //增加文件后缀格式检查，区分：mp4, mov, m3u8
+        $videoExtension = pathinfo($arr['path'], PATHINFO_EXTENSION);
+
+        //支持m3u8地址：/m3u8/?id=xxx
+        if ($videoFilename == 'm3u8') {
+            $videoExtension = 'm3u8';
+
+            //从缓存数据获取文件名
+            $cacheSeconds = 86400;
+            $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
+            if (!empty($cachedParentData)) {
+                $m3u8 = $cachedParentData[$videoId];
+                $videoFilename = $m3u8['filename'] . '.m3u8';
+            }
+        }
+
+        $videoSourceType = Html::getMediaSourceType($videoExtension);
 
         //获取联系方式
         $maxScanDeep = 0;       //最大扫描目录级数
@@ -596,7 +696,7 @@ Class SiteController extends Controller {
         $params = compact(
             'videoUrl', 'videoId', 'videoFilename',
             'cateId', 'cacheParentDataId', 'page', 'pageSize',
-            'copyright', 'isAdminIp'
+            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
