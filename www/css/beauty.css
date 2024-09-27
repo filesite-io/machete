@@ -148,7 +148,7 @@ a:link{text-decoration:none}
 .audio-list-item .im_img_title{background:none}
 .audio-list-item .im_img{width:86%;height:86%;margin:0 auto}
 .audio-list-item .title{margin-top:5px;color:#444;text-wrap:nowrap;white-space:nowrap;text-overflow:ellipsis}
-.audio-list-item .duration{bottom:17.5%;left:50%;width:50px;margin-left:-25px}
+.audio-list-item .duration{bottom:17.5%;left:50%;width:56px;margin-left:-28px}
 .audiolist{max-width:600px;margin:0 auto;min-height:560px}
 .audiolist .othervideos{max-height:inherit}
 .audio-item{background:rgba(7, 7, 7, .1);padding:5px;border-radius:5px;margin:0 5px;position:relative;cursor:pointer}
