@@ -407,15 +407,25 @@ eof;
                         $linkUrl .= "&page={$viewData['page']}&limit={$viewData['pageSize']}";
                     }
 
+                    $snapshot = '/img/beauty/audio_icon.jpeg';
+                    if (!empty($file['snapshot'])) {
+                        $snapshot = $file['snapshot'];
+                    }else {     //尝试找出同名的图片文件
+                        $matchedImage = Html::searchImageByFilename($file['filename'], $viewData['allFiles'], $imgExts);
+                        if (!empty($matchedImage)) {
+                            $snapshot = $matchedImage['path'];
+                        }
+                    }
+
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2 audio-list-item">
     <a href="{$linkUrl}" target="_blank" class="bor_radius vercenter" title="{$title} - {$file['filename']}">
-        <img src="/img/beauty/audio_icon.jpeg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
+        <img src="{$snapshot}" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
             data-video-id="{$file['id']}"
             data-video-url="{$file['path']}"
             alt="{$file['filename']}">
         <span class="title">{$title}</span>
-        <!--img src="/img/video-play.svg" class="playbtn hide" alt="video play button"-->
+        <img src="/img/video-play.svg" class="playbtn hide" alt="video play button">
         <span class="duration">00:00:00</span>
     </a>
 </div>

@@ -8,11 +8,11 @@ require_once __DIR__ . '/../../../plugins/Common.php';
 
 Class M3u8Controller extends Controller {
 
-	//参数
-	//@id - 文件id
-	//@cid - 数据缓存id
-	//支持nginx secure防盗链：md5={$md5}&expires={$expires}
-	public function actionIndex() {
+    //参数
+    //@id - 文件id
+    //@cid - 数据缓存id
+    //支持nginx secure防盗链：md5={$md5}&expires={$expires}
+    public function actionIndex() {
         $videoId = $this->get('id', '');
         $cacheParentDataId = $this->get('cid', '');
         if (empty($videoId) || empty($cacheParentDataId)) {
@@ -31,17 +31,17 @@ Class M3u8Controller extends Controller {
         }
 
         if (empty($cachedParentData[$videoId])) {
-        	$erro = "缓存数据中找不到当前视频，请返回上一页重新进入！";
+            $erro = "缓存数据中找不到当前视频，请返回上一页重新进入！";
             throw new Exception($err, 404);
         }else if (!empty($cachedParentData)) {
-        	$m3u8 = $cachedParentData[$videoId];
-        	$m3u8Content = $this->getM3u8Content($m3u8['realpath'], $cachedParentData);
-        	if (!empty($m3u8Content)) {
-        		return $this->renderM3u8($m3u8Content);
-        	}else {
-        		$err = 'm3u8内容为空！';
-            	throw new Exception($err, 500);
-        	}
+            $m3u8 = $cachedParentData[$videoId];
+            $m3u8Content = $this->getM3u8Content($m3u8['realpath'], $cachedParentData);
+            if (!empty($m3u8Content)) {
+                return $this->renderM3u8($m3u8Content);
+            }else {
+                $err = 'm3u8内容为空！';
+                throw new Exception($err, 500);
+            }
         }
     }
 
@@ -67,50 +67,50 @@ Class M3u8Controller extends Controller {
 #EXT-X-ENDLIST
      **/
     protected function getM3u8Content($m3u8_realpath, $cachedParentData = array()) {
-    	$m3u8Content = file_get_contents($m3u8_realpath);
-    	if (empty($m3u8Content) || strpos($m3u8Content, 'EXTM3U') === false) {
-    		return false;
-    	}
+        $m3u8Content = file_get_contents($m3u8_realpath);
+        if (empty($m3u8Content) || strpos($m3u8Content, 'EXTM3U') === false) {
+            return false;
+        }
 
-    	$lines = preg_split("/[\r\n]/", $m3u8Content);
-    	
-    	$newContent = '';
-    	foreach($lines as $index => $line) {
-    		if (strpos($line, '.ts') !== false) {
-    			$newContent .= $this->getRelativePathOfTs($line, $m3u8_realpath, $cachedParentData) . "\n";
-    		}else if (!empty($line)) {
-	    		$newContent .= $line . "\n";
-    		}
-    	}
+        $lines = preg_split("/[\r\n]/", $m3u8Content);
+        
+        $newContent = '';
+        foreach($lines as $index => $line) {
+            if (strpos($line, '.ts') !== false) {
+                $newContent .= $this->getRelativePathOfTs($line, $m3u8_realpath, $cachedParentData) . "\n";
+            }else if (!empty($line)) {
+                $newContent .= $line . "\n";
+            }
+        }
 
-    	return $newContent;
+        return $newContent;
     }
 
     //返回ts相对当前m3u8文件的相对路径
     //TODO: 支持防盗链
     protected function getRelativePathOfTs($ts_filename, $m3u8_realpath, $cachedParentData = array()) {
-    	if (!empty($cachedParentData)) {
-    		$matchedTs = null;
-    		foreach($cachedParentData as $item) {
-    			if ($item['extension'] == 'ts' && strpos($item['path'], $ts_filename) !== false) {
-    				$matchedTs = $item;
-    				break;
-    			}
-    		}
+        if (!empty($cachedParentData)) {
+            $matchedTs = null;
+            foreach($cachedParentData as $item) {
+                if (!empty($item['extension']) && $item['extension'] == 'ts' && strpos($item['path'], $ts_filename) !== false) {
+                    $matchedTs = $item;
+                    break;
+                }
+            }
 
-    		if (!empty($matchedTs)) {
-    			return $matchedTs['path'];
-    		}else {
-    			$webroot = FSC::$app['config']['content_directory'];
-    			$rootDir = __DIR__ . '/../../../www/' . $webroot;
-    			$rootDir = realpath($rootDir);
-    			$m3u8Dir = dirname($m3u8_realpath);
-    			$relativeDir = str_replace("{$rootDir}/", '', $m3u8Dir);
-    			return "/{$webroot}{$relativeDir}/{$ts_filename}";
-    		}
-    	}
+            if (!empty($matchedTs)) {
+                return $matchedTs['path'];
+            }else {
+                $webroot = FSC::$app['config']['content_directory'];
+                $rootDir = __DIR__ . '/../../../www/' . $webroot;
+                $rootDir = realpath($rootDir);
+                $m3u8Dir = dirname($m3u8_realpath);
+                $relativeDir = str_replace("{$rootDir}/", '', $m3u8Dir);
+                return "/{$webroot}{$relativeDir}/{$ts_filename}";
+            }
+        }
 
-    	return dirname($m3u8_realpath) . "/{$ts_filename}";
+        return dirname($m3u8_realpath) . "/{$ts_filename}";
     }
 
 }

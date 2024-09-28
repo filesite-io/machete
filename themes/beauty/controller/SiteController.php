@@ -155,6 +155,7 @@ Class SiteController extends Controller {
         //mp3支持
         $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
 
+        $allFiles = $scanResults;
         $showType = $this->get('show', 'all');
         if ($showType == 'image') {
             $scanResults = array_filter($scanResults, function($item) {
@@ -174,7 +175,7 @@ Class SiteController extends Controller {
         }
 
 
-        //dataType支持：[image, video]
+        //dataType支持：[image, video, audio]
         $dataType = $this->get('dataType', 'html');
         if ($dataType == 'image') {
             $imgs = array();
@@ -235,6 +236,17 @@ Class SiteController extends Controller {
                 }
 
                 if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                    //为音乐文件获取封面图
+                    if (empty($item['snapshot'])) {
+                        $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                        $matchedImage = Html::searchImageByFilename($item['filename'], $allFiles, $imgExts);
+                        if (!empty($matchedImage)) {
+                            $item['snapshot'] = $matchedImage['path'];
+                        }else {
+                            $item['snapshot'] = '/img/beauty/audio_icon.jpeg?v1';
+                        }
+                    }
+
                     array_push($audios, $item);
                     $index ++;
                 }
@@ -249,7 +261,7 @@ Class SiteController extends Controller {
         $params = compact(
             'page', 'pageSize', 'cacheDataId', 'showType',
             'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright',
-            'alertWarning', 'isAdminIp'
+            'alertWarning', 'isAdminIp', 'allFiles'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -271,6 +283,19 @@ Class SiteController extends Controller {
 
                     unlink("{$cacheDir}{$file}");
                 }
+
+                //删除图片缓存: image/
+                $imgCacheDir = "{$cacheDir}image/";
+                if (is_dir($imgCacheDir)) {
+                    $files = scandir($imgCacheDir);
+                    foreach($files as $file) {
+                        if (!preg_match('/\.json$/i', $file)) {continue;}
+
+                        unlink("{$imgCacheDir}{$file}");
+                    }
+
+                    rmdir($imgCacheDir);
+                }
             }
         }catch(Exception $e) {
             $code = 0;
@@ -281,6 +306,13 @@ Class SiteController extends Controller {
     }
 
     //根据目录id，获取第一张图网址作为封面图返回
+    /**
+     * size可选值：
+     * original - 原图
+     * small    - 缩略图
+     * vm       - 视频封面图(vmeta)
+     * am       - 音乐封面图
+     **/
     public function actionDirsnap() {
         $code = 1;
         $msg = 'OK';
@@ -298,11 +330,20 @@ Class SiteController extends Controller {
             $cacheKey = $this->getCacheKey($cateId, 'snap');
             $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
             $cacheSubDir = 'dir';
-            $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+            $withCreateTime = true;     //返回数据的缓存时间
+            $cache = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir, $withCreateTime);
+            $cachedData = !empty($cache) ? $cache['data'] : null;
+            $cachedCtime = !empty($cache) ? $cache['ctime'] : 0;
+            $now = time();
 
             //如果关闭缩略图
             if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
                 if (!empty($cachedData) && !empty($cachedData['size']) && $cachedData['size'] == 'small') {
+                    $cachedData = null;
+                }
+            }else if ( !empty($cachedData) && !empty($cachedData['size']) && in_array($cachedData['size'], array('vm', 'am')) ) {
+                //如果是视频、音乐封面图，则缓存 10 分钟
+                if ($cachedCtime > 0 && $now - $cachedCtime > 600) {
                     $cachedData = null;
                 }
             }
@@ -339,7 +380,7 @@ Class SiteController extends Controller {
                             if (!empty($cachedData)) {
                                 $url = $cachedData['snapshot'];
                                 $cacheSubDir = 'dir';
-                                $size = 'vm';
+                                $size = 'vm';   //视频封面图
                                 Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
                             }
                         }else {
@@ -347,12 +388,16 @@ Class SiteController extends Controller {
                             $firstVideo = $scanner->getSnapshotImage($realpath, $audioExts);
                             if (!empty($firstVideo)) {
                                 $url = '/img/beauty/audio_icon.jpeg';
+
+                                //TODO: 获取音乐封面图
+                                //$size = 'am';     //音乐封面图
+
                             }
                         }
                     }else {
                         $url = $imgFile['path'];
                         $img_id = $imgFile['id'];
-                        $size = 'orignal';
+                        $size = 'orignal';      //原尺寸
 
                         //小尺寸图片支持
                         if (!empty(FSC::$app['config']['enableSmallImage']) && FSC::$app['config']['enableSmallImage'] !== 'false') {
@@ -362,7 +407,7 @@ Class SiteController extends Controller {
                             $cachedData = Common::getCacheFromFile($cacheKey_smimg, $expireSeconds, $cacheSubDir);
                             if (!empty($cachedData)) {      //已经有缩略图
                                 $url = $cachedData;
-                                $size = 'small';
+                                $size = 'small';    //缩略图
 
                                 //当前目录有缩略图的时候才缓存
                                 $cacheSubDir = 'dir';
@@ -419,7 +464,6 @@ Class SiteController extends Controller {
             $msg = '403 Forbidden，禁止访问';
         }else {
             $cacheKey = $this->getCacheKey($cateId, 'snap');
-            $img_id = '';   //为保持数据格式一致，图片id传空
             $cacheSubDir = 'dir';
 
             $size = 'orignal';
@@ -427,7 +471,7 @@ Class SiteController extends Controller {
                 $size = 'small';
             }
 
-            $saved = Common::saveCacheToFile($cacheKey, compact('url', 'img_id', 'size'), $cacheSubDir);
+            $saved = Common::saveCacheToFile($cacheKey, compact('url', 'size'), $cacheSubDir);
 
             if ($saved !== false) {
                 $code = 1;
@@ -496,11 +540,11 @@ Class SiteController extends Controller {
             //保存base64格式的缩略图到缓存文件
             if (!empty($imgSource)) {
                 $dst_img = imagecreatetruecolor($width, $height);
-                $copy_done = imagecopyresized($dst_img, $imgSource, 0, 0, 0, 0, $width, $height, $naturalWidth, $naturalHeight);
-
+                $copy_done = imagecopyresampled($dst_img, $imgSource, 0, 0, 0, 0, $width, $height, $naturalWidth, $naturalHeight);
                 if ($copy_done) {
                     ob_start();
-                    imagejpeg($dst_img);
+                    $quality = !empty(FSC::$app['config']['smallImageQuality']) ? FSC::$app['config']['smallImageQuality'] : 90;
+                    imagejpeg($dst_img, null, $quality);
                     $img_data = ob_get_clean();
                     ob_end_clean();
                 }
@@ -616,6 +660,23 @@ Class SiteController extends Controller {
         $videoExtension = pathinfo($arr['path'], PATHINFO_EXTENSION);
         $videoSourceType = Html::getMediaSourceType($videoExtension);
 
+        //从缓存数据获取封面图
+        $poster = '/img/beauty/audio_bg.jpg';
+        $cacheSeconds = 86400;
+        $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
+        if (!empty($cachedParentData)) {
+            $mp3 = $cachedParentData[$videoId];
+            if (!empty($mp3['snapshot'])) {
+                $poster = $mp3['snapshot'];
+            }else {
+                $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                $matchedImage = Html::searchImageByFilename($mp3['filename'], $cachedParentData, $imgExts);
+                if (!empty($matchedImage)) {
+                    $poster = $matchedImage['path'];
+                }
+            }
+        }
+
 
         //获取联系方式
         $maxScanDeep = 0;       //最大扫描目录级数
@@ -637,7 +698,7 @@ Class SiteController extends Controller {
         $params = compact(
             'videoUrl', 'videoId', 'videoFilename',
             'cateId', 'cacheParentDataId', 'page', 'pageSize',
-            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType'
+            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType', 'poster'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

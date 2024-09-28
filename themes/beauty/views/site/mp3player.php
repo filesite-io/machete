@@ -43,7 +43,7 @@
         data-cid="<?php echo $viewData['cacheParentDataId']; ?>"
         data-page="<?php echo $viewData['page']; ?>"
         data-page-size="<?php echo $viewData['pageSize']; ?>"
-        class="row othervideos"><div class="ml-1">...</div></div>
+        class="row othervideos"><div class="ml-2">...</div></div>
 </div>
 <div class="audioplayer" style="background:url('/img/beauty/audio_bg.jpg') top center">
     <div class="row">
@@ -56,7 +56,7 @@
                     controls
                     playsinline
                     data-setup='{"inactivityTimeout":0}'
-                    poster="/img/beauty/audio_bg.jpg"
+                    poster="<?php echo $viewData['poster']; ?>"
                     data-src="<?php echo $viewData['videoUrl']; ?>"
                     data-type="<?php echo $viewData['videoSourceType']; ?>"
                     id="my-player">
@@ -79,7 +79,7 @@
     <div class="col-xs-12">
         <div class="mb-1 audio-item clearfix">
             <a href="{videoUrl}" title="{title}">
-                <img src="/img/beauty/audio_icon.jpeg?v1" class="bor_radius video-poster" id="poster_{videoId}"
+                <img src="{snapshot}" class="bor_radius video-poster" id="poster_{videoId}"
                     width="60" height="60"
                     data-video-id="{videoId}"
                     data-video-url="{videoPath}"

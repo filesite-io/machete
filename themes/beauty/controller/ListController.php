@@ -122,6 +122,7 @@ Class ListController extends Controller {
         }
 
         //图片、视频类型筛选支持
+        $allFiles = $scanResults[$cateId]['files'];
         $showType = $this->get('show', 'all');
         if ($showType == 'image' && !empty($scanResults[$cateId]['files'])) {
             $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
@@ -247,6 +248,18 @@ Class ListController extends Controller {
                 }
 
                 if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                    //print_r($subcate['files']);exit;
+                    //为音乐文件获取封面图
+                    if (empty($item['snapshot'])) {
+                        $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                        $matchedImage = Html::searchImageByFilename($item['filename'], $allFiles, $imgExts);
+                        if (!empty($matchedImage)) {
+                            $item['snapshot'] = $matchedImage['path'];
+                        }else {
+                            $item['snapshot'] = '/img/beauty/audio_icon.jpeg?v1';
+                        }
+                    }
+
                     array_push($audios, $item);
                     $index ++;
                 }
@@ -263,7 +276,7 @@ Class ListController extends Controller {
         $viewName = '//site/index';     //共享视图
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
-            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType', 'isAdminIp'
+            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType', 'isAdminIp', 'allFiles'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

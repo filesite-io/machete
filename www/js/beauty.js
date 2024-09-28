@@ -537,7 +537,7 @@ var getVideoMetaAndShowIt = function(videoId, videoUrl) {
         if (data.code != 1) {
             console.warn('no meta data', data.msg);
             noSnapVideos.push({id: videoId, url: videoUrl});
-        }else {
+        }else {     //jQuery会兼容传值为undefined的情况
             $('#poster_'+videoId).attr('src', data.meta.snapshot);
             $('#poster_'+videoId).parent('a').find('.duration').text(formatDuration(data.meta.duration));
             $('#poster_'+videoId).parent('a').find('.playbtn').removeClass('hide');
@@ -680,10 +680,15 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
 
         for (var index in videos) {
             if (videos[index].id == ignoreId) {continue;}
-            tmp = template.replace('{videoUrl}', getVideoUrl(videos[index].id, videos[index].path));
-            tmp = tmp.replaceAll('{title}', videos[index].filename);
-            tmp = tmp.replaceAll('{videoId}', videos[index].id);
-            tmp = tmp.replaceAll('{videoPath}', videos[index].path);
+            tmp = template.replace(/\{videoUrl\}/ig, getVideoUrl(videos[index].id, videos[index].path));
+            tmp = tmp.replace(/\{title\}/ig, videos[index].filename);
+            tmp = tmp.replace(/\{videoId\}/ig, videos[index].id);
+            tmp = tmp.replace(/\{videoPath\}/ig, videos[index].path);
+
+            //支持mp3的封面图显示
+            if (typeof(videos[index].snapshot) != 'undefined') {
+                tmp = tmp.replace(/\{snapshot\}/ig, videos[index].snapshot);
+            }
 
             html += tmp;
         }

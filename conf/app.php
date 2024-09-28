@@ -3,8 +3,8 @@
  * Config
  */
 $configs = array(
-    'version' => '0.2.9',
-    'releaseDate' => '2024-9-27',
+    'version' => '0.3.1',
+    'releaseDate' => '2024-9-28',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
@@ -62,6 +62,7 @@ $configs = array(
 
     'enableSmallImage' => true,             //列表页面是否开启缩略图，true 为显示缩略图，false 则显示原图
     'enableSmallImageForWan' => false,      //外网使用时，点击图片打开fancybox时是否显示缩略图：true 显示缩略图， false 则显示原图
+    'smallImageQuality' => 95,              //缩略图压缩比率，0 - 100，数字越大，清晰度越高，系统默认：95
 
     //关闭服务器端生成缩略图，如果在cpu性能较低的设备（如路由器）里运行，开启此配置可以减少cpu消耗
     //如果在外网运行，开启此配置，则可能会因为服务器带宽较小导致图片加载缓慢

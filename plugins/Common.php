@@ -553,7 +553,7 @@ Class Common {
 
     //从文件缓存读取数据
     //expireSeconds: 缓存失效时间，默认10分钟
-    public static function getCacheFromFile($key, $expireSeconds = 600, $cacheSubDir = '') {
+    public static function getCacheFromFile($key, $expireSeconds = 600, $cacheSubDir = '', $withCreateTime = false) {
         $cacheDir = __DIR__ . '/../runtime/cache/';
         //子目录支持
         if (!empty($cacheSubDir)) {
@@ -568,7 +568,7 @@ Class Common {
             //如果缓存没有失效
             $now = time();
             if ($now - $data['ctime'] <= $expireSeconds) {
-                return $data['data'];
+                return empty($withCreateTime) ? $data['data'] : $data;
             }else {
                 return null;
             }

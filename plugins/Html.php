@@ -291,4 +291,20 @@ eof;
         return $sourceType;
     }
 
+    //根据文件名，找出同名的图片文件
+    public static function searchImageByFilename($filename, $files, $imgExts = array('jpg', 'jpeg', 'png', 'webp', 'gif', 'svg')) {
+        $matchedImage = null;
+
+        if (!empty($files)) {
+            foreach($files as $item) {
+                if (!empty($item['filename']) && $item['filename'] == $filename && in_array($item['extension'], $imgExts)) {
+                    $matchedImage = $item;
+                    break;
+                }
+            }
+        }
+
+        return $matchedImage;
+    }
+
 }

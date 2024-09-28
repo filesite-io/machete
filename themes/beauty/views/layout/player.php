@@ -12,8 +12,8 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <link rel="icon" type="image/x-icon" href="<?= Html::getFaviconUrl() ?>">
     <link href="/css/main.css?v.1.1" rel="stylesheet">
     <!--for theme beauty-->
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/video-js.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css?v1.1" rel="stylesheet">
+    <link href="/css/video-js.min.css?v1.1" rel="stylesheet">
     <link href="/css/beauty.css?v<?= Html::getStaticFileVersion('beauty.css', 'css') ?>" rel="stylesheet">
 </head>
 

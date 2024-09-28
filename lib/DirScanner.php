@@ -285,6 +285,7 @@ Class DirScanner {
     //合并描述文件内容到md文件或者目录数据
     //增加视频文件：mp4, mov, m3u8描述文件支持
     //增加.url文件支持
+    //增加.mp3文件支持
     private function mergeDescriptionData($realpath) {
         $data = array();
         $ext = $this->parseDescriptionFiles($realpath);
@@ -296,6 +297,8 @@ Class DirScanner {
         $targetFile_mov = preg_replace('/_?[a-z0-9]+\.txt$/U', '.mov', $realpath);
         $targetFile_m3u8 = preg_replace('/_?[a-z0-9]+\.txt$/U', '.m3u8', $realpath);
         $targetFile_url = preg_replace('/_?[a-z0-9]+\.txt$/U', '.url', $realpath);
+        $targetFile_mp3 = preg_replace('/_?[a-z0-9]+\.txt$/U', '.mp3', $realpath);
+
         if (file_exists($targetFile_md)) {
             $targetFile = $targetFile_md;
         }else if (file_exists($targetFile_mp4)) {
@@ -306,6 +309,8 @@ Class DirScanner {
             $targetFile = $targetFile_m3u8;
         }else if (file_exists($targetFile_url)) {
             $targetFile = $targetFile_url;
+        }else if (file_exists($targetFile_mp3)) {
+            $targetFile = $targetFile_mp3;
         }
 
         if (!empty($targetFile) && $targetFile != $realpath) {
