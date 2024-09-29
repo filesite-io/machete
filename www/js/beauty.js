@@ -89,12 +89,25 @@ if ($('#image_site').get(0)) {
     var customToolbar_show1to1 = {
         tpl: $('#btn_show1to1_tmp').html(),
         click: function() {
-            var btn = this, fancybox = this.instance;
+            var fancybox = this.instance;
             var slide = fancybox.getSlide();
+
+            if (slide.src == slide.downloadSrc) {
+                slide.panzoom.toggleZoom();
+                return false;
+            }
+
             fancybox.showLoading(slide);
+            //如果没有自动显示loading图标，主动加上
+            if ($(slide.el).find('.fancybox-spinner').length == 0) {
+                var spinner = '<div class="f-spinner fancybox-spinner"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20"></circle><circle cx="25" cy="25" r="20"></circle></svg></div>';
+                $(spinner).insertBefore(slide.contentEl);
+            }
+
             $(slide.imageEl).one('load', function() {
                 console.log('image loaded');
                 fancybox.hideLoading(slide);
+                $(slide.el).find('.fancybox-spinner').remove();
                 slide.panzoom.toggleZoom();
             });
 
@@ -171,7 +184,7 @@ if ($('#image_site').get(0)) {
         if (!naturalWidth || naturalWidth <= min_width || naturalHeight <= min_height ||
             (typeof(disableSmallImage) != 'undefined' && disableSmallImage)
         ) {
-            console.warn('ignored', imgEl);
+            //console.warn('ignored', imgEl);
             return false;
         }
 
