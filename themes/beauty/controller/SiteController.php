@@ -401,7 +401,7 @@ Class SiteController extends Controller {
 
                         //小尺寸图片支持
                         if (!empty(FSC::$app['config']['enableSmallImage']) && FSC::$app['config']['enableSmallImage'] !== 'false') {
-                            $cacheKey_smimg = $this->getCacheKey($imgFile['id'], 'imgsm');
+                            $cacheKey_smimg = $this->getCacheKey("{$imgFile['id']}_small", 'imgsm');
                             $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
                             $cacheSubDir = 'image';
                             $cachedData = Common::getCacheFromFile($cacheKey_smimg, $expireSeconds, $cacheSubDir);
@@ -415,10 +415,12 @@ Class SiteController extends Controller {
                             }else {
                                 //实时生成缩略图
                                 $img_filepath = $imgFile['realpath'];
-                                $img_data = $this->createSmallJpg($img_filepath);
+                                $imgSize = 'small';
+                                $sizeOptions = $this->getImageSizeOptions($imgSize);
+                                $img_data = $this->createSmallJpg($img_filepath, $sizeOptions['min_width'], $sizeOptions['min_height']);
                                 if (!empty($img_data)) {
                                     //保存到缓存文件
-                                    $cacheKey_smimg = $this->getCacheKey($imgFile['id'], 'imgsm');
+                                    $cacheKey_smimg = $this->getCacheKey("{$imgFile['id']}_small", 'imgsm');
                                     $cacheSubDir = 'image';
                                     $base64_img = base64_encode($img_data);
                                     Common::saveCacheToFile($cacheKey_smimg, "data:image/jpeg;base64,{$base64_img}", $cacheSubDir);
@@ -482,7 +484,7 @@ Class SiteController extends Controller {
     }
 
     //借助gd库，获取图片类型、尺寸，并实时生成缩略图
-    protected function createSmallJpg($img_filepath, $min_width = 198, $min_height = 219, $max_width = 600, $max_height = 500) {
+    protected function createSmallJpg($img_filepath, $min_width = 100, $min_height = 100) {
         //如果服务器端生成缩略图关闭
         if (!empty(FSC::$app['config']['disableGenerateSmallImageInServer']) && FSC::$app['config']['disableGenerateSmallImageInServer'] !== 'false') {
             return false;
@@ -495,22 +497,17 @@ Class SiteController extends Controller {
             $imgType = image_type_to_extension($imgTypeIndex);
 
             //小图片则保持原图尺寸
-            if ($naturalWidth <= $max_width || $naturalHeight <= $max_height) {
+            if ($naturalWidth <= $min_width || $naturalHeight <= $min_height) {
                 return false;
             }
 
             //生成同比例缩略图尺寸
-            $zoomRate = FSC::$app['config']['small_image_zoom_rate'];        //缩略图在最小尺寸基础上放大比例，为确保清晰度
             $width = $min_width;
             $height = $min_height;
             $aspect = $naturalHeight / $naturalWidth;
             if ($naturalWidth <= $naturalHeight) {
-                if ($width * $zoomRate >= $naturalWidth) {return false;}        //避免把小图片放大
-                $width = $width * $zoomRate <= $max_width ? (int)($width * $zoomRate) : $max_width;
                 $height = (int)($width * $aspect);
             }else {
-                if ($height * $zoomRate >= $naturalHeight) {return false;}      //避免把小图片放大
-                $height = $height * $zoomRate <= $max_height ? (int)($height * $zoomRate) : $max_height;
                 $width = (int)($height / $aspect);
             }
 
@@ -558,16 +555,35 @@ Class SiteController extends Controller {
         return $img_data;
     }
 
+    //根据图片大小类型获取最大、最小尺寸设置
+    protected function getImageSizeOptions($imgSize) {
+        $options = array(
+            'min_width' => FSC::$app['config']['small_image_min_width'],
+            'min_height' => FSC::$app['config']['small_image_min_height'],
+        );
+
+        if ($imgSize == 'middle') {
+            $options = array(
+                'min_width' => FSC::$app['config']['middle_image_min_width'],
+                'min_height' => FSC::$app['config']['middle_image_min_height'],
+            );
+        }
+
+        return $options;
+    }
+
     //优先从缓存获取小尺寸的图片
     //增加父目录封面图缓存更新
+    //增加图片尺寸类型参数: size
     public function actionSmallimg() {
         $imgId = $this->get('id', '');
         $imgUrl = $this->get('url', '');
+        $imgSize = $this->get('size', 'small');
         if (empty($imgId) || empty($imgUrl)) {
             return $this->redirect('/img/beauty/lazy.svg');
         }
 
-        $cacheKey = $this->getCacheKey($imgId, 'imgsm');
+        $cacheKey = $this->getCacheKey("{$imgId}_{$imgSize}", 'imgsm');
         $expireSeconds = FSC::$app['config']['screenshot_expire_seconds'];  //有效期3650天
         $cacheSubDir = 'image';
         $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
@@ -576,10 +592,10 @@ Class SiteController extends Controller {
         if (empty($cachedData)) {
             $tmpUrl = parse_url($imgUrl);
             $img_filepath = __DIR__ . '/../../../www' . $tmpUrl['path'];
-            $img_data = $this->createSmallJpg($img_filepath);
+            $sizeOptions = $this->getImageSizeOptions($imgSize);
+            $img_data = $this->createSmallJpg($img_filepath, $sizeOptions['min_width'], $sizeOptions['min_height']);
             if (!empty($img_data)) {
                 //保存到缓存文件
-                $cacheKey = $this->getCacheKey($imgId, 'imgsm');
                 $cacheSubDir = 'image';
                 $base64_img = base64_encode($img_data);
                 Common::saveCacheToFile($cacheKey, "data:image/jpeg;base64,{$base64_img}", $cacheSubDir);
@@ -627,7 +643,8 @@ Class SiteController extends Controller {
                 Common::saveCacheToFile($cacheKey, array('url' => $imgData, 'img_id' => $img_id, 'size' => $size), $cacheSubDir);
             }
 
-            $cacheKey = $this->getCacheKey($imgId, 'imgsm');
+            $imgSize = 'small';
+            $cacheKey = $this->getCacheKey("{$imgId}_{$imgSize}", 'imgsm');
             $cacheSubDir = 'image';
             $saved = Common::saveCacheToFile($cacheKey, $imgData, $cacheSubDir);
 

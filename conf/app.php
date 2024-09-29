@@ -3,7 +3,7 @@
  * Config
  */
 $configs = array(
-    'version' => '0.3.1',
+    'version' => '0.3.2',
     'releaseDate' => '2024-9-28',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
@@ -58,7 +58,15 @@ $configs = array(
 
     'screenshot_start' => 1000,     //视频播放页快照截取开始时间，单位：毫秒
     'screenshot_expire_seconds' => 315360000,   //视频封面图缓存3650天
-    'small_image_zoom_rate' => 2.5,   //缩略图在最小尺寸基础上的放大倍数，以确保清晰度
+    'small_image_zoom_rate' => 2.5,     //浏览器生成缩略图在其展示尺寸的放大倍数，以确保清晰度
+
+    //列表页缩略图尺寸设置
+    'small_image_min_width' => 360,     //缩略图最小宽度设置，以确保清晰度
+    'small_image_min_height' => 270,    //缩略图最小高度设置，以确保清晰度
+
+    //预览大图时，缩略图尺寸设置
+    'middle_image_min_width' => 1080,    //打开图片浏览器显示大图时，大图的最小宽度设置，以确保清晰度
+    'middle_image_min_height' => 720,   //打开图片浏览器显示大图时，大图的最小高度设置，以确保清晰度
 
     'enableSmallImage' => true,             //列表页面是否开启缩略图，true 为显示缩略图，false 则显示原图
     'enableSmallImageForWan' => false,      //外网使用时，点击图片打开fancybox时是否显示缩略图：true 显示缩略图， false 则显示原图

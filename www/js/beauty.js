@@ -1,9 +1,7 @@
 /*  
-******The author
-
-******Tan
+ * The author
+ * Tan
  */
-
 //关闭videojs的ga统计
 window.HELP_IMPROVE_VIDEOJS = false;
 
@@ -46,9 +44,11 @@ if ($('#image_site').get(0)) {
                 _slidesOfNextPage = data.imgs;
             }else if (typeof(data.videos) != 'undefined' && data.videos.length > 0) {
                 _slidesOfNextPage = data.videos;
-            }else {
+            }else if (typeof(data.msg) != 'undefined' && data.msg) {
                 _noMoreData = true;
                 console.warn('获取下一页json数据出错啦', data.msg);
+            }else {
+                _noMoreData = true;
             }
         }).fail(function(jqXHR, textStatus, errorThrown) {
             console.error('获取下一页json数据失败，错误信息：' + errorThrown);
@@ -85,30 +85,53 @@ if ($('#image_site').get(0)) {
         }, 1000);
     };
 
+    //自定义显示原图按钮
+    var customToolbar_show1to1 = {
+        tpl: $('#btn_show1to1_tmp').html(),
+        click: function() {
+            var btn = this, fancybox = this.instance;
+            var slide = fancybox.getSlide();
+            fancybox.showLoading(slide);
+            $(slide.imageEl).one('load', function() {
+                console.log('image loaded');
+                fancybox.hideLoading(slide);
+                slide.panzoom.toggleZoom();
+            });
+
+            slide.src = slide.downloadSrc;
+            slide.imageEl.src = slide.downloadSrc;
+        }
+    };
+
     // 图片浏览
     var fancyboxToolbar = {
+        items: {'show1to1': customToolbar_show1to1},
         display: {
             left: ["infobar"],
             middle: [
                 "zoomIn",
                 "zoomOut",
-                "toggle1to1",
+                "show1to1",
                 "rotateCCW",
                 "rotateCW",
                 "flipX",
-                "flipY"
+                "flipY",
+                "fitX",
+                "fitY",
+                "reset"
             ],
             right: ["slideshow", "fullscreen", "thumbs", "download", "close"],
         },
     };
     if ($(window).width() < 640) {  //小屏幕只显示部分按钮
         fancyboxToolbar = {
+            items: {'show1to1': customToolbar_show1to1},
             display: {
                 left: ["infobar"],
                 middle: [
                     "zoomIn",
                     "zoomOut",
-                    "rotateCCW",
+                    "show1to1",
                     "rotateCW"
                 ],
                 right: ["download", "close"]
@@ -140,9 +163,15 @@ if ($('#image_site').get(0)) {
             height = imgEl.height,
             naturalWidth = imgEl.naturalWidth,
             naturalHeight = imgEl.naturalHeight;
-        if (!naturalWidth || naturalWidth <= 600 || naturalHeight <= 500 ||
+
+        var plusRate = typeof(small_image_zoom_rate) != 'undefined' ? small_image_zoom_rate : 2.5;
+        var min_width = typeof(small_image_min_width) != 'undefined' ? small_image_min_width : 200,
+            min_height = typeof(small_image_min_height) != 'undefined' ? small_image_min_height : 200;
+
+        if (!naturalWidth || naturalWidth <= min_width || naturalHeight <= min_height ||
             (typeof(disableSmallImage) != 'undefined' && disableSmallImage)
         ) {
+            console.warn('ignored', imgEl);
             return false;
         }
 
@@ -150,10 +179,10 @@ if ($('#image_site').get(0)) {
         var canvas = document.createElement('canvas');
 
         if (naturalWidth <= naturalHeight) {
-            canvas.width = width * 2.5 <= 600 ? width * 2.5 : 600;
+            canvas.width = width * plusRate <= min_width ? width * plusRate : min_width;
             canvas.height = canvas.width * aspect;
         }else {
-            canvas.height = height * 2.5 <= 500 ? height * 2.5 : 500;
+            canvas.height = height * plusRate <= min_height ? height * plusRate : min_height;
             canvas.width = canvas.height / aspect;
         }
 
@@ -340,7 +369,6 @@ $('.dir_item').each(function(index, el) {
                 imgHtml += ' class="bor_radius im_img">';
                 $(el).find('.im_img_title').before(imgHtml);
             }else {
-                //console.warn('目录 %s 里没有任何图片', id);
                 var imgHtml = '<img src="/img/default.png">';
                 $(el).find('.im_img_title').before(imgHtml);
             }
@@ -553,7 +581,7 @@ $('.video-poster').each(function(index, el) {
     getVideoMetaAndShowIt(videoId, videoUrl);
 });
 
-//保存视频数据
+//保存视频/音乐meta数据
 var saveVideoMeta = function(videoId, metaData, manual) {
     var params = {
             id: videoId,
@@ -827,7 +855,6 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         switchAutoPlayBtns('on');
     });
 }
-
 
 //目录收拢、展开
 $('.btn-dir-ext').click(function(evt) {

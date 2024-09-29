@@ -104,6 +104,16 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     </div>
 
     <!--for theme beauty-->
+    <script>
+        var small_image_zoom_rate = <?php echo FSC::$app['config']['small_image_zoom_rate']; ?>,
+            small_image_min_width = <?php echo FSC::$app['config']['small_image_min_width']; ?>,
+            small_image_min_height = <?php echo FSC::$app['config']['small_image_min_height']; ?>;
+        <?php if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
+            echo <<<eof
+var disableSmallImage = true;
+eof;
+        } ?>
+    </script>
     <script src="/js/jquery-3.1.1.min.js"></script>
     <script src="/js/bootstrap.min.js"></script>
     <script src="/js/lazyload.min.js"></script>
@@ -112,13 +122,6 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
     <script src="/js/video.min.js"></script>
     <script src="/js/js.cookie.min.js"></script>
     <script src="/js/beauty.js?v<?= Html::getStaticFileVersion('beauty.js', 'js') ?>"></script>
-    <script>
-        <?php if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
-            echo <<<eof
-var disableSmallImage = true;
-eof;
-        } ?>
-    </script>
     <?php echo Html::getGACode(); ?>
 </body>
 </html>
