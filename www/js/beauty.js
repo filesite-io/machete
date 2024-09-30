@@ -160,6 +160,11 @@ if ($('#image_site').get(0)) {
         },
         on: {
             startSlideshow: function(fancybox) {
+                var autoplay = fancybox.plugins.Slideshow.ref;
+                if (autoplay) {
+                    autoplay.options.timeout = typeof(slide_show_timeout) != 'undefined' && slide_show_timeout > 0 ? slide_show_timeout*1000 : 3000;
+                }
+
                 $('.fancybox__footer .fancybox__thumbs').addClass('is-masked'); //hide thumbs
                 refreshFancyBoxStatus = 'on';
                 autoRefreshFancybox(fancybox);

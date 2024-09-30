@@ -75,7 +75,7 @@ eof;
 
                 $platform = Html::getShareVideosPlatform($file['shortcut']['url']);
                 
-                $pubDate = date('m/d', $file['fstat']['ctime']);
+                $pubDate = date('m/d', min($file['fstat']['mtime'], $file['fstat']['ctime']));
 
                 $imgSrc = $tagIndex == 0 && $index < 4 ? " src=\"{$snapshot}\"" : '';
                 $imgAlt = $tagIndex == 0 && $index < 4 ? " alt=\"{$title}\"" : '';

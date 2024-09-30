@@ -79,7 +79,7 @@ Class Html {
     public static function sortFilesByCreateTime($files, $way = 'desc') {
         $ctimes = array();
         foreach($files as $id => $item) {
-            $ctimes[$id] = $item['fstat']['ctime'];
+            $ctimes[$id] = min($item['fstat']['ctime'], $item['fstat']['mtime']);
         }
 
         if ($way == 'desc') {

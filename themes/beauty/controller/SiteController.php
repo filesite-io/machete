@@ -130,7 +130,7 @@ Class SiteController extends Controller {
 
         //翻页支持
         $page = $this->get('page', 1);
-        $pageSize = $this->get('limit', 24);
+        $pageSize = $this->get('limit', FSC::$app['config']['default_page_size']);
         $page = (int)$page;
         $pageSize = (int)$pageSize;
 

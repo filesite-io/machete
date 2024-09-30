@@ -171,6 +171,9 @@ a:link{text-decoration:none}
 
 .simple-form{max-width:480px;margin:0 auto}
 
+/*自动播放图片时隐藏标题*/
+.has-slideshow .fancybox__caption{display:none}
+
 
 /* 主题切换 */
 .lampshow .web_info{border-color:#363636}

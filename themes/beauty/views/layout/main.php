@@ -105,6 +105,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
 
     <!--for theme beauty-->
     <script>
+        var slide_show_timeout = <?php echo FSC::$app['config']['slide_show_timeout']; ?>;
         var small_image_zoom_rate = <?php echo FSC::$app['config']['small_image_zoom_rate']; ?>,
             small_image_min_width = <?php echo FSC::$app['config']['small_image_min_width']; ?>,
             small_image_min_height = <?php echo FSC::$app['config']['small_image_min_height']; ?>;

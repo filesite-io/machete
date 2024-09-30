@@ -60,8 +60,7 @@ eof;
                 $title = !empty($file['title']) ? Html::mb_substr($file['title'], 0, 33, 'utf-8') : $file['filename'];
 
                 $platform = Html::getShareVideosPlatform($file['shortcut']['url']);
-                
-                $pubDate = date('m/d', $file['fstat']['ctime']);
+                $pubDate = date('m/d', min($file['fstat']['mtime'], $file['fstat']['ctime']));
 
                 $imgSrc = $index < 4 ? " src=\"{$snapshot}\"" : '';
                 $imgAlt = $index < 4 ? " alt=\"{$title}\"" : '';
