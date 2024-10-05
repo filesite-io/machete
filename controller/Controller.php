@@ -89,7 +89,7 @@ Class Controller {
     }
 
     //render json data
-    protected function renderJson($data, $httpStatus = 200) {  
+    protected function renderJson($data, $httpStatus = 200, $headers = array()) {
         if (!empty(FSC::$app['config']['debug'])) {
             $end_time = microtime(true);
             $data['page_time_cost'] = ceil( ($end_time - FSC::$app['start_time']) * 1000 );   //ms
@@ -99,6 +99,9 @@ Class Controller {
         if ($httpStatus != 200 && is_numeric($httpStatus)) {
             $title = "HTTP/1.0 {$httpStatus} Internal Server Error";
             switch($httpStatus) {
+                case 304:
+                    $title = "HTTP/1.0 {$httpStatus} Not Modified";
+                    break;
                 case 401:
                     $title = "HTTP/1.0 {$httpStatus} 未授权";
                     break;
@@ -117,6 +120,12 @@ Class Controller {
             }
 
             header($title, true, $httpStatus);
+        }
+
+        if (!empty($headers)) {
+            foreach($headers as $item) {
+                header($item);
+            }
         }
 
         echo json_encode($data);

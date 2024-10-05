@@ -320,8 +320,11 @@ Class SiteController extends Controller {
         $img_id = '';
         $size = 'orignal';
 
-        $cacheId = $this->post('cid', '');
-        $cateId = $this->post('id', '');
+        $cacheId = $this->get('cid', '');
+        $cateId = $this->get('id', '');
+        $customHeaders = array();
+        $httpStatus = 200;
+
         if (empty($cacheId) || empty($cateId)) {
             $code = 0;
             $msg = '参数不能为空';
@@ -388,10 +391,6 @@ Class SiteController extends Controller {
                             $firstVideo = $scanner->getSnapshotImage($realpath, $audioExts);
                             if (!empty($firstVideo)) {
                                 $url = '/img/beauty/audio_icon.jpeg';
-
-                                //TODO: 获取音乐封面图
-                                //$size = 'am';     //音乐封面图
-
                             }
                         }
                     }else {
@@ -445,10 +444,21 @@ Class SiteController extends Controller {
                 }
             }else {
                 $url = $cachedData['url'];
+                $etag = md5($url);
+                $etag_from_client = !empty($_SERVER['HTTP_IF_NONE_MATCH']) ? $_SERVER['HTTP_IF_NONE_MATCH'] : '';  //get etag from client
+                if (!empty($etag) && $etag == $etag_from_client) {
+                    $httpStatus = 304;
+                }
+
+                $dir_snapshot_client_cache_seconds = FSC::$app['config']['dir_snapshot_client_cache_seconds'];
+                $customHeaders = array(
+                    "Cache-Control: max-age={$dir_snapshot_client_cache_seconds}",
+                    "Etag: {$etag}",
+                );
             }
         }
 
-        return $this->renderJson(compact('code', 'msg', 'url'));
+        return $this->renderJson(compact('code', 'msg', 'url'), $httpStatus, $customHeaders);
     }
 
     //保存目录封面图到缓存
@@ -588,6 +598,8 @@ Class SiteController extends Controller {
         $cacheSubDir = 'image';
         $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
 
+        $small_image_client_cache_seconds = FSC::$app['config']['small_image_client_cache_seconds'];
+
         //无缓存，则实时生成缩略图
         if (empty($cachedData)) {
             $tmpUrl = parse_url($imgUrl);
@@ -602,7 +614,7 @@ Class SiteController extends Controller {
 
                 //返回图片数据
                 header("Content-Type: image/jpeg");
-                header('Cache-Control: max-age=3600');  //缓存 1 小时
+                header("Cache-Control: max-age={$small_image_client_cache_seconds}");
                 header("Etag: " . md5($img_data));
                 echo $img_data;
                 exit;
@@ -612,9 +624,16 @@ Class SiteController extends Controller {
             $base64_img = preg_replace('/^data:image\/.+;base64,/i', '', $cachedData);
 
             $img_data = base64_decode($base64_img);
+
+            $etag = md5($img_data);
+            $etag_from_client = !empty($_SERVER['HTTP_IF_NONE_MATCH']) ? $_SERVER['HTTP_IF_NONE_MATCH'] : '';  //get etag from client
+            if (!empty($etag) && $etag == $etag_from_client) {
+                header("HTTP/1.0 304 Not Modified", true, 304);
+            }
+
             header("Content-Type: {$imgType}");
-            header('Cache-Control: max-age=3600');  //缓存 1 小时
-            header("Etag: " . md5($img_data));
+            header("Cache-Control: max-age={$small_image_client_cache_seconds}");
+            header("Etag: {$etag}");
             echo $img_data;
             exit;
         }
@@ -786,6 +805,9 @@ Class SiteController extends Controller {
         $msg = 'OK';
         $meta = array();
 
+        $httpStatus = 200;
+        $customHeaders = array();
+
         $videoId = $this->get('id', '');
         if (empty($videoId)) {
             $code = 0;
@@ -797,13 +819,26 @@ Class SiteController extends Controller {
             $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
             if (!empty($cachedData)) {
                 $meta = $cachedData;
+
+                //增加客户端缓存header
+                $etag = md5(json_encode($meta));
+                $etag_from_client = !empty($_SERVER['HTTP_IF_NONE_MATCH']) ? $_SERVER['HTTP_IF_NONE_MATCH'] : '';  //get etag from client
+                if (!empty($etag) && $etag == $etag_from_client) {
+                    $httpStatus = 304;
+                }
+
+                $meta_client_cache_seconds = FSC::$app['config']['meta_client_cache_seconds'];
+                $customHeaders = array(
+                    "Cache-Control: max-age={$meta_client_cache_seconds}",
+                    "Etag: {$etag}",
+                );
             }else {
                 $code = 0;
                 $msg = '此视频无缓存或缓存已过期';
             }
         }
 
-        return $this->renderJson(compact('code', 'msg', 'meta'));
+        return $this->renderJson(compact('code', 'msg', 'meta'), $httpStatus, $customHeaders);
     }
 
     //保存视频meta数据到缓存，支持手动生成

@@ -3,8 +3,8 @@
  * Config
  */
 $configs = array(
-    'version' => '0.3.3',
-    'releaseDate' => '2024-9-30',
+    'version' => '0.3.4',
+    'releaseDate' => '2024-10-05',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
@@ -56,9 +56,16 @@ $configs = array(
     'supportedVideoExts' => array('mp4', 'mov', 'm3u8'),
     'supportedAudioExts' => array('mp3'),
 
-    'screenshot_start' => 1000,     //视频播放页快照截取开始时间，单位：毫秒
-    'screenshot_expire_seconds' => 315360000,   //视频封面图缓存3650天
-    'small_image_zoom_rate' => 2.5,     //浏览器生成缩略图在其展示尺寸的放大倍数，以确保清晰度
+    'screenshot_start' => 1000,                 //视频播放页快照截取开始时间，单位：毫秒
+    'screenshot_expire_seconds' => 315360000,   //视频封面图在服务器端缓存时长，单位：秒
+    'small_image_zoom_rate' => 2.5,             //浏览器生成缩略图在其展示尺寸的放大倍数，以确保清晰度
+
+    //缩略图在浏览器端缓存时长，单位：秒
+    'small_image_client_cache_seconds' => 600,
+    //目录封面图在浏览器端缓存时长，单位：秒
+    'dir_snapshot_client_cache_seconds' => 300,
+    //视频、音乐meta在浏览器端缓存时长，单位：秒
+    'meta_client_cache_seconds' => 300,
 
     //列表页缩略图尺寸设置
     'small_image_min_width' => 360,     //缩略图最小宽度设置，以确保清晰度

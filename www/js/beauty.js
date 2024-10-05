@@ -372,7 +372,7 @@ $('.dir_item').each(function(index, el) {
     if ($(el).find('.im_img').length == 0) {
         $.ajax({
             url: '/site/dirsnap',
-            method: 'POST',
+            method: 'GET',
             dataType: 'json',
             data: {
                 cid: cid,
