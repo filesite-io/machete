@@ -259,7 +259,7 @@ if ($('#image_site').get(0)) {
                     url: imgUrl
                 };
 
-            $(btn).prop('disabled', true);
+            $(btn).prop('disabled', true).hide();
             $.ajax({
                 url: '/site/savedirsnap',
                 method: 'POST',
@@ -267,11 +267,14 @@ if ($('#image_site').get(0)) {
                 data: params
             }).done(function(data) {
                 $(btn).prop('disabled', false);
+                setTimeout(function() {
+                    $(btn).show();
+                }, 3000);
                 if (data.code != 1) {
                     console.warn('目录封面图保存失败', data.msg);
                 }
             }).fail(function(jqXHR, textStatus, errorThrown) {
-                $(btn).prop('disabled', false);
+                $(btn).prop('disabled', false).show();
                 console.error('目录封面图保存失败，错误信息：' + errorThrown);
             });
         }

@@ -4,6 +4,8 @@
  */
 Class Common {
     public static function cleanSpecialChars($str) {
+        if (empty($str)) {return $str;}
+
         $findChars = array(
             '"',
             "'",

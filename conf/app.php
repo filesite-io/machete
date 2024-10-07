@@ -3,8 +3,8 @@
  * Config
  */
 $configs = array(
-    'version' => '0.3.4',
-    'releaseDate' => '2024-10-05',
+    'version' => '0.3.5',
+    'releaseDate' => '2024-10-07',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php

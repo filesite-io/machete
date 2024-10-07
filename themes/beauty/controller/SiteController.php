@@ -126,7 +126,7 @@ Class SiteController extends Controller {
 
         //提示信息支持
         $alertWarning = $this->get('err', '');
-
+        $alertWarning = Common::cleanSpecialChars($alertWarning);
 
         //翻页支持
         $page = $this->get('page', 1);
@@ -882,6 +882,8 @@ Class SiteController extends Controller {
     //密码授权
     public function actionPwdauth() {
         $checkDir = $this->get('dir', '');
+        $checkDir = Common::cleanSpecialChars($checkDir);
+
         $goBackUrl = $this->get('back', '');
         $password = '';
 
@@ -892,12 +894,37 @@ Class SiteController extends Controller {
         $errorMsg = '';
         $post = $this->post();
         if (!empty($post)) {
-            $password = $this->post('password', '');
-            $authed = Common::pwdAuthToDir($checkDir, $password);
-            if ($authed == false) {
-                $errorMsg = '密码错误，请仔细检查后重试。';
+            //增加频率限制
+            $user_ip = $this->getUserIp();
+            $ipLockKey = $this->getCacheKey($user_ip, $checkDir);
+            $lockCacheDir = 'lock';
+            $expireSeconds = 600;       //缓存 10 分钟
+            $maxFailNum = 5;            //最多失败次数
+            $ipTryData = Common::getCacheFromFile($ipLockKey, $expireSeconds, $lockCacheDir);
+            if (!empty($ipTryData) && $ipTryData['fail'] >= $maxFailNum) {
+                $authed = false;
+                $minutes = $expireSeconds/60;
+                $errorMsg = "密码错误已达 {$maxFailNum} 次，请 {$minutes} 分钟后再试！";
             }else {
-                return $this->redirect($goBackUrl);
+                $password = $this->post('password', '');
+                $authed = Common::pwdAuthToDir($checkDir, $password);
+
+                if ($authed == false) {
+                    if (empty($ipTryData)) {
+                        $ipTryData = array(
+                            'at' => time(),
+                            'fail' => 1,
+                        );
+                    }else {
+                        $ipTryData['fail'] ++;
+                        $ipTryData['at'] = time();
+                    }
+                    Common::saveCacheToFile($ipLockKey, $ipTryData, $lockCacheDir);
+
+                    $errorMsg = "第 {$ipTryData['fail']} 次密码错误，请仔细检查后重试。";
+                }else {
+                    return $this->redirect($goBackUrl);
+                }
             }
         }
 

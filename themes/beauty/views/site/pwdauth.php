@@ -17,8 +17,8 @@
 <div class="container">
     <form class="simple-form" action="" method="POST">
         <div class="alert alert-warning">
-            <h3>当前页面需密码授权</h3>
-            <p class="mt-1">如果你不知道密码，请联系管理员索要。</p>
+            <h3>【<?php echo $viewData['checkDir']; ?>】需要输入密码才能浏览</h3>
+            <p class="mt-1">如果你还不知道密码，请联系管理员。</p>
         </div>
         <?php
         if (!empty($viewData['errorMsg'])) {
@@ -35,7 +35,7 @@ eof;
         </div>
         <div class="">
             <button class="btn btn-primary" type="submit">
-                继续访问
+                继续浏览
             </button>
         </div>
     </form>
