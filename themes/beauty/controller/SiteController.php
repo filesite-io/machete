@@ -901,7 +901,7 @@ Class SiteController extends Controller {
             $expireSeconds = 600;       //缓存 10 分钟
             $maxFailNum = 5;            //最多失败次数
             $ipTryData = Common::getCacheFromFile($ipLockKey, $expireSeconds, $lockCacheDir);
-            if (!empty($ipTryData) && $ipTryData['fail'] >= $maxFailNum) {
+            if (!empty($ipTryData) && $ipTryData['fail'] >= $maxFailNum && time() - $ipTryData['at'] < $expireSeconds) {
                 $authed = false;
                 $minutes = $expireSeconds/60;
                 $errorMsg = "密码错误已达 {$maxFailNum} 次，请 {$minutes} 分钟后再试！";
@@ -916,7 +916,12 @@ Class SiteController extends Controller {
                             'fail' => 1,
                         );
                     }else {
-                        $ipTryData['fail'] ++;
+                        if (time() - $ipTryData['at'] < $expireSeconds) {
+                            $ipTryData['fail'] ++;
+                        }else {
+                            $ipTryData['fail'] = 1;
+                        }
+
                         $ipTryData['at'] = time();
                     }
                     Common::saveCacheToFile($ipLockKey, $ipTryData, $lockCacheDir);
