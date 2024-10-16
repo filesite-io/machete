@@ -39,16 +39,34 @@ Class ListController extends Controller {
         }else if (!empty($cachedParentData)) {
             $currentDir = $cachedParentData[$cateId];
 
+            //扫描当前目录
+            $scanner->setWebRoot($this->getCurrentWebroot($currentDir['realpath']));
+            $scanner->setRootDir($currentDir['realpath']);
+
             //密码授权检查
             $isAllowed = Common::isUserAllowedToDir($currentDir['directory']);
             if (!$isAllowed) {
                 $goUrl = "/site/pwdauth/?dir=" . urlencode($currentDir['directory']) . "&back=" . urlencode(FSC::$app['requestUrl']);
                 return $this->redirect($goUrl);
             }
+        }
 
-            //扫描当前目录
-            $scanner->setWebRoot($this->getCurrentWebroot($currentDir['realpath']));
-            $scanner->setRootDir($currentDir['realpath']);
+        //获取目录面包屑
+        $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
+
+        //父目录密码授权检查
+        $isAllowed = true;
+        $needAuthDir = '';
+        foreach($breadcrumbs as $subdir) {
+            $isAllowed = Common::isUserAllowedToDir($subdir['name']);
+            if (!$isAllowed) {
+                $needAuthDir = $subdir['name'];
+                break;
+            }
+        }
+        if (!$isAllowed && !empty($needAuthDir)) {
+            $goUrl = "/site/pwdauth/?dir=" . urlencode($needAuthDir) . "&back=" . urlencode(FSC::$app['requestUrl']);
+            return $this->redirect($goUrl);
         }
 
 
@@ -267,9 +285,6 @@ Class ListController extends Controller {
             return $this->renderJson(compact('page', 'pageSize', 'audios'));
         }
 
-
-        //获取目录面包屑
-        $breadcrumbs = $this->getBreadcrumbs($currentDir, $cachedParentData, $scanner);
 
         $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
 

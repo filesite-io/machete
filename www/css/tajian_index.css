@@ -194,7 +194,7 @@ button,input,select,textarea,label{font-size:18px;line-height:27px}
 .bubble-3 svg{width:143px}
 .bubble-4{top:-25px;right:-54px}
 .bubble-4 svg{width:104px}
-@media (min-width: 641px){.hero{padding-top:80px;padding-bottom:120px}
+@media (min-width: 641px){.hero{padding-top:20px;padding-bottom:120px}
 .hero-paragraph{margin-bottom:40px;padding-left:72px;padding-right:72px}
 .bubble-1 svg,.bubble-2 svg,.bubble-3 svg,.bubble-4 svg{width:auto}
 .bubble-1{top:85px;left:-30px}
@@ -295,6 +295,7 @@ main{flex:1 0 auto}
 .elementNone,.hide{display:none !important}
 .ml20{margin-left:20px}
 .mt10{margin-top:10px}
+.inline-block{display:inline-block}
 
 @media (max-width:640px){
 .hero-title small{display:block}

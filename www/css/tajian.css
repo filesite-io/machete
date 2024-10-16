@@ -1,5 +1,4 @@
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,button,textarea,select,p,blockquote,th,td{margin:0;padding:0}
-/* body{position:relative;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;word-break: break-all;background-color:#FFF;color:#FFF;font-size:14px;line-height:1.428571429} */
 body{position:relative;font-family:"Roboto","Arial",sans-serif;background-color:#FFF;color:#000;font-size:14px;line-height:1.428571429}
 html{scroll-behavior:smooth}
 ul,li{list-style:none;margin:0;padding:0}

@@ -546,8 +546,13 @@ Class SiteController extends Controller {
 
             //保存base64格式的缩略图到缓存文件
             if (!empty($imgSource)) {
-                $dst_img = imagecreatetruecolor($width, $height);
-                $copy_done = imagecopyresampled($dst_img, $imgSource, 0, 0, 0, 0, $width, $height, $naturalWidth, $naturalHeight);
+                //方法1: 使用imagecopyresampled复制部分图片
+                //$dst_img = imagecreatetruecolor($width, $height);
+                //$copy_done = imagecopyresampled($dst_img, $imgSource, 0, 0, 0, 0, $width, $height, $naturalWidth, $naturalHeight);
+
+                //方法2: 直接缩小图片
+                $dst_img = imagescale($imgSource, $width, $height, IMG_CATMULLROM);
+                $copy_done = !empty($dst_img) ? true : false;
                 if ($copy_done) {
                     ob_start();
                     $quality = !empty(FSC::$app['config']['smallImageQuality']) ? FSC::$app['config']['smallImageQuality'] : 90;
@@ -585,6 +590,7 @@ Class SiteController extends Controller {
     //优先从缓存获取小尺寸的图片
     //增加父目录封面图缓存更新
     //增加图片尺寸类型参数: size
+    //增加缩略图生成失败检查，如果缩略图文件大小小于 5 Kb，则认为生成了无效的图片（如黑图）
     public function actionSmallimg() {
         $imgId = $this->get('id', '');
         $imgUrl = $this->get('url', '');
@@ -599,6 +605,17 @@ Class SiteController extends Controller {
         $cachedData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
 
         $small_image_client_cache_seconds = FSC::$app['config']['small_image_client_cache_seconds'];
+
+        //检查文件大小，如果小于 5 Kb，则重新生成图片
+        if (!empty($cachedData)) {
+            $imgType = preg_replace('/^data:(image\/.+);base64,.+$/i', "$1", $cachedData);
+            $base64_img = preg_replace('/^data:image\/.+;base64,/i', '', $cachedData);
+            $img_data = base64_decode($base64_img);
+            $minNormalImgSize = 5 * 1024;       //最小图片尺寸：5Kb
+            if (strlen($img_data) < $minNormalImgSize) {
+                $cachedData = null;
+            }
+        }
 
         //无缓存，则实时生成缩略图
         if (empty($cachedData)) {
@@ -624,7 +641,6 @@ Class SiteController extends Controller {
             $base64_img = preg_replace('/^data:image\/.+;base64,/i', '', $cachedData);
 
             $img_data = base64_decode($base64_img);
-
             $etag = md5($img_data);
             $etag_from_client = !empty($_SERVER['HTTP_IF_NONE_MATCH']) ? $_SERVER['HTTP_IF_NONE_MATCH'] : '';  //get etag from client
             if (!empty($etag) && $etag == $etag_from_client) {

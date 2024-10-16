@@ -17,12 +17,12 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                     可添加B站、抖音、快手等平台的视频、直播链接，Ta荐是你的视频收纳盒，分类整理你喜欢的内容，随时快速找到它们！
                 </p>
                 <div class="hero-form newsletter-form field field-grouped is-revealing">
-                    <div class="control">
-                        <a class="button button-primary button-block button-shadow" href="/site/register">
-                            <img class="btn_icon" src="/img/favorite.png" alt="Create your favorite tajian link.">
-                            创建聚宝盆
-                        </a>
-                    </div>
+                    <a class="button button-primary button-block button-shadow" href="/site/register">
+                        <img class="btn_icon" src="/img/favorite.png" alt="Create your favorite tajian link.">
+                        创建聚宝盆
+                    </a>
+                    <span class="mt10 inline-block">&nbsp;&nbsp;马上整理你喜欢的视频吧！</span>
+                    <?php /*
                     <div class="control">
                         <a class="button button-block button-shadow" href="/site/login/?go=<?=$loginBackUrl?>">
                             <img class="btn_icon" src="/img/share.png" alt="分享给朋友">
@@ -35,6 +35,7 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                             搭建视频站
                         </a>
                     </div>
+                    */ ?>
                 </div>
                 <div class="hero-browser">
                     <div class="bubble-3 is-revealing">
@@ -113,7 +114,9 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                             </g>
                         </svg>
                         <div class="hero-footer">
-                            <video src="https://static.jialuoma.cn/mp4/machete/add_video_share_url.mp4" style="width:100%;height:100%" controls>
+                            <video
+                                poster="/img/bg/learning_by_watching_500.jpg"
+                                src="https://static.jialuoma.cn/mp4/machete/add_video_share_url.mp4" style="width:100%;height:100%" controls>
                             </video>
                         </div>
                     </div>

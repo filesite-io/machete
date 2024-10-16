@@ -564,15 +564,19 @@ Class Common {
         $cache_filename = "{$cacheDir}{$key}.json";
 
         if (file_exists($cache_filename)) {
-            $jsonData = file_get_contents($cache_filename);
-            $data = json_decode($jsonData, true);
+            try {
+                $jsonData = file_get_contents($cache_filename);
+                $data = json_decode($jsonData, true);
 
-            //如果缓存没有失效
-            $now = time();
-            if ($now - $data['ctime'] <= $expireSeconds) {
-                return empty($withCreateTime) ? $data['data'] : $data;
-            }else {
-                return null;
+                //如果缓存没有失效
+                $now = time();
+                if ($now - $data['ctime'] <= $expireSeconds) {
+                    return empty($withCreateTime) ? $data['data'] : $data;
+                }else {
+                    return null;
+                }
+            }catch(Exception $e) {
+                return false;
             }
         }
 
