@@ -618,6 +618,7 @@ Class SiteController extends Controller {
         }
 
         //无缓存，则实时生成缩略图
+        $minCacheImgSize = 2 * 1024;       //最小图片尺寸：20Kb
         if (empty($cachedData)) {
             $tmpUrl = parse_url($imgUrl);
             $img_filepath = __DIR__ . '/../../../www' . $tmpUrl['path'];
@@ -631,8 +632,10 @@ Class SiteController extends Controller {
 
                 //返回图片数据
                 header("Content-Type: image/jpeg");
-                header("Cache-Control: max-age={$small_image_client_cache_seconds}");
-                header("Etag: " . md5($img_data));
+                if (strlen($img_data) >= $minCacheImgSize) {
+                    header("Cache-Control: max-age={$small_image_client_cache_seconds}");
+                    header("Etag: " . md5($img_data));
+                }
                 echo $img_data;
                 exit;
             }
@@ -648,8 +651,10 @@ Class SiteController extends Controller {
             }
 
             header("Content-Type: {$imgType}");
-            header("Cache-Control: max-age={$small_image_client_cache_seconds}");
-            header("Etag: {$etag}");
+            if (strlen($img_data) >= $minCacheImgSize) {
+                header("Cache-Control: max-age={$small_image_client_cache_seconds}");
+                header("Etag: {$etag}");
+            }
             echo $img_data;
             exit;
         }

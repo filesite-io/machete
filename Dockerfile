@@ -1,6 +1,6 @@
-FROM php:8.1.12RC1-fpm-alpine3.16
-RUN apk add rsync nginx zlib-dev libpng-dev freetype-dev libjpeg-turbo-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+FROM php:8.4.0RC2-fpm-alpine3.20
+RUN apk add rsync nginx zlib-dev libpng-dev freetype-dev libjpeg-turbo-dev libwebp-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) gd \
     && cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini \
     && cd /usr/local/etc/php/ \
