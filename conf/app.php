@@ -3,8 +3,8 @@
  * Config
  */
 $configs = array(
-    'version' => '0.3.6',
-    'releaseDate' => '2024-10-16',
+    'version' => '0.3.7',
+    'releaseDate' => '2024-10-22',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
@@ -90,14 +90,16 @@ $configs = array(
 
     'defaultMenuStatusInPC' => 'closed',    //PC下左侧目录默认状态，可选值：opened, closed
 
+    'sortFilesByName' => false,     //图片、视频、音乐文件按名字排序，默认关闭，以文件创建时间倒序排
+    'sortOrderOfFiles' => 'asc',    //排序方式，asc顺序，desc倒序
+
     //开启局域网ip拥有管理权限，如：保存目录、视频封面图
-    //默认只支持192.168网段以及本机（127.0.0.1、localhost）
+    //默认只支持192.168网段以及本机（127.0.0.1、172.17.0.1, localhost）
     'adminForLanIps' => true,
 
     //拥有管理权限的ip白名单
     'adminWhiteIps' => array(
-        '127.0.0.1',
-        '192.168.1.105',
+        //'192.168.1.105',
     ),
 
     /*

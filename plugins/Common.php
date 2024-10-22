@@ -703,6 +703,7 @@ Class Common {
 
         $localhostIps = array(
             '127.0.0.1',
+            '172.17.0.1',
             'localhost',
         );
 
@@ -718,6 +719,68 @@ Class Common {
         }
 
         return $admin;
+    }
+
+    //根据指定的数组元素值对数组进行排序
+    public static function sortArrayByValue($array, $keyName, $sortOrder = 'asc') {
+        if (empty($array) || count($array) == 0) {return $array;}
+
+        $sorted = $array;
+
+        $tmp = [];
+        foreach ($array as $index => $item) {
+            $tmp[$item[$keyName]] = $index;
+        }
+
+        if ($sortOrder == 'asc') {
+            ksort($tmp);
+        }else {
+            krsort($tmp);
+        }
+
+        $newArr = [];
+        foreach ($tmp as $key => $index) {
+            $newArr[$index] = $array[$index];
+        }
+
+        return !empty($newArr) ? $newArr : $sorted;
+    }
+
+    //根据指定的数组对数组进行排序
+    public static function sortArrayByFilenameList($array, $sortedArray) {
+        if (empty($array) || count($array) == 0) {return $array;}
+
+        $sorted = $array;
+
+        $tmp = [];
+        foreach ($sortedArray as $filename) {
+            foreach ($array as $index => $val) {
+                if (!empty($filename) && "{$val['filename']}.{$val['extension']}" == $filename) {
+                    $tmp[$filename] = $index;
+                    break;
+                }
+            }
+        }
+
+        $newArr = [];
+        $sortIndexes = [];
+        foreach ($tmp as $filename => $index) {
+            $newArr[$index] = $array[$index];
+            array_push($sortIndexes, $index);
+        }
+
+        //append others
+        if (count($newArr) < count($array)) {
+            foreach ($array as $index => $val) {
+                if (in_array($index, $sortIndexes)) {
+                    continue;
+                }
+
+                $newArr[$index] = $val;
+            }
+        }
+
+        return !empty($newArr) ? $newArr : $sorted;
     }
 
 }

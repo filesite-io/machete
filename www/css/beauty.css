@@ -180,6 +180,8 @@ a:link{text-decoration:none}
 /*hide cursor when slideshow is idle*/
 .has-slideshow.is-idle .fancybox__viewport,
 .has-slideshow.is-idle .fancybox__content{cursor:none}
+.has-slideshow.is-idle .fancybox__toolbar{display:none}
+.has-slideshow.is-idle .fancybox__slide.has-image>.fancybox__content{width:100% !important;height:100% !important}
 
 
 /* 主题切换 */

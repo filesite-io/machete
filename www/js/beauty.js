@@ -155,9 +155,6 @@ if ($('#image_site').get(0)) {
         Toolbar: fancyboxToolbar,
         loop: true,
         smallBtn: false,
-        iframe: {
-            preload: false
-        },
         on: {
             startSlideshow: function(fancybox) {
                 var autoplay = fancybox.plugins.Slideshow.ref;

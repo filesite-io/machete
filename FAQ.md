@@ -16,6 +16,11 @@
 * [怎么修改浏览器地址栏左侧的小图标？](#怎么修改浏览器地址栏左侧的小图标)
 * [相册部署到外网了，点击图片打开有点慢怎么办？](#相册部署到外网了点击图片打开有点慢怎么办)
 * [在局域网内使用，能否所有图片使用原图而不是缩略图？](#在局域网内使用能否所有图片使用原图而不是缩略图)
+* [怎么对照片、视频、音乐文件进行排序？](#怎么对照片、视频、音乐文件进行排序)
+* [怎么设置每页照片、视频、音乐文件数量？](#怎么设置每页照片、视频、音乐文件数量)
+* [怎么设置自动播放时每张照片停留时间？](#怎么设置自动播放时每张照片停留时间)
+* [怎么设置局域网内访问拥有刷新、设置封面等管理权限？](#怎么设置局域网内访问拥有刷新、设置封面等管理权限)
+* [外网访问怎么设置允许当前IP访问拥有刷新、设置封面等管理权限？](#外网访问怎么设置允许当前IP访问拥有刷新、设置封面等管理权限)
 * [我的设备cpu性能较差，缩略图显示有点慢且cpu占用较高怎么解决？](#我的设备cpu性能较差缩略图显示有点慢且cpu占用较高怎么解决)
 * [更多问题如何联系？](#更多问题如何联系)
 
@@ -112,7 +117,7 @@ docker exec -it machete_album /var/www/machete/bin/upgrade.sh
 
 ## 怎么关闭网页底部的二维码？
 
-在runtime/custom_config.json中增加配置：
+在runtime/custom_config.json中增加以下配置：
 ```
 "showQRImageInFooter": false
 ```
@@ -150,7 +155,7 @@ by <a href="https://filesite.io/" target="_blank">FileSite.io</a>
 
 ## 怎么修改浏览器地址栏左侧的小图标？
 
-请创建自己的icon文件，命名为favicon.ico，把它复制到你的图片根目录即可；
+请创建自己的icon文件，命名为favicon.ico，把它复制到你的图片根目录；
 
 **以容器目录为例：**
 ```
@@ -164,7 +169,7 @@ machete家庭相册默认为局域网使用，配置**enableSmallImageForWan**�
 如果你的照片文件大小很大，那么在外网打开可能会很慢。
 
 解决办法，为外网点击图片浏览大图开启缩略图功能，
-在自定义配置：runtime/custom_config.json里增加以下配置即可：
+在自定义配置：runtime/custom_config.json里增加以下配置：
 ```
 "enableSmallImageForWan": true
 ```
@@ -175,6 +180,78 @@ machete家庭相册默认为局域网使用，配置**enableSmallImageForWan**�
 系统配置**enableSmallImage**默认为true打开的，在自定义配置文件中，加入以下配置保存即可关闭所有缩略图功能：
 ```
 "enableSmallImage": false
+```
+
+
+## 怎么对照片、视频、音乐文件进行排序？
+
+在**runtime/custom_config.json**中增加以下配置：
+```
+"sortFilesByName": true,
+"sortOrderOfFiles": "asc"
+```
+
+其中sortFilesByName设置为true，打开文件按名称排序，
+sortOrderOfFiles则设定排序方式，asc顺序，desc倒序。
+
+除此之外，还可以在照片目录下增加排序文件：sort.txt，
+内容为当前目录下的文件名，格式一行一个，示例：
+```
+2_20240406223804.jpg
+1_20240406223752.jpg
+3_20240406223809.jpg
+```
+
+如果配置了此排序文件，且sortFilesByName为false关闭状态，则系统会按照排序文件中的文件名从上到下排序。
+
+
+## 怎么设置每页照片、视频、音乐文件数量？
+
+在自定义配置：runtime/custom_config.json里增加以下配置：
+```
+"default_page_size": 50
+```
+
+
+## 怎么设置自动播放时每张照片停留时间？
+
+在自定义配置：runtime/custom_config.json里增加以下配置：
+```
+"slide_show_timeout": 10
+```
+
+单位：秒。
+
+
+## 怎么设置局域网内访问拥有刷新、设置封面等管理权限？
+
+在自定义配置：runtime/custom_config.json里增加以下配置：
+```
+"adminForLanIps": true
+```
+
+系统支持这三类IP：
+```
+127.0.0.1
+172.17.0.1,
+192.168.xxx.xxx
+```
+
+
+## 外网访问怎么设置允许当前IP访问拥有刷新、设置封面等管理权限？
+
+在自定义配置：runtime/custom_config.json里增加以下配置：
+```
+"adminWhiteIps": [
+    "你的外网ip地址"
+]
+```
+
+如果部署的时候相册是经过nginx反向代理转发的，请在nginx的配置中设置转发用户ip地址：
+```
+proxy_set_header         Host                $host;
+proxy_set_header         X-Real-IP           $remote_addr;
+proxy_set_header         X-Forwarded-For     $proxy_add_x_forwarded_for;
 ```
 
 

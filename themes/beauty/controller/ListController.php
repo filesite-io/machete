@@ -159,6 +159,18 @@ Class ListController extends Controller {
             });
         }
 
+
+        //文件排序支持：默认按创建时间倒序、按文件名排序、按目录说明文件_sort.txt排序
+        if (!empty(FSC::$app['config']['sortFilesByName'])) {
+            $sortOrder = !empty(FSC::$app['config']['sortOrderOfFiles']) ? FSC::$app['config']['sortOrderOfFiles'] : 'asc';
+            $sortField = 'filename';
+            $scanResults[$cateId]['files'] = Common::sortArrayByValue($scanResults[$cateId]['files'], $sortField, $sortOrder);
+        }else if (!empty($scanResults[$cateId]['sort'])) {
+            $sortByArray = explode("\n", $scanResults[$cateId]['sort']);
+            $scanResults[$cateId]['files'] = Common::sortArrayByFilenameList($scanResults[$cateId]['files'], $sortByArray);
+        }
+
+
         //获取当前目录下的readme
         $cateReadmeFile = $scanner->getDefaultReadme();
         if (!empty($cateReadmeFile)) {

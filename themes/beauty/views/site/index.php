@@ -325,7 +325,6 @@ eof;
                     break;
                 }
 
-                $title = !empty($file['title']) ? $file['title'] : $file['filename'];
                 //图片、视频显示文件修改日期
                 $title = Common::getDateFromString($file['filename']);
                 if (empty($title) && !empty($file['fstat']['mtime']) && !empty($file['fstat']['ctime'])) {
