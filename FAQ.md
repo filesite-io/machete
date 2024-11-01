@@ -22,6 +22,7 @@
 * [怎么设置局域网内访问拥有刷新、设置封面等管理权限？](#怎么设置局域网内访问拥有刷新、设置封面等管理权限)
 * [外网访问怎么设置允许当前IP访问拥有刷新、设置封面等管理权限？](#外网访问怎么设置允许当前IP访问拥有刷新、设置封面等管理权限)
 * [我的设备cpu性能较差，缩略图显示有点慢且cpu占用较高怎么解决？](#我的设备cpu性能较差缩略图显示有点慢且cpu占用较高怎么解决)
+* [在启用Imagick扩展后，CPU占用过高或者大图片缩略图无法生成怎么解决？](#在启用Imagick扩展后，CPU占用过高或者大图片缩略图无法生成怎么解决)
 * [更多问题如何联系？](#更多问题如何联系)
 
 
@@ -262,6 +263,29 @@ machete家庭相册在设计的时候考虑到在嵌入式设备中运行，缩�
 在自定义配置中把**disableGenerateSmallImageInServer**开关打开即可关闭服务器端生成缩略图，从而节省cpu消耗：
 ```
 "disableGenerateSmallImageInServer": true
+```
+
+
+## 在启用Imagick扩展后，CPU占用过高或者大图片缩略图无法生成怎么解决？
+
+Imagick库的特性是生成的缩略图画质更高，但缺点是CPU占用比较高。
+
+使用最新版filesite/machete的docker镜像，在自定义配置中加上开启配置项就能使用Imagick库来生成缩略图：
+```
+"enable_lib_imagick": true
+```
+
+请在启动容器的时候根据你的服务器配置，指定容器最大能使用的内存和cpu数量，
+这将改善缩略图生成，避免因为过高的CPU占用导致php进程被docker杀死从而无法生成大图片的缩略图。
+
+例如***1G内存双核cpu服务器***，允许最大使用512M内存，1.5个cpu核心：
+```
+docker run --name machete -p 1080:80 \
+    -m 512m \
+    --cpus="1.5" \
+    -v /d/图片目录/:/var/www/machete/www/girls/ \
+    -itd filesite/machete \
+    beauty
 ```
 
 

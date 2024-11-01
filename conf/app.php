@@ -3,8 +3,8 @@
  * Config
  */
 $configs = array(
-    'version' => '0.3.7',
-    'releaseDate' => '2024-10-22',
+    'version' => '0.3.8',
+    'releaseDate' => '2024-10-31',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
@@ -66,6 +66,9 @@ $configs = array(
     'dir_snapshot_client_cache_seconds' => 300,
     //视频、音乐meta在浏览器端缓存时长，单位：秒
     'meta_client_cache_seconds' => 300,
+
+    //开启Imagick扩展，缩略图生成可能慢一点，但是会更清晰、稳定
+    'enable_lib_imagick' => false,
 
     //列表页缩略图尺寸设置
     'small_image_min_width' => 360,     //缩略图最小宽度设置，以确保清晰度

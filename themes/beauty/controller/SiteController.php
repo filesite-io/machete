@@ -494,6 +494,7 @@ Class SiteController extends Controller {
     }
 
     //借助gd库，获取图片类型、尺寸，并实时生成缩略图
+    //支持imagick库
     protected function createSmallJpg($img_filepath, $min_width = 100, $min_height = 100) {
         //如果服务器端生成缩略图关闭
         if (!empty(FSC::$app['config']['disableGenerateSmallImageInServer']) && FSC::$app['config']['disableGenerateSmallImageInServer'] !== 'false') {
@@ -503,65 +504,98 @@ Class SiteController extends Controller {
         $img_data = null;
 
         try {
-            list($naturalWidth, $naturalHeight, $imgTypeIndex, $style) = getimagesize($img_filepath);
-            $imgType = image_type_to_extension($imgTypeIndex);
+            if (!empty(FSC::$app['config']['enable_lib_imagick']) && class_exists('Imagick')) {                  //Imagick库支持
 
-            //小图片则保持原图尺寸
-            if ($naturalWidth <= $min_width || $naturalHeight <= $min_height) {
-                return false;
-            }
+                $imagick = new Imagick($img_filepath);
+                $imgProps = $imagick->getImageGeometry();
+                $naturalWidth = $imgProps['width'];
+                $naturalHeight = $imgProps['height'];
 
-            //生成同比例缩略图尺寸
-            $width = $min_width;
-            $height = $min_height;
-            $aspect = $naturalHeight / $naturalWidth;
-            if ($naturalWidth <= $naturalHeight) {
-                $height = (int)($width * $aspect);
-            }else {
-                $width = (int)($height / $aspect);
-            }
-
-            $imgSource = null;
-            switch ($imgType) {
-                case '.jpeg':
-                    $imgSource = imagecreatefromjpeg($img_filepath);
-                    break;
-                case '.png':
-                    $imgSource = imagecreatefrompng($img_filepath);
-                    break;
-                case '.gif':
-                    $imgSource = imagecreatefromgif($img_filepath);
-                    break;
-                case '.webp':
-                    if (function_exists('imagecreatefromwebp')) {
-                        $imgSource = imagecreatefromwebp($img_filepath);
-                    }
-                    break;
-                case '.bmp':
-                    if (function_exists('imagecreatefrombmp')) {
-                        $imgSource = imagecreatefrombmp($img_filepath);
-                    }
-                    break;
-            }
-
-            //保存base64格式的缩略图到缓存文件
-            if (!empty($imgSource)) {
-                //方法1: 使用imagecopyresampled复制部分图片
-                //$dst_img = imagecreatetruecolor($width, $height);
-                //$copy_done = imagecopyresampled($dst_img, $imgSource, 0, 0, 0, 0, $width, $height, $naturalWidth, $naturalHeight);
-
-                //方法2: 直接缩小图片
-                $dst_img = imagescale($imgSource, $width, $height, IMG_CATMULLROM);
-                $copy_done = !empty($dst_img) ? true : false;
-                if ($copy_done) {
-                    ob_start();
-                    $quality = !empty(FSC::$app['config']['smallImageQuality']) ? FSC::$app['config']['smallImageQuality'] : 90;
-                    imagejpeg($dst_img, null, $quality);
-                    $img_data = ob_get_clean();
-                    ob_end_clean();
+                //小图片则保持原图尺寸
+                if ($naturalWidth <= $min_width || $naturalHeight <= $min_height) {
+                    return false;
                 }
 
-                imagedestroy($dst_img);
+                //生成同比例缩略图尺寸
+                $width = $min_width;
+                $height = $min_height;
+                $aspect = $naturalHeight / $naturalWidth;
+                if ($naturalWidth <= $naturalHeight) {
+                    $height = (int)($width * $aspect);
+                }else {
+                    $width = (int)($height / $aspect);
+                }
+
+                $imagick->scaleImage($width, $height, true);        //生成缩略图，并自适应
+                $imagick->setImageFormat('jpeg');
+                $quality = !empty(FSC::$app['config']['smallImageQuality']) ? FSC::$app['config']['smallImageQuality'] : 90;
+                $imagick->setImageCompressionQuality($quality);
+                $img_data = $imagick->getImageBlob();
+                $imagick->clear();
+
+            }else if (function_exists('gd_info')) {         //gd库支持
+
+                list($naturalWidth, $naturalHeight, $imgTypeIndex, $style) = getimagesize($img_filepath);
+                $imgType = image_type_to_extension($imgTypeIndex);
+
+                //小图片则保持原图尺寸
+                if ($naturalWidth <= $min_width || $naturalHeight <= $min_height) {
+                    return false;
+                }
+
+                //生成同比例缩略图尺寸
+                $width = $min_width;
+                $height = $min_height;
+                $aspect = $naturalHeight / $naturalWidth;
+                if ($naturalWidth <= $naturalHeight) {
+                    $height = (int)($width * $aspect);
+                }else {
+                    $width = (int)($height / $aspect);
+                }
+
+                $imgSource = null;
+                switch ($imgType) {
+                    case '.jpeg':
+                        $imgSource = imagecreatefromjpeg($img_filepath);
+                        break;
+                    case '.png':
+                        $imgSource = imagecreatefrompng($img_filepath);
+                        break;
+                    case '.gif':
+                        $imgSource = imagecreatefromgif($img_filepath);
+                        break;
+                    case '.webp':
+                        if (function_exists('imagecreatefromwebp')) {
+                            $imgSource = imagecreatefromwebp($img_filepath);
+                        }
+                        break;
+                    case '.bmp':
+                        if (function_exists('imagecreatefrombmp')) {
+                            $imgSource = imagecreatefrombmp($img_filepath);
+                        }
+                        break;
+                }
+
+                //保存base64格式的缩略图到缓存文件
+                if (!empty($imgSource)) {
+                    //方法1: 使用imagecopyresampled复制部分图片
+                    //$dst_img = imagecreatetruecolor($width, $height);
+                    //$copy_done = imagecopyresampled($dst_img, $imgSource, 0, 0, 0, 0, $width, $height, $naturalWidth, $naturalHeight);
+
+                    //方法2: 直接缩小图片
+                    $dst_img = imagescale($imgSource, $width, $height, IMG_CATMULLROM);
+                    $copy_done = !empty($dst_img) ? true : false;
+                    if ($copy_done) {
+                        ob_start();
+                        $quality = !empty(FSC::$app['config']['smallImageQuality']) ? FSC::$app['config']['smallImageQuality'] : 90;
+                        imagejpeg($dst_img, null, $quality);
+                        $img_data = ob_get_clean();
+                        ob_end_clean();
+                    }
+
+                    imagedestroy($dst_img);
+                }
+
             }
         }catch(Exception $e) {
             $this->logError('创建缩略图失败：' . $e->getMessage());

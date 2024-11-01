@@ -118,6 +118,19 @@ docker run --name machete -p 1080:80 \
 | webdirectory | /var/www/machete/www/navs/ |
 
 
+如果开启Imagick库支持，请在启动容器的时候根据你的服务器配置，指定容器最大能使用的内存和cpu数量。
+
+例如***1G内存双核cpu服务器***，允许最大使用512M内存，1.5个cpu核心：
+```
+docker run --name machete -p 1080:80 \
+    -m 512m \
+    --cpus="1.5" \
+    -v /d/图片目录/:/var/www/machete/www/girls/ \
+    -itd filesite/machete \
+    beauty
+```
+
+
 ### 查看容器
 
 ```
