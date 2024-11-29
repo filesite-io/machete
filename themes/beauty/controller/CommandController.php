@@ -241,7 +241,7 @@ eof;
             mkdir($cacheDir, 0777, true);
         }
 
-        $rootDir = __DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'];
+        $rootDir = realpath(__DIR__ . '/../../../www/' . FSC::$app['config']['content_directory']);
         if ($dirpath == $rootDir) {
             if ($index == $total) {
                 $stats['status'] = 'finished';
