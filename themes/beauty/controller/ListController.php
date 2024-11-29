@@ -8,6 +8,9 @@ require_once __DIR__ . '/../../../plugins/Common.php';
 require_once __DIR__ . '/../../../plugins/Html.php';
 
 Class ListController extends Controller {
+    protected $dateIndexCacheKey = 'MainBotDateIndex';      //索引数据的key单独缓存，缓存key为此{cacheKey}_keys
+    protected $allFilesCacheKey = 'MainBotAllFiles';
+    protected $noOriginalCtimeFilesCacheKey = 'MainBotNoOriginalCtimeFiles';
 
     public function actionIndex() {
         $cateId = $this->get('id', '');
@@ -140,7 +143,7 @@ Class ListController extends Controller {
         }
 
         //图片、视频类型筛选支持
-        $allFiles = $scanResults[$cateId]['files'];
+        $allFiles = !empty($scanResults[$cateId]['files']) ? $scanResults[$cateId]['files'] : [];
         $showType = $this->get('show', 'all');
         if ($showType == 'image' && !empty($scanResults[$cateId]['files'])) {
             $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
@@ -278,7 +281,6 @@ Class ListController extends Controller {
                 }
 
                 if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
-                    //print_r($subcate['files']);exit;
                     //为音乐文件获取封面图
                     if (empty($item['snapshot'])) {
                         $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
@@ -300,10 +302,14 @@ Class ListController extends Controller {
 
         $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
 
+        //从缓存文件获取按年份、月份归类的索引数据
+        $cacheDataByDate = Common::getCacheFromFile($this->dateIndexCacheKey . '_keys', 86400*365, 'index');
+
         $viewName = '//site/index';     //共享视图
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
-            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType', 'isAdminIp', 'allFiles'
+            'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType', 'isAdminIp', 'allFiles',
+            'cacheDataByDate'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -345,7 +351,7 @@ Class ListController extends Controller {
     //缓存key统一生成，方便按规则获取上一级目录的缓存cid
     protected function getBreadcrumbs($currentDir, $scanResults, $scanner) {
         $webroot = FSC::$app['config']['content_directory'];
-        $arr = explode($webroot, $currentDir['realpath']);
+        $arr = !empty($currentDir['realpath']) ? explode($webroot, $currentDir['realpath']) : [];
         $breads = array();
 
         if (count($arr) < 2) {
@@ -383,6 +389,223 @@ Class ListController extends Controller {
         ]);
 
         return $breads;
+    }
+
+    //按年份、月份展示
+    public function actionBydate() {
+        $para_year = $this->get('year', '');
+        $para_month = $this->get('month', '');
+        if (empty($para_year) && empty($para_month)) {
+            throw new Exception("参数缺失！", 403);
+        }
+
+        $intYear = str_replace('y', '', $para_year);
+        $intMonth = str_replace('m', '', $para_month);
+
+        //先获取keys文件，以快速检查年份和月份数据是否存在，并用于展示月份导航栏
+        $cacheKey = $this->dateIndexCacheKey . "_keys";
+        $expireSeconds = 86400 * 365;    //缓存 365 天
+        $cacheSubDir = 'index';
+        $cacheData_keys = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+        if (empty($cacheData_keys)) {
+            throw new Exception("索引数据已失效，请重新扫描所有文件以生成索引数据！", 404);
+        }else if ( !empty($para_month) && !in_array($para_month, $cacheData_keys[$para_year]) ) {
+            throw new Exception("{$intYear} 年没有 {$intMonth} 月的数据！", 404);
+        }
+
+        $cacheKey = $this->dateIndexCacheKey . "_{$para_year}";
+        $expireSeconds = 86400 * 30;    //缓存 30 天
+        $cacheSubDir = 'index';
+        $cacheData = Common::getCacheFromFile($cacheKey, $expireSeconds, $cacheSubDir);
+        if (empty($cacheData)) {
+            throw new Exception("索引数据已失效，请重新扫描所有文件以生成索引数据！", 404);
+        }
+
+        //把所有文件拼接到一个数组里
+        $allFiles = [];
+        foreach($cacheData as $month => $files) {
+            $allFiles = array_merge($allFiles, $files);
+        }
+
+
+        //其它数据获取
+
+        //优先从缓存获取目录数据
+        $maxScanDeep = 0;       //最大扫描目录级数
+        $expireSeconds = 86400;
+        $cacheKey = $this->getCacheKey('all', 'menu', $maxScanDeep);
+        $menus = Common::getCacheFromFile($cacheKey, $expireSeconds);
+
+        //获取目录面包屑
+        $breadcrumbs = [
+            [
+                'id' => $para_year,
+                'name' => $intYear,
+                'url' => "/list/bydate?year={$para_year}",
+            ]
+        ];
+        if (!empty($para_month)) {
+            array_push($breadcrumbs,
+                [
+                    'id' => $para_month,
+                    'name' => $intMonth,
+                    'url' => "/list/bydate?year={$para_year}&month={$para_month}",
+                ]
+            );
+        }
+
+        $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
+
+        $htmlReadme = array();   //Readme.md 内容，底部网站详细介绍
+        $htmlCateReadme = '';   //当前目录下的Readme.md 内容
+        $copyright = '';
+
+        $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $readmeFile = Common::getCacheFromFile($cacheKey, $expireSeconds);
+
+        $cacheKey = $this->getCacheKey('root', 'mp3', $maxScanDeep);
+        $mp3File = Common::getCacheFromFile($cacheKey, $expireSeconds);
+
+        //翻页支持
+        $page = $this->get('page', 1);
+        $pageSize = $this->get('limit', FSC::$app['config']['default_page_size']);
+        $page = (int)$page;
+        $pageSize = (int)$pageSize;
+
+        //支持图片、视频、音乐类型筛选
+        $pageTitleSuffix = '照片和视频';
+        $showType = $this->get('show', 'all');
+        $filtExts = [];
+        if ($showType == 'image') {
+            $pageTitleSuffix = '照片';
+            foreach($cacheData as $month => $arr) {
+                $cacheData[$month] = array_filter($arr, function($item) {
+                    $filtExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                    return !empty($item['extension']) && in_array($item['extension'], $filtExts);
+                });
+            }
+        }else if ($showType == 'video') {
+            $pageTitleSuffix = '视频';
+            foreach($cacheData as $month => $arr) {
+                $cacheData[$month] = array_filter($arr, function($item) {
+                    $filtExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+                    return !empty($item['extension']) && in_array($item['extension'], $filtExts);
+                });
+            }
+        }else if ($showType == 'audio') {
+            $pageTitleSuffix = '音乐';
+            foreach($cacheData as $month => $arr) {
+                $cacheData[$month] = array_filter($arr, function($item) {
+                    $filtExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+                    return !empty($item['extension']) && in_array($item['extension'], $filtExts);
+                });
+            }
+        }
+
+
+        //dataType支持：[image, video, audio]
+        $dataType = $this->get('dataType', 'html');
+        if ($dataType == 'image' && !empty($allFiles)) {
+            $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+            $imgs = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($allFiles as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                //增加caption：图片、视频显示文件修改日期
+                $title = Common::getDateFromString($item['filename']);
+                if (empty($title) && !empty($item['fstat']['mtime']) && !empty($item['fstat']['ctime'])) {
+                    $title = date('Y-m-d', min($item['fstat']['mtime'], $item['fstat']['ctime']));
+                }
+                $item['caption'] = "{$title} - {$item['filename']}";
+
+                if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
+                    array_push($imgs, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'imgs'));
+        }else if ($dataType == 'video' && !empty($allFiles)) {
+            $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
+            $videos = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($allFiles as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $videoExts)) {
+                    $item['videoType'] = Html::getMediaSourceType($item['extension']);
+
+                    array_push($videos, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'videos'));
+        }else if ($dataType == 'audio' && !empty($allFiles)) {
+            $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
+            $audios = array();
+            $pageStartIndex = ($page-1) * $pageSize;
+            $index = 0;
+            foreach ($allFiles as $id => $item) {
+                //翻页支持
+                if ($index < $pageStartIndex) {
+                    $index ++;
+                    continue;
+                }else if ($index >= $pageStartIndex + $pageSize) {
+                    break;
+                }
+
+                if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                    //为音乐文件获取封面图
+                    if (empty($item['snapshot'])) {
+                        $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                        $matchedImage = Html::searchImageByFilename($item['filename'], $allFiles, $imgExts);
+                        if (!empty($matchedImage)) {
+                            $item['snapshot'] = $matchedImage['path'];
+                        }else {
+                            $item['snapshot'] = '/img/beauty/audio_icon.jpeg?v1';
+                        }
+                    }
+
+                    array_push($audios, $item);
+                    $index ++;
+                }
+            }
+            return $this->renderJson(compact('page', 'pageSize', 'audios'));
+        }
+
+
+        $pageTitlePrefix = "{$intYear}年的";
+        if (!empty($para_month)) {
+            $pageTitlePrefix = "{$intYear}年{$intMonth}月的";
+        }
+        $pageTitle = "{$pageTitlePrefix}{$pageTitleSuffix}";
+
+
+        $viewName = 'bydate';
+        $params = compact(
+            'menus', 'breadcrumbs',
+            'htmlReadme', 'htmlCateReadme', 'copyright', 'mp3File', 'isAdminIp',
+            'page', 'pageSize', 'showType',
+            'allFiles',
+            'cacheData',
+            'cacheData_keys',
+            'para_year', 'para_month'
+        );
+        return $this->render($viewName, $params, $pageTitle);
     }
 
 }

@@ -26,7 +26,7 @@
     </div><!-- /.container-fluid -->
 </nav>
 
-
+<?php if (!empty($viewData['cacheParentDataId']) || !empty($viewData['page'])) { ?>
 <div class="morevideos audiolist">
     <div class="btn_autoplay text_dark ml-1">
         自动播放：
@@ -43,8 +43,12 @@
         data-cid="<?php echo $viewData['cacheParentDataId']; ?>"
         data-page="<?php echo $viewData['page']; ?>"
         data-page-size="<?php echo $viewData['pageSize']; ?>"
+        data-api="<?php echo !empty($viewData['cacheParentDataId']) ? '/list/' : '/list/bydate/'; ?>"
+        data-year="<?php echo $viewData['para_year']; ?>"
+        data-month="<?php echo $viewData['para_month']; ?>"
         class="row othervideos"><div class="ml-2">...</div></div>
 </div>
+<?php } ?>
 <div class="audioplayer" style="background:url('/img/beauty/audio_bg.jpg') top center">
     <div class="row">
         <div class="col col-md-offset-3 col-md-6 col-xs-12">

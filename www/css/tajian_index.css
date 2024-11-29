@@ -63,6 +63,7 @@ th,td{padding:10px 16px}
 th:first-child,td:first-child{padding-left:0}
 th:last-child,td:last-child{padding-right:0}
 html{font-size:18px;line-height:27px}
+.inline{display:inline}
 @media (min-width: 641px){html{font-size:20px;line-height:30px;letter-spacing:-0.1px}
 }
 body{color:#5B6F82;font-size:1rem}

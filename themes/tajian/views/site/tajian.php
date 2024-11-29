@@ -17,12 +17,20 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                     可添加B站、抖音、快手等平台的视频、直播链接，Ta荐是你的视频收纳盒，分类整理你喜欢的内容，随时快速找到它们！
                 </p>
                 <div class="hero-form newsletter-form field field-grouped is-revealing">
-                    <a class="button button-primary button-block button-shadow" href="/site/register">
-                        <img class="btn_icon" src="/img/favorite.png" alt="Create your favorite tajian link.">
-                        创建聚宝盆
-                    </a>
-                    <span class="mt10 inline-block">&nbsp;&nbsp;马上整理你喜欢的视频吧！</span>
+                    <div class="control">
+                        <a class="button button-block button-shadow" href="/2000" target="_blank">
+                            <img class="btn_icon" src="/img/share.png" alt="在线演示">
+                            查看演示收藏夹
+                        </a>
+                    </div>
+                    <div class="control">
+                        <a class="button button-primary button-block button-shadow" href="/site/register">
+                            <img class="btn_icon" src="/img/favorite.png" alt="Create your favorite tajian link.">
+                            创建我的聚宝盆
+                        </a>
+                    </div>
                     <?php /*
+                    <span class="mt10 inline-block">&nbsp;&nbsp;马上整理你喜欢的视频吧！</span>
                     <div class="control">
                         <a class="button button-block button-shadow" href="/site/login/?go=<?=$loginBackUrl?>">
                             <img class="btn_icon" src="/img/share.png" alt="分享给朋友">

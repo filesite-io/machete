@@ -8,6 +8,9 @@ require_once __DIR__ . '/../../../plugins/Common.php';
 require_once __DIR__ . '/../../../plugins/Html.php';
 
 Class SiteController extends Controller {
+    protected $dateIndexCacheKey = 'MainBotDateIndex';      //索引数据的key单独缓存，缓存key为此{cacheKey}_keys
+    protected $allFilesCacheKey = 'MainBotAllFiles';
+    protected $noOriginalCtimeFilesCacheKey = 'MainBotNoOriginalCtimeFiles';
 
     public function actionIndex() {
         //获取数据
@@ -257,11 +260,16 @@ Class SiteController extends Controller {
 
         $isAdminIp = Common::isAdminIp($this->getUserIp());        //判断是否拥有管理权限
 
+
+        //从缓存文件获取按年份、月份归类的索引数据
+        $cacheDataByDate = Common::getCacheFromFile($this->dateIndexCacheKey . '_keys', 86400*365, 'index');
+
         $viewName = 'index';
         $params = compact(
             'page', 'pageSize', 'cacheDataId', 'showType',
             'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright',
-            'alertWarning', 'isAdminIp', 'allFiles'
+            'alertWarning', 'isAdminIp', 'allFiles',
+            'cacheDataByDate'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -737,33 +745,40 @@ Class SiteController extends Controller {
 
         $cateId = $this->get('pid', '');
         $cacheParentDataId = $this->get('cid', '');
-        $page = $this->get('page', 1);
+        $page = $this->get('page', 0);
         $pageSize = $this->get('limit', 100);
 
-        if (empty($videoUrl) || empty($videoId) || empty($cateId) || empty($cacheParentDataId)) {
+        //增加按年、月查看视频自动播放更多视频支持
+        $para_year = $this->get('year', '');
+        $para_month = $this->get('month', '');
+
+        if (empty($videoUrl) || empty($videoId) || empty($cateId)) {
             throw new Exception("缺少参数！", 403);
         }
 
         $arr = parse_url($videoUrl);
         $videoFilename = basename($arr['path']);
 
-        //增加文件后缀格式检查，区分：mp4, mov, m3u8
+        //增加文件后缀格式检查，区分：mp4, mov, m3u8, mp3
         $videoExtension = pathinfo($arr['path'], PATHINFO_EXTENSION);
         $videoSourceType = Html::getMediaSourceType($videoExtension);
 
         //从缓存数据获取封面图
         $poster = '/img/beauty/audio_bg.jpg';
         $cacheSeconds = 86400;
-        $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
-        if (!empty($cachedParentData)) {
-            $mp3 = $cachedParentData[$videoId];
-            if (!empty($mp3['snapshot'])) {
-                $poster = $mp3['snapshot'];
-            }else {
-                $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
-                $matchedImage = Html::searchImageByFilename($mp3['filename'], $cachedParentData, $imgExts);
-                if (!empty($matchedImage)) {
-                    $poster = $matchedImage['path'];
+
+        if (!empty($cacheParentDataId)) {
+            $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
+            if (!empty($cachedParentData)) {
+                $mp3 = $cachedParentData[$videoId];
+                if (!empty($mp3['snapshot'])) {
+                    $poster = $mp3['snapshot'];
+                }else {
+                    $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
+                    $matchedImage = Html::searchImageByFilename($mp3['filename'], $cachedParentData, $imgExts);
+                    if (!empty($matchedImage)) {
+                        $poster = $matchedImage['path'];
+                    }
                 }
             }
         }
@@ -789,7 +804,8 @@ Class SiteController extends Controller {
         $params = compact(
             'videoUrl', 'videoId', 'videoFilename',
             'cateId', 'cacheParentDataId', 'page', 'pageSize',
-            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType', 'poster'
+            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType', 'poster',
+            'para_year', 'para_month'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -798,20 +814,25 @@ Class SiteController extends Controller {
     public function actionPlayer() {
         $videoUrl = $this->get('url', '');
         $videoId = $this->get('id', '');
+        $videoName = $this->get('name', '');
 
         $cateId = $this->get('pid', '');
         $cacheParentDataId = $this->get('cid', '');
-        $page = $this->get('page', 1);
-        $pageSize = $this->get('limit', 100);
+        $page = $this->get('page', 0);
+        $pageSize = $this->get('limit', 10);
 
-        if (empty($videoUrl) || empty($videoId) || empty($cateId) || empty($cacheParentDataId)) {
+        //增加按年、月查看视频自动播放更多视频支持
+        $para_year = $this->get('year', '');
+        $para_month = $this->get('month', '');
+
+        if (empty($videoUrl) || empty($videoId) || empty($cateId)) {
             throw new Exception("缺少参数！", 403);
         }
 
         $arr = parse_url($videoUrl);
         $videoFilename = basename($arr['path']);
 
-        //增加文件后缀格式检查，区分：mp4, mov, m3u8
+        //增加文件后缀格式检查，区分：mp4, mov
         $videoExtension = pathinfo($arr['path'], PATHINFO_EXTENSION);
 
         //支持m3u8地址：/m3u8/?id=xxx
@@ -819,11 +840,13 @@ Class SiteController extends Controller {
             $videoExtension = 'm3u8';
 
             //从缓存数据获取文件名
-            $cacheSeconds = 86400;
-            $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
-            if (!empty($cachedParentData)) {
-                $m3u8 = $cachedParentData[$videoId];
-                $videoFilename = $m3u8['filename'] . '.m3u8';
+            if (!empty($cacheParentDataId)) {
+                $cacheSeconds = 86400;
+                $cachedParentData = Common::getCacheFromFile($cacheParentDataId, $cacheSeconds);
+                if (!empty($cachedParentData)) {
+                    $m3u8 = $cachedParentData[$videoId];
+                    $videoFilename = $m3u8['filename'] . '.m3u8';
+                }
             }
         }
 
@@ -848,7 +871,8 @@ Class SiteController extends Controller {
         $params = compact(
             'videoUrl', 'videoId', 'videoFilename',
             'cateId', 'cacheParentDataId', 'page', 'pageSize',
-            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType'
+            'copyright', 'isAdminIp', 'videoExtension', 'videoSourceType',
+            'para_year', 'para_month', 'videoName'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

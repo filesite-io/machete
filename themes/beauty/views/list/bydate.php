@@ -1,7 +1,4 @@
 <?php
-$selectedId = !empty($viewData['cateId']) ? $viewData['cateId'] : '';
-$total = 0;     //翻页支持
-
 $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
 $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
@@ -14,15 +11,18 @@ if ($viewData['showType'] == 'image') {
     $supportedExts = $audioExts;
 }
 
-//需密码授权的目录显示lock图标
-$authConfig = !empty(FSC::$app['config']['password_auth']) ? FSC::$app['config']['password_auth'] : array();
-
 $dir_ext_status = !empty($_COOKIE['dir_ext_status']) ? $_COOKIE['dir_ext_status'] : 'opened';
 $menu_ext_status = !empty($_COOKIE['menu_ext_status']) ? $_COOKIE['menu_ext_status'] : FSC::$app['config']['defaultMenuStatusInPC'];
 
 $menu_expand_icon_cls = $menu_ext_status == 'opened' ? '' : 'closed';
 $menu_expand_icon_url = $menu_ext_status == 'opened' ? 'arrow-left-circle.svg' : 'arrow-right-circle.svg';
 $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
+
+$selectedId = $viewData['para_year'];
+if (!empty($viewData['para_month'])) {
+    $selectedId = $viewData['para_month'];
+}
+
 ?><!-- 顶部导航栏模块 -->
 <nav class="navbar navbar-default navbar-fixed-top navbarJS">
     <div class="container-fluid">
@@ -53,15 +53,6 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
                 <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
             </div>
-            
-            <?php /*
-            <form class="navbar-form navbar-right">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="搜索图片名称">
-                </div>
-                <button type="submit" class="btn btn-default">搜索</button>
-            </form>
-            */ ?>
 
             <!--侧边栏-->
             <ul class="nav navbar-fixed-left <?=$menu_expand_icon_cls?>">
@@ -72,13 +63,14 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
                     <?php } ?>
                 </li>
                 <?php
-                if (!empty($viewData['cacheDataByDate'])) {
-                    $arrYears = array_keys($viewData['cacheDataByDate']);
+                if (!empty($viewData['cacheData_keys'])) {
+                    $arrYears = array_keys($viewData['cacheData_keys']);
                     arsort($arrYears);
                     foreach($arrYears as $year) {
                         $intYear = str_replace('y', '', $year);
+                        $selected = $year == $viewData['para_year'] ? 'active' : '';
                         echo <<<eof
-                <li><a href="/list/bydate?year={$year}"><img src="/img/beauty/calendar.svg?gray" alt="calendar" width="14" class="menu-icon"> {$intYear}年</a></li>
+                <li class="{$selected}"><a href="/list/bydate?year={$year}"><img src="/img/beauty/calendar.svg?gray" alt="calendar" width="14" class="menu-icon"> {$intYear}年</a></li>
 eof;
                     }
                 }else {
@@ -92,12 +84,10 @@ eof;
                 ?>
                 <li class="menu-title mt-1">目录</li>
                 <?php
-                $breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
                 if (!empty($viewData['menus'])) {        //只显示第一级目录
                     foreach ($viewData['menus'] as $index => $item) {
-                        $selected = $item['id'] == $selectedId || (!empty($breadcrumbs) && $item['id'] == $breadcrumbs[0]['id']) ? 'active' : '';
                         echo <<<eof
-        <li class="{$selected}"><a href="{$item['path']}">
+        <li><a href="{$item['path']}">
             <img src="/img/beauty/folder.svg" alt="directories" width="17" class="menu-icon">
             {$item['directory']}
         </a></li>
@@ -113,28 +103,17 @@ eof;
 
 <!-- 内容主题 -->
 <div class="img_main <?=$main_view_cls?>">
-
 <?php
-$category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : [];
-$btnSetSnap = '<button class="btn btn-xs btn-info btn-set-snap">选作封面</button>';
+$cacheData = !empty($viewData['cacheData']) ? $viewData['cacheData'] : [];
+$btnSetSnap = '';
 
-//如果是首页
-if (empty($selectedId) && !empty($viewData['menus'])) {
-    $category = array(
-        'directories' => $viewData['menus'],
-        'files' => $viewData['scanResults'],
-    );
-    $btnSetSnap = '';
+$total = 0;
+if (!empty($cacheData)) {
+    foreach($cacheData as $month => $files) {
+        $total += Html::getDataTotal($files, $supportedExts);     //翻页支持
+    }
 }
 
-if (empty($viewData['isAdminIp'])) {
-    $btnSetSnap = '';
-}
-
-if (!empty($category['files'])) {
-    $total = Html::getDataTotal($category['files'], $supportedExts);     //翻页支持
-}
-        
 
 $totalNum = '';
 if ($total > 0) {
@@ -157,6 +136,7 @@ echo <<<eof
         <a href="/">首页</a>
 eof;
 
+$breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
 if (!empty($breadcrumbs)) {
     foreach ($breadcrumbs as $bread) {
         if ($bread['id'] != $selectedId) {
@@ -176,134 +156,9 @@ echo <<<eof
 eof;
 ?>
 
-    <?php
-        //如果没有选中任何目录，则把所有目录显示出来
-        if (empty($selectedId) && !empty($viewData['menus'])) {
-            $category = array(
-                'directories' => $viewData['menus'],
-                'files' => $viewData['scanResults'],
-            );
-        }
-
-        //当前目录的描述介绍
-        if (!empty($category['description'])) {
-            echo <<<eof
-    <p class="modal-body text_dark">{$category['description']}</p>
-eof;
-        }
-
-        //当前目录的readme详细介绍
-        if (!empty($viewData['htmlCateReadme'])) {
-            echo <<<eof
-    <div class="modal-body text_dark markdown-body">{$viewData['htmlCateReadme']}</div>
-eof;
-        }
-
-    $dirHideClass = $dir_ext_status == 'closed' ? 'hide' : '';
-    ?>
-    <div class="im_mainl row <?php echo $dirHideClass; ?>">
-        <?php
-        if (!empty($category['directories'])) {        //两级目录支持
-            $index = 0;
-            foreach ($category['directories'] as $dir) {
-                $dirUrl = $dir['path'];
-                if (strpos($dirUrl, 'cid=') === false) {
-                    $dirUrl .= "&cid={$viewData['cacheDataId']}";
-                }
-                echo <<<eof
-            <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-                <a href="{$dirUrl}" class="bor_radius dir_item" data-id="{$dir['id']}" data-cid="{$viewData['cacheDataId']}">
-eof;
-
-                if (!empty($dir['snapshot'])) {
-                    if ($index > 0) {
-                        echo <<<eof
-    <img src="/img/beauty/lazy.svg" data-original="{$dir['snapshot']}" class="bor_radius im_img lazy" alt="{$dir['directory']}">
-eof;
-                    } else {
-                        echo <<<eof
-    <img src="{$dir['snapshot']}" class="bor_radius im_img" alt="{$dir['directory']}">
-eof;
-                    }
-                } else if (!empty($dir['files'])) {
-                    $first_img = array_shift($dir['files']);
-                    if (!in_array($first_img['extension'], $imgExts)) {
-                        foreach ($dir['files'] as $file) {
-                            if (in_array($file['extension'], $imgExts)) {
-                                $first_img = $file;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (in_array($first_img['extension'], $imgExts)) {
-                        $imgUrl = urlencode($first_img['path']);
-                        $smallUrl = "/site/smallimg/?id={$first_img['id']}&url={$imgUrl}";
-                        if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
-                            $smallUrl = $first_img['path'];
-                        }
-                        echo <<<eof
-    <img src="/img/beauty/lazy.svg"
-        data-id="{$first_img['id']}"
-        data-original="{$smallUrl}"
-        data-original_="{$first_img['path']}"
-        class="bor_radius im_img lazy" alt="{$first_img['filename']}">
-eof;
-                    } else {
-                        echo <<<eof
-    <img src="/img/default.png" class="bor_radius im_img" alt="default image">
-eof;
-                    }
-                }
-
-                //判断是否需要加密访问的目录
-                $lockIcon = '';
-                if (!empty($authConfig['enable']) && $authConfig['enable'] !== 'false'
-                    && (
-                        ( empty($authConfig['default']) && !empty($authConfig['allow'][$dir['directory']]) )
-                        ||
-                        !empty($authConfig['default'])       //如果所有目录都需要密码
-                    )
-                ) {
-                    $lockIcon = <<<eof
-<div class="locked_dir"><img src="/img/beauty/lock2-fill.svg" alt="加密目录" width="30"></div>
-eof;
-                }
-
-                $title = !empty($dir['title']) ? $dir['title'] : $dir['directory'];
-                echo <<<eof
-                <div class="im_img_title">
-                    <span class="folder_title">
-                        <img src="/img/beauty/folder.svg" alt="folder" width="20">
-                        {$title}
-                    </span>
-                </div>
-                {$lockIcon}
-            </a>
-        </div>
-eof;
-                $index++;
-            }
-
-        }
-
-
-        //分割目录和文件
-        echo '</div>';
-
-        if (!empty($category['directories'])) {        //两级目录支持
-            $arrowImg = $dir_ext_status == 'opened' ? 'arrow-up.svg' : 'arrow-down.svg';
-            $btnTxt = $dir_ext_status == 'opened' ? '收拢目录' : '展开目录';
-            echo <<<eof
-<div class="gap-hr">
-    <hr>
-    <button class="btn btn-default btn-xs btn-dir-ext" data-status="{$dir_ext_status}" data-opened-title="收拢目录" data-closed-title="展开目录"><img src="/img/{$arrowImg}" alt="directory toggle"> <span>{$btnTxt}</span></button>
-</div>
-eof;
-        }
-
-
-        //显示图片、视频、音乐筛选链接
+	<div class="im_mainl row">
+<?php
+		//显示图片、视频、音乐筛选链接
         $arrShowTypes = array(
             'all' => '所有',
             'image' => '照片',
@@ -322,33 +177,13 @@ eof;
         echo '</ul>';
 
 
-        //空目录显示提示信息
-        if (
-            ( empty($selectedId) && empty($category['directories']) ) || 
-            ( !empty($selectedId) && empty($category['files']) )
-        ) {
-            echo <<<eof
-    <div class="alert alert-warning mt-1 mr-1 ml-1">
-        <h2>咦？没有文件哦</h2>
-        <p class="mt-2">
-            空目录吗？复制照片目录或文件到目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存。
-            <br>
-            如果不是空目录，点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存，网页有 10 分钟缓存。
-        </p>
-    </div>
-eof;
-        }
-
-
-        echo '<div class="im_mainl row">';
-
-
-        //显示图片、视频
-        if (!empty($category['files'])) {        //一级目录支持
+        //显示图片、视频、音乐
+        $allFiles = $viewData['allFiles'];
+        if(!empty($allFiles)) {        //输出所有文件
             $pageStartIndex = ($viewData['page']-1) * $viewData['pageSize'];
             $index = 0;
 
-            foreach ($category['files'] as $file) {
+            foreach ($allFiles as $file) {
                 if (empty($file['extension']) || !in_array($file['extension'], $supportedExts)) {
                     continue;
                 }
@@ -409,20 +244,16 @@ eof;
 </div>
 eof;
                 }else if (in_array($file['extension'], $videoExts)) {       //输出视频
-                    //m3u8支持
-                    if ($file['extension'] == 'm3u8') {
-                        $videoUrl = urlencode("{$file['path']}&cid={$viewData['cacheDataId']}");
-                    }else {
-                        $videoUrl = urlencode($file['path']);
-                    }
-
-                    $linkUrl = "/site/player?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}";
+                    $videoUrl = urlencode($file['path']);
+                    $linkUrl = "/site/player?id={$file['id']}&pid={$file['pid']}&url={$videoUrl}";
                     if ($viewData['showType'] == 'video') {
                         $linkUrl .= "&page={$viewData['page']}&limit={$viewData['pageSize']}";
+                        //支持按年、月查看视频时，获取更多视频以便自动播放
+                        $linkUrl .= "&year={$viewData['para_year']}&month={$viewData['para_month']}";
                     }
 
                     if ($file['extension'] == 'm3u8') {
-                        $linkUrl .= "&name=" . urlencode($file['filename']);
+                    	$linkUrl .= "&name=" . urlencode($file['filename']);
                     }
 
                     echo <<<eof
@@ -445,16 +276,18 @@ eof;
                 }else if (in_array($file['extension'], $audioExts)) {       //输出音乐
                     $title = !empty($file['title']) ? $file['title'] : $file['filename'];
                     $videoUrl = urlencode($file['path']);
-                    $linkUrl = "/site/audioplayer?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}";
+                    $linkUrl = "/site/audioplayer?id={$file['id']}&pid={$file['pid']}&url={$videoUrl}";
                     if ($viewData['showType'] == 'audio') {
                         $linkUrl .= "&page={$viewData['page']}&limit={$viewData['pageSize']}";
+                        //支持按年、月查看视频时，获取更多视频以便自动播放
+                        $linkUrl .= "&year={$viewData['para_year']}&month={$viewData['para_month']}";
                     }
 
                     $snapshot = '/img/beauty/audio_icon.jpeg';
                     if (!empty($file['snapshot'])) {
                         $snapshot = $file['snapshot'];
                     }else {     //尝试找出同名的图片文件
-                        $matchedImage = Html::searchImageByFilename($file['filename'], $viewData['allFiles'], $imgExts);
+                        $matchedImage = Html::searchImageByFilename($file['filename'], $allFiles, $imgExts);
                         if (!empty($matchedImage)) {
                             $snapshot = $matchedImage['path'];
                         }
@@ -479,10 +312,9 @@ eof;
                 $index++;
             }
         }
-        ?>
-
-    </div>
-</div>
+?>
+	</div><!--im_mainl-->
+</div><!--img_main-->
 
 <div class="text-center">
 <?php
@@ -491,15 +323,6 @@ if ($total > $viewData['pageSize']) {
     echo $pagination;
 }
 ?>
-</div>
-
-<div class="video_previewer">
-    <video
-        class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
-        playsinline
-        poster="" 
-        id="pr-player">
-    </video>
 </div>
 
 <script type="text/template" id="btn_show1to1_tmp">

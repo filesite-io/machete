@@ -3,6 +3,8 @@
  * 常用的公用方法
  */
 Class Common {
+    public static $cache = array();
+
     public static function cleanSpecialChars($str) {
         if (empty($str)) {return $str;}
 
@@ -546,7 +548,7 @@ Class Common {
         }
 
         if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0700, true);
+            mkdir($cacheDir, 0755, true);
         }
 
         $cache_filename = "{$cacheDir}{$key}.json";
@@ -781,6 +783,25 @@ Class Common {
         }
 
         return !empty($newArr) ? $newArr : $sorted;
+    }
+
+    public static function setCache($key, $val) {
+        self::$cache[$key] = $val;
+    }
+
+    public static function getCache($key) {
+        return !empty(self::$cache[$key]) ? self::$cache[$key] : null;
+    }
+
+    public static function getFileCreateTime($file) {
+        return !empty($file['fstat']['mtime']) && !empty($file['fstat']['ctime']) ? min($file['fstat']['mtime'], $file['fstat']['ctime']) : 0;
+    }
+
+    //根据文件id、索引分批存储数量，返回当前文件所属索引序号
+    public static function getIndexNumByFileId($id, $dirNum) {
+        $firstChar = substr($id, 0, 1);
+        $ascNum = ord($firstChar);
+        return $ascNum % $dirNum;
     }
 
 }

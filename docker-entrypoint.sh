@@ -3,8 +3,16 @@ theme=$1
 if [ -d "/var/www/machete/themes/${theme}/" ]; then
     echo "Theme chosed [${theme}]."
 
+    ## 权限重新设置
+    chown -R www-data:www-data /var/www/machete/runtime/
+
     ## 复制对应皮肤的配置文件
     cd /var/www/machete/runtime/
+    if [ ! -d cache ]; then
+        mkdir cache/
+        chown -R www-data:www-data cache/
+    fi
+
 
     ## 避免容器重启后重新生成配置文件
     if [ ! -f custom_config.json ]; then
@@ -13,11 +21,6 @@ if [ -d "/var/www/machete/themes/${theme}/" ]; then
     fi
 fi
 
-## 启动samba
-if [ -e /usr/sbin/smbd ]; then
-    echo "Start smbd."
-    /usr/sbin/smbd -D
-fi
 
 ## 启动nginx和php-fpm
 if [ -e /usr/sbin/nginx ]; then
@@ -25,5 +28,17 @@ if [ -e /usr/sbin/nginx ]; then
     /usr/sbin/nginx
 fi
 
-echo "Start php-fpm."
-php-fpm -F
+
+## 启动bot主程序
+if [ -e /usr/local/bin/php ]; then
+    echo "Start main bot."
+    cd /var/www/machete/
+    /usr/local/bin/php bin/command.php mainBot &
+fi
+
+
+## 启动php-fpm
+if [ -e /usr/local/sbin/php-fpm ]; then
+    echo "Start php-fpm."
+    php-fpm -F
+fi

@@ -62,6 +62,9 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
                     </ul>
                     <ul class="footer-social-links list-reset">
                         <li>
+                            <a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank"><img src="/img/qq.png" width="20" alt="qq" class="inline">群: 44123711</a>
+                        </li>
+                        <li>
                             <a href="https://space.bilibili.com/3461581318916273" target="_blank">
                                 <span class="screen-reader-text">B站</span>
 <svg width="18" height="18" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg" fill="#FFFFFF">

@@ -27,6 +27,12 @@ Class DirScanner {
         'description' => '描述',
         'keywords' => '关键词',
         'snapshot' => '快照图片',
+
+        'original_ctime' => '照片拍摄时间',
+
+        //TODO: 待启用
+        'exif' => '照片EXIF信息',
+        'iptc' => '照片IPTC信息',
     );
     private $rootDir;                               //当前扫描的根目录
     private $webRoot = '/content/';                 //网站静态文件相对路径的根目录
@@ -51,6 +57,22 @@ Class DirScanner {
         'mov',     //视频
         'ts',      //视频
         'm3u8',    //视频
+    );
+
+    public $exifSupportFileExtensions = array(
+        'jpg',     //图片
+        'jpeg',    //图片
+    );
+
+    public $iptcSupportFileExtensions = array(
+        'jpg',     //图片
+        'jpeg',    //图片
+    );
+
+    public $exiftoolSupported = false;
+    public $exiftoolSupportFileExtensions = array(
+        'mp4',     //视频
+        'mov',     //视频
     );
 
     //暂未使用
@@ -230,6 +252,49 @@ Class DirScanner {
         return $data;
     }
 
+    //format: Ymd
+    //example: 20240322
+    //return: timestamp
+    private function getCreateDateFromIPTCMeta($realpath) {
+        $createTime = 0;
+
+        try {
+            if (function_exists('getimagesize') && function_exists('iptcparse')) {
+                $size = getimagesize($realpath, $info);
+                if(!empty($info['APP13'])) {
+                    $iptc = iptcparse($info['APP13']);
+                    if (!empty($iptc['2#055'])) {
+                        $createTime = strtotime($iptc['2#055'][0]);
+                    }
+                }
+            }
+        }catch(Exception $e) {
+            //do nothing
+        }
+
+        return $createTime;
+    }
+
+    //format: Y:m:d H:i:s
+    //example: 2024:03:22 00:23:02
+    //return: timestamp
+    private function getCreateDateFromExifMeta($realpath) {
+        $createTime = 0;
+
+        try {
+            if (function_exists('exif_read_data')) {
+                $exif = @exif_read_data($realpath, 0, true);
+                if(!empty($exif['EXIF']['DateTimeOriginal'])) {
+                    $createTime = strtotime($exif['EXIF']['DateTimeOriginal']);
+                }
+            }
+        }catch(Exception $e) {
+            //do nothing
+        }
+
+        return $createTime;
+    }
+
     //根据路径生成文件数组，兼容URL文件
     private function getFileData($realpath) {
         $id = $this->getId($realpath);
@@ -255,6 +320,30 @@ Class DirScanner {
 
         if ($extension == 'url') {
             $data['shortcut'] = $this->parseShortCuts($realpath, $filename);
+        }else if (in_array($extension, $this->exifSupportFileExtensions) || in_array($extension, $this->iptcSupportFileExtensions)) {
+            $photo_create_time = $this->getCreateDateFromExifMeta($realpath);
+            if ($photo_create_time == 0) {
+                $photo_create_time = $this->getCreateDateFromIPTCMeta($realpath);
+            }
+
+            if ($photo_create_time > 0) {
+                $data['original_ctime'] = $photo_create_time;
+            }
+        }else if ($this->exiftoolSupported && in_array($extension, $this->exiftoolSupportFileExtensions)) {
+            //try to exec command to get original create time of videos
+            try {
+                $output = shell_exec( sprintf("exiftool -createdate %s", escapeshellarg($realpath)) );
+
+                //output samples:
+                //Create Date                     : 2024:06:01 20:47:06
+                //Create Date                     : 0000:00:00 00:00:00
+                if (!empty($output) && strpos($output, ': 0000:') === false) {
+                    $dateArr = explode(' : ', $output);
+                    $data['original_ctime'] = strtotime($dateArr[1]);
+                }
+            }catch(Exception $e) {
+                //do nothing
+            }
         }
 
         return $data;

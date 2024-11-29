@@ -14,7 +14,7 @@
             <a class="navbar-brand" href="/">
                 <span class="verMiddle">正在播放</span>
             </a>
-            <span class="navbar-text videotitle"><?php echo $viewData['videoFilename']; ?></span>
+            <span class="navbar-text videotitle"><?php echo !empty($viewData['videoName']) ? $viewData['videoName'] : $viewData['videoFilename']; ?></span>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -57,6 +57,7 @@
             </div>
         </div>
     </div>
+    <?php if (!empty($viewData['cacheParentDataId']) || !empty($viewData['page'])) { ?>
     <div class="col col-md-4 morevideos">
         <hr class="visible-xs">
         <div class="btn_autoplay text_dark">
@@ -73,8 +74,12 @@
             data-cid="<?php echo $viewData['cacheParentDataId']; ?>"
             data-page="<?php echo $viewData['page']; ?>"
             data-page-size="<?php echo $viewData['pageSize']; ?>"
+            data-api="<?php echo !empty($viewData['cacheParentDataId']) ? '/list/' : '/list/bydate/'; ?>"
+            data-year="<?php echo $viewData['para_year']; ?>"
+            data-month="<?php echo $viewData['para_month']; ?>"
             class="othervideos"><div class="ml-1">...</div></div>
     </div>
+    <?php } ?>
 </div>
 
 <script type="text/template" id="template_video_item">

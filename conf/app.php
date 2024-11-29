@@ -3,8 +3,8 @@
  * Config
  */
 $configs = array(
-    'version' => '0.3.8',
-    'releaseDate' => '2024-10-31',
+    'version' => '0.3.9',
+    'releaseDate' => '2024-11-09',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
@@ -198,6 +198,10 @@ $configs = array(
     //Google Adwords目标跟踪ID
     'GAD_MEASUREMENT_ID' => '',
 
+    //密码授权默认关闭
+    "password_auth" => array(
+        "enable" => false,
+    ),
 );
 
 //自定义配置支持

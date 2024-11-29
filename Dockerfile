@@ -1,5 +1,6 @@
 FROM php:8.2-fpm-alpine3.20
-RUN apk add autoconf gcc musl-dev make imagemagick-dev rsync nginx zlib-dev libpng-dev freetype-dev libjpeg-turbo-dev libwebp-dev \
+RUN apk add autoconf gcc musl-dev make imagemagick-dev rsync nginx zlib-dev libpng-dev freetype-dev libjpeg-turbo-dev libwebp-dev exiftool \
+    && docker-php-ext-install exif \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) gd \
     && pecl install imagick && docker-php-ext-enable imagick \

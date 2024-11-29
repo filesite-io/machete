@@ -746,7 +746,9 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
     var currentPage = $('.othervideos').attr('data-page'),
         currentPageSize = $('.othervideos').attr('data-page-size'),
         currentVideoId = $('.othervideos').attr('data-id'),
-        currentMediaType = $('.othervideos').attr('data-type');
+        currentMediaType = $('.othervideos').attr('data-type'),
+        currentYear = $('.othervideos').attr('data-year'),
+        currentMonth = $('.othervideos').attr('data-month');
     if (!currentMediaType) {
         currentMediaType = 'video';
     }
@@ -756,14 +758,16 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         var videoId = $('.othervideos').attr('data-id'),
             cateId = $('.othervideos').attr('data-pid'),
             cacheId = $('.othervideos').attr('data-cid');
-        var api = '/list/',
+        var api = $('.othervideos').attr('data-api'),
             params = {
                 id: cateId,
                 cid: cacheId,
                 show: currentMediaType,
                 dataType: currentMediaType,
                 page: currentPage,
-                limit: currentPageSize
+                limit: currentPageSize,
+                year: currentYear,
+                month: currentMonth
             };
         $.ajax({
             url: api,
@@ -813,7 +817,9 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
         });
     };
 
-    getOtherVideos();
+    if ($('.othervideos').length > 0) {
+        getOtherVideos();
+    }
 
     //自动播放
     var playNextVideo = function() {
