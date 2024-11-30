@@ -156,9 +156,9 @@ echo <<<eof
 eof;
 ?>
 
-	<div class="im_mainl row">
+    <div class="im_mainl row">
 <?php
-		//显示图片、视频、音乐筛选链接
+        //显示图片、视频、音乐筛选链接
         $arrShowTypes = array(
             'all' => '所有',
             'image' => '照片',
@@ -175,6 +175,39 @@ eof;
 eof;
         }
         echo '</ul>';
+
+
+        //显示月份导航菜单
+        if (!empty($viewData['para_year']) && !empty($viewData['cacheData_keys'][$viewData['para_year']])) {
+            echo '<ul class="nav nav-pills ml-1 mb-1">';
+
+            $activedClass = empty($viewData['para_month']) ? 'active' : '';
+            $monthLink = Html::getLinkByParams(FSC::$app['requestUrl'], array(
+                    'show' => $viewData['showType'],
+                    'page' => 1,
+                    'month' => ''
+                ));
+            echo <<<eof
+            <li role="presentation" class="{$activedClass}"><a href="{$monthLink}">所有</a></li>
+eof;
+
+            $months = $viewData['cacheData_keys'][$viewData['para_year']];
+            asort($months);        //排序
+            foreach ($months as $month) {
+                $intMonth = str_replace('m', '', $month);
+                $activedClass = $month == $viewData['para_month'] ? 'active' : '';
+                $monthLink = Html::getLinkByParams(FSC::$app['requestUrl'], array(
+                    'show' => $viewData['showType'],
+                    'page' => 1,
+                    'month' => $month,
+                ));
+                echo <<<eof
+            <li role="presentation" class="{$activedClass}"><a href="{$monthLink}">{$intMonth}月</a></li>
+eof;
+            }
+
+            echo '</ul>';
+        }
 
 
         //显示图片、视频、音乐
@@ -253,7 +286,7 @@ eof;
                     }
 
                     if ($file['extension'] == 'm3u8') {
-                    	$linkUrl .= "&name=" . urlencode($file['filename']);
+                        $linkUrl .= "&name=" . urlencode($file['filename']);
                     }
 
                     echo <<<eof
@@ -313,7 +346,7 @@ eof;
             }
         }
 ?>
-	</div><!--im_mainl-->
+    </div><!--im_mainl-->
 </div><!--img_main-->
 
 <div class="text-center">
@@ -323,6 +356,15 @@ if ($total > $viewData['pageSize']) {
     echo $pagination;
 }
 ?>
+</div>
+
+<div class="video_previewer">
+    <video
+        class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
+        playsinline
+        poster="" 
+        id="pr-player">
+    </video>
 </div>
 
 <script type="text/template" id="btn_show1to1_tmp">

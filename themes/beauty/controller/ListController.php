@@ -421,13 +421,6 @@ Class ListController extends Controller {
             throw new Exception("索引数据已失效，请重新扫描所有文件以生成索引数据！", 404);
         }
 
-        //把所有文件拼接到一个数组里
-        $allFiles = [];
-        foreach($cacheData as $month => $files) {
-            $allFiles = array_merge($allFiles, $files);
-        }
-
-
         //其它数据获取
 
         //优先从缓存获取目录数据
@@ -500,6 +493,23 @@ Class ListController extends Controller {
                     return !empty($item['extension']) && in_array($item['extension'], $filtExts);
                 });
             }
+        }
+
+        //按月份筛选数据
+        if (!empty($para_month)) {
+            $newData = [];
+            foreach($cacheData as $month => $arr) {
+                if ($month != $para_month) {continue;}
+                $newData[$month] = $arr;
+            }
+            $cacheData = $newData;
+        }
+
+
+        //把所有文件拼接到一个数组里
+        $allFiles = [];
+        foreach($cacheData as $month => $files) {
+            $allFiles = array_merge($allFiles, $files);
         }
 
 
