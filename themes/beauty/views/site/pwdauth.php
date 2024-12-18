@@ -7,7 +7,7 @@
         <!-- Brand and toggle get grouped for better mobile display navbar-inverse-->
         <div class="navbar-header">
             <a class="navbar-brand" href="/">
-                <span class="verMiddle"><?php echo $pageTitle; ?></span>
+                <span class="verMiddle">小泓的个人相册</span>
             </a>
         </div>
     </div><!-- /.container-fluid -->

@@ -37,7 +37,6 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
         </div>
         <div class="right_class_tn">
             <a class="search_move_tn search_mob_JS visible_movi_xs hide" href="javascript:;" title="搜索"><img src="/img/search.svg" alt="图片" /></a>
-            <a class="connect_me_tn hidden-xs connectmeJS" href="javascript:;" title="联系我们"><img src="/img/contactUs.svg" alt="联系我们"></a>
             <a class="connect_me_tn visible_movi_xs connectmeJS" href="javascript:;" title="我的分类"><img src="/img/beauty/navshow.svg" alt="展开分类菜单"></a>
         </div>
     </header>
@@ -88,7 +87,6 @@ if (!empty($viewFile) && file_exists($viewFile)) {
     <div class="blank_cover elementNone blank_coverJS rtcloseJS"></div>
     <div class="right_sidebox right_sideboxJS elementNone">
         <h5>
-            <span class="hidden-xs">联系我们</span>
             <span class="visible_movi_xs">视频分类</span>
             <a class="rtcloseJS" href="javascript:;">
                 <img class="icon svgimg verMiddle" src="/img/clos.svg" alt="关闭" title="关闭" />
@@ -141,7 +139,7 @@ eof;
     </div>
 
     <div class="footimg vercenter">
-        <a class="log_tn clearfix" href="/" title="<?php echo $pageTitle; ?>">
+        <a class="log_tn clearfix" href="/" title="小泓的个人相册">
             <span class="verBaseline">Ta荐</span>
             - TaJian.tv
         </a>

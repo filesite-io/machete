@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
 <html>
 <head>
     <meta charset="utf-8">
-    <title><?php echo $pageTitle; ?></title>
+    <title>小泓的个人相册</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <link rel="icon" type="image/x-icon" href="<?= Html::getFaviconUrl() ?>">
@@ -45,13 +45,13 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
                 }else {
                 ?>
                 <span>&copy;2022 - <?=date('Y')?></span>
-                by <a href="https://filesite.io/" target="_blank">FileSite.io</a>
+                by <a href="https://wsdm1.top/" target="_blank">铃铛岛少年泓</a>
                 <br>
                 <?php if (!empty(FSC::$app['config']['theme'])) { ?>
                     当前皮肤 <strong><?php echo FSC::$app['config']['theme']; ?></strong>
                     - 执行耗时: {page_time_cost} ms
                 <?php } ?>
-                <br>友情链接：<a href="https://tajian.tv" target="_blank">Ta荐 - 你的聚宝盆</a>
+                <br><a href="https://tajian.tv" target="_blank">琼ICP备2021006951号-4</a>
             <?php } ?>
             </p>
         </footer>
@@ -89,9 +89,6 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
                     <img class="icon svg verMiddle" src="/img/beauty/music.svg" alt="音乐" title="开启关闭音乐" />
                 </li>
                 <?php } ?>
-                <li class="connectmeJS">
-                    <img class="icon3 svg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
-                </li>
             </ul>
         </div>
 

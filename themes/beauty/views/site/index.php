@@ -33,7 +33,6 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
                 <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
                 <?php } ?>
                 <img class="svg icon1 svgimg lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
-                <img class="icon1 svg connectmeJS svgimg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
                 <button type="button" class="collapsed mr_button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                     <span class="sr-only">Toggle navigation</span>
                     <img class="svg icon1 svgimg verMiddle" src="/img/beauty/navshow.svg" alt="展开列表" title="展开列表">
@@ -41,7 +40,7 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
             </div>
 
             <a class="navbar-brand" href="/">
-                <span class="verMiddle"><?php echo $pageTitle; ?></span>
+                <span class="verMiddle">小泓的个人相册</span>
             </a>
         </div>
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -51,7 +50,6 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
                 <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
                 <?php } ?>
                 <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
-                <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
             </div>
             
             <?php /*
