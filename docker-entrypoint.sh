@@ -33,6 +33,9 @@ fi
 if [ -e /usr/local/bin/php ]; then
     echo "Start main bot."
     cd /var/www/machete/
+    if [ -f runtime/cache/stats_scan.json ]; then
+        rm -f runtime/cache/stats_scan.json
+    fi
     /usr/local/bin/php bin/command.php mainBot &
 fi
 

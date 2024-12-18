@@ -923,3 +923,62 @@ $('.expand-icon').click(function(evt) {
         Cookies.set(cookieKey, 'opened', { expires: 1 });
     }
 });
+
+/* MainBot扫描进度展示 */
+if ($('.botstats').length > 0) {
+    var didScan = false;
+    var refreshBotStats = function() {
+        $.ajax({
+            url: '/site/botstats',
+            method: 'GET',
+            dataType: 'json'
+        }).done(function(data) {
+            if (data.code != 1) {
+                console.warn('Bot stats获取失败', data.msg);
+            }else {
+                $('.botstats .progress-bar').css('width', data.percent + '%');
+                if (data.percent >= 10) {
+                    $('.botstats .progress-bar').text('扫描已完成 ' + data.percent + '%');
+                }else {
+                    $('.botstats .progress-bar').text(data.percent + '%');
+                }
+                if (data.percent < 100) {
+                    didScan = true;
+                    $('.btnStartScan').prop('disabled', true);
+                    $('.botstats').removeClass('hide');
+                    $('.botstats .progress-bar').removeClass('progress-bar-success');
+                    setTimeout(refreshBotStats, 10000);
+                }else if (didScan) {
+                    $('.botstats .progress-bar').addClass('progress-bar-success');
+                    setTimeout(function() {
+                        $('.botstats').addClass('hide');
+                        $('.btnStartScan').removeAttr('disabled');
+                        location.reload();
+                    }, 4000);
+                }
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            console.error('Bot stats获取失败，错误信息：' + errorThrown);
+        });
+    };
+
+    refreshBotStats();
+}
+
+/* MainBot扫描启动 */
+$('.btnStartScan').click(function() {
+    $.ajax({
+        url: '/site/startbot',
+        method: 'POST',
+        dataType: 'json'
+    }).done(function(data) {
+        if (data.code != 1) {
+            alert('文件扫描开始失败：' + data.msg);
+        }else {
+            location.reload();
+        }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        alert('文件扫描开始失败，错误信息：' + errorThrown);
+        console.error('文件扫描开始失败，错误信息：' + errorThrown);
+    });
+});

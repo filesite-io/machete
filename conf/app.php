@@ -3,8 +3,8 @@
  * Config
  */
 $configs = array(
-    'version' => '0.4.0',
-    'releaseDate' => '2024-11-29',
+    'version' => '0.4.1',
+    'releaseDate' => '2024-12-18',
     'showVersion' => false,     //默认不显示版本号和发布日期
 
     'default_timezone' => 'Asia/Hong_Kong',      //timezone, check more: https://www.php.net/manual/en/timezones.asia.php
@@ -92,6 +92,8 @@ $configs = array(
     'showQRImageInFooter' => true,          //在网页底部显示当前网址二维码
 
     'defaultMenuStatusInPC' => 'closed',    //PC下左侧目录默认状态，可选值：opened, closed
+
+    'showYearMonthMenus' => true,           //是否在菜单栏显示年、月分类菜单
 
     'sortFilesByName' => false,     //图片、视频、音乐文件按名字排序，默认关闭，以文件创建时间倒序排
     'sortOrderOfFiles' => 'asc',    //排序方式，asc顺序，desc倒序

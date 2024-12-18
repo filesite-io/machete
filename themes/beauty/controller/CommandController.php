@@ -9,9 +9,11 @@ require_once __DIR__ . '/../../../plugins/Common.php';
 Class CommandController extends Controller {
     protected $logPrefix = '[MainBot]';
     protected $scanedDirCacheKey = 'MainBotScanedDirs';
-    protected $dateIndexCacheKey = 'MainBotDateIndex';      //索引数据的key单独缓存，缓存key为此{cacheKey}_keys
+    protected $dateIndexCacheKey = 'MainBotDateIndex';          //索引数据的key单独缓存，缓存key为此{cacheKey}_keys
+    protected $dirCounterCacheKey = 'MainBotDirCounter';        //缓存所有目录包含的文件数量
     protected $noOriginalCtimeFilesCacheKey = 'MainBotNoOriginalCtimeFiles';
     protected $allFilesCacheKey = 'MainBotAllFiles';
+    protected $allDirTreeCacheKey = 'MainBotAllDirTree';
 
     public function actionIndex() {
         $commands = <<<eof
@@ -115,29 +117,43 @@ eof;
         echo "{$botLogPrefix} Main bot started @{$thisTime}\n";
 
 
-        $menus = array();        //菜单，一级目录
-        $htmlReadme = array();   //Readme.md 内容，底部网站详细介绍
-        $htmlCateReadme = '';   //当前目录下的Readme.md 内容
-        $menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
+        //$menus = array();        //菜单，一级目录
+        //$htmlReadme = array();   //Readme.md 内容，底部网站详细介绍
+        //$htmlCateReadme = '';   //当前目录下的Readme.md 内容
+        //$menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
 
+        while (true) {
+            $time = date('Y-m-d H:i:s');
+            echo "{$botLogPrefix} {$time}\n";
 
-        //执行一次扫描任务
-        $this->cleanScanCaches();
-        $this->scanMediaFiles();
-        $this->saveDateIndexIntoCacheFile();
-        $this->saveNoOriginalCtimeFilesIntoFile();
-        //缓存所有文件id跟文件信息，便于根据id列表来渲染，并按id首字母分子目录存放，以支持大量文件的场景
-        $this->saveAllFilesIntoCacheFile();
+            $statsFile = __DIR__ . '/../../../runtime/cache/stats_scan.json';
+            if (!file_exists($statsFile)) {
+                //执行一次扫描任务
+                $this->cleanScanCaches();
+                $this->scanMediaFiles();
+                $this->saveDateIndexIntoCacheFile();
+                $this->saveNoOriginalCtimeFilesIntoFile();
+                //缓存所有文件id跟文件信息，便于根据id列表来渲染，并按id首字母分子目录存放，以支持大量文件的场景
+                $this->saveAllFilesIntoCacheFile();
+                //缓存所有目录的文件数量
+                $this->saveDirCounter();
+            }else {
+                try {
+                    $json = file_get_contents($statsFile);
+                    $stats = json_decode($json, true);
+                    if ($stats['status'] == 'running') {
+                        echo "{$botLogPrefix} It's already running...\n";
+                    }else {
+                        $date = date('Y-m-d H:i:s', $stats['updatetime']);
+                        echo "{$botLogPrefix} It's finished at {$date}.\n";
+                    }
+                }catch(Exception $e) {
+                    echo "{$botLogPrefix} Exception: " . $e->getMessage();
+                }
+            }
 
-        //TODO: 保存所有目录下文件数量统计
-        //按年、月保存文件数据，以便按年、月显示
-
-        //while (true) {
-            //$time = date('Y-m-d H:i:s');
-            //echo "{$botLogPrefix} {$time}\n";
-
-            //sleep(3);
-        //}
+            sleep(5);
+        }
     }
 
     //清空内存中的临时缓存数据
@@ -146,6 +162,32 @@ eof;
         Common::setCache($this->dateIndexCacheKey, array());
         Common::setCache($this->noOriginalCtimeFilesCacheKey, array());
         Common::setCache($this->allFilesCacheKey, array());
+        Common::setCache($this->dirCounterCacheKey, array());
+        Common::setCache($this->allDirTreeCacheKey, array());
+    }
+
+    protected function getParentDir($dirpath) {
+        $rootDir = __DIR__ . '/../../../www/' . FSC::$app['config']['content_directory'];
+        $rootDir = realpath($rootDir);
+
+        if ($dirpath == $rootDir) {
+            return '';
+        }
+
+        if (strpos($dirpath, $rootDir) !== false) {
+            $dirs = str_replace($rootDir, '', $dirpath);
+            $dirs = preg_replace('/\/$/', '', $dirs);
+            $arr = explode('/', $dirs);
+            $num = count($arr);
+            if ($num >= 1) {
+                $left = array_slice($arr, 0, $num-1);
+                return realpath( $rootDir . '/' . implode('/', $left) );
+            }else {
+                return '';
+            }
+        }
+
+        return '';
     }
 
     //扫描媒体文件：图片、视频、音乐
@@ -168,6 +210,11 @@ eof;
 
         $maxScanDeep = 0;       //最大扫描目录级数
         $dirTree = $scanner->scan($dirpath, $maxScanDeep);
+
+        //统计文件数量
+        $dirId = $scanner->getId($dirpath);
+        $this->updateAllDirTreeCache($dirId, $dirpath, $dirTree, $scanner);
+
         $scanResults = $scanner->getScanResults();
         echo 'Total directories or files: ' . count($scanResults);
         echo "\n";
@@ -184,7 +231,15 @@ eof;
             foreach ($scanResults as $id => $item) {
                 $hadScanedDirs = Common::getCache($cacheKey);
 
-                if (!empty($item['filename'])) {
+                //忽略.txt描述文件
+                if (
+                    !empty($item['filename']) && !empty($item['extension'])
+                    && (
+                        in_array($item['extension'], $supportedImageExts)
+                        || in_array($item['extension'], $supportedVideoExts)
+                        || in_array($item['extension'], $supportedAudioExts)
+                    )
+                ) {
                     //保存所有文件到索引
                     $this->updateAllFilesCache($item);
                     //更新年份、月份时间索引
@@ -227,6 +282,7 @@ eof;
         if (empty($total)) {return false;}
 
         $stats = array(
+            'updatetime' => time(),
             'currentDir' => $dirpath,
             'total' => $total,
             'current' => $index,
@@ -251,6 +307,7 @@ eof;
 
             //保存进度文件
             file_put_contents($statsFile, json_encode($stats) . "\n");
+            chmod($statsFile, 0777);
         }else if (file_exists($statsFile)) {        //更新当前扫描目录
             $json = file_get_contents($statsFile);
             if (!empty($json)) {
@@ -334,6 +391,10 @@ eof;
         $indexKeys = [];
         foreach ($cacheData as $year => $item) {
             $indexKeys[$year] = array_keys($item);
+            $indexKeys[$year]['total'] = 0;
+            foreach($item as $month => $ids) {
+                $indexKeys[$year]['total'] += count($ids);
+            }
         }
         Common::saveCacheToFile("{$cacheKey}_keys", $indexKeys, $cacheDir);
 
@@ -388,7 +449,9 @@ eof;
         $filesByFirstChar = $this->getFilesByFirstCharcter($cacheData, $dirNum);
         $cacheDir = 'index';
         for ($i=1;$i<=$dirNum;$i++) {
-            Common::saveCacheToFile("{$cacheKey}_{$i}", $filesByFirstChar[$i-1], $cacheDir);
+            if (!empty($filesByFirstChar[$i-1])) {
+                Common::saveCacheToFile("{$cacheKey}_{$i}", $filesByFirstChar[$i-1], $cacheDir);
+            }
         }
 
         //保存文件总数，以及分批数量，以便前端根据id来索引数据
@@ -401,13 +464,112 @@ eof;
         return true;
     }
 
+    protected function updateAllDirTreeCache($dirId, $dirpath, $dirTree, $scanner) {
+        $cacheKey = $this->allDirTreeCacheKey;
+        $cacheData = Common::getCache($cacheKey);
+        if (empty($cacheData)) {
+            $cacheData = array();
+        }
+
+        $cacheData = array_merge($cacheData, $dirTree);
+        if (empty($cacheData[$dirId])) {
+            $cacheData[$dirId] = $dirTree;
+        }
+
+        $supportedImageExts = FSC::$app['config']['supportedImageExts'];
+        $supportedVideoExts = FSC::$app['config']['supportedVideoExts'];
+        $supportedAudioExts = FSC::$app['config']['supportedAudioExts'];
+        $imgNum = $videoNum = $audioNum = 0;
+        foreach ($dirTree as $id => $item) {
+            if (empty($item['pid'])) {
+                echo "Ignored file no pid: {$id}\n";
+                //print_r($item);
+                //echo "\n";
+                continue;
+            }
+
+            if (
+                !empty($item['filename']) && in_array($item['extension'], $supportedImageExts)
+            ) {
+                $imgNum ++;
+            }else if (
+                !empty($item['filename']) && in_array($item['extension'], $supportedVideoExts)
+            ) {
+                $videoNum ++;
+            }else if (
+                !empty($item['filename']) && in_array($item['extension'], $supportedAudioExts)
+            ) {
+                $audioNum ++;
+            }
+        }
+
+        $cacheData[$dirId]['image_total'] = $imgNum;
+        $cacheData[$dirId]['video_total'] = $videoNum;
+        $cacheData[$dirId]['audio_total'] = $audioNum;
+        echo "File total: {$dirId}: image {$imgNum}, video {$videoNum}, audio {$audioNum}\n";
+
+        //更新所有父目录数据
+        $parentDir = $this->getParentDir($dirpath);
+        while (!empty($parentDir)) {
+            //echo "{$dirpath} => {$parentDir}\n";
+            $parentId = $scanner->getId($parentDir);
+            if (!empty($cacheData[$parentId])) {
+                if (isset($cacheData[$parentId]['image_total'])) {
+                    $cacheData[$parentId]['image_total'] += $imgNum;
+                }else {
+                    $cacheData[$parentId]['image_total'] = $imgNum;
+                }
+
+                if (isset($cacheData[$parentId]['video_total'])) {
+                    $cacheData[$parentId]['video_total'] += $videoNum;
+                }else {
+                    $cacheData[$parentId]['video_total'] = $videoNum;
+                }
+
+                if (isset($cacheData[$parentId]['audio_total'])) {
+                    $cacheData[$parentId]['audio_total'] += $audioNum;
+                }else {
+                    $cacheData[$parentId]['audio_total'] = $audioNum;
+                }
+            }
+
+            $dirpath = $parentDir;
+            $parentDir = $this->getParentDir($dirpath);
+        }
+
+        return Common::setCache($cacheKey, $cacheData);
+    }
+
+    protected function getAllFilesTotalInSubDirs() {
+
+    }
+
     //汇总每个目录下图片、视频、音乐文件数量
     /**
      * 数据格式：
      * {dirid: {image: 10, video: 20, audio: 0}, ...}
      */
-    protected function updateDirCounter() {
+    protected function saveDirCounter() {
+        $cacheKey = $this->allDirTreeCacheKey;
+        $cacheData = Common::getCache($cacheKey);
+        if (empty($cacheData)) {
+            return false;
+        }
 
+        $dirCounter = array();
+        foreach ($cacheData as $id => $item) {
+            if ( isset($item['image_total']) ) {
+                $dirCounter[$id] = array(
+                    'image_total' => $item['image_total'],
+                    'video_total' => $item['video_total'],
+                    'audio_total' => $item['audio_total'],
+                );
+            }
+        }
+
+        $saveKey = $this->dirCounterCacheKey;
+        $cacheDir = 'index';
+        Common::saveCacheToFile($saveKey, $dirCounter, $cacheDir);
     }
 
     //归类没有original_ctime的图片、视频文件

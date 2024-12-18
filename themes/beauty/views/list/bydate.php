@@ -23,6 +23,7 @@ if (!empty($viewData['para_month'])) {
     $selectedId = $viewData['para_month'];
 }
 
+$cacheData = !empty($viewData['cacheData']) ? $viewData['cacheData'] : [];
 ?><!-- 顶部导航栏模块 -->
 <nav class="navbar navbar-default navbar-fixed-top navbarJS">
     <div class="container-fluid">
@@ -69,15 +70,25 @@ if (!empty($viewData['para_month'])) {
                     foreach($arrYears as $year) {
                         $intYear = str_replace('y', '', $year);
                         $selected = $year == $viewData['para_year'] ? 'active' : '';
+                        $htmlFileTotal = '';
+                        if (!empty($viewData['cacheData_keys'][$year]['total'])) {
+                            $htmlFileTotal = <<<eof
+                            <small class="badge">{$viewData['cacheData_keys'][$year]['total']}</small>
+eof;
+                        }
                         echo <<<eof
-                <li class="{$selected}"><a href="/list/bydate?year={$year}"><img src="/img/beauty/calendar.svg?gray" alt="calendar" width="14" class="menu-icon"> {$intYear}年</a></li>
+                <li class="{$selected}"><a href="/list/bydate?year={$year}">
+                        <img src="/img/beauty/calendar.svg?gray" alt="calendar" width="14" class="menu-icon">
+                        {$intYear}年
+                        {$htmlFileTotal}
+                </a></li>
 eof;
                     }
                 }else {
                     echo <<<eof
                 <li class="text-center">
                     还没有索引数据！
-                    <button class="btnStartScan btn btn-xs btn-primary disabled">点我开始扫描</button>
+                    <button class="btnStartScan btn btn-xs btn-primary">点我开始扫描</button>
                 </li>
 eof;
                 }
@@ -86,10 +97,19 @@ eof;
                 <?php
                 if (!empty($viewData['menus'])) {        //只显示第一级目录
                     foreach ($viewData['menus'] as $index => $item) {
+                        $htmlFileTotal = '';
+                        if ( !empty($viewData['dirCounters']) && !empty($viewData['dirCounters'][$item['id']]) ) {
+                            $dirTotal = $viewData['dirCounters'][$item['id']];
+                            $fileTotal = $dirTotal['image_total'] + $dirTotal['video_total'] + $dirTotal['audio_total'];
+                            $htmlFileTotal = <<<eof
+                            <small class="badge">{$fileTotal}</small>
+eof;
+                        }
                         echo <<<eof
         <li><a href="{$item['path']}">
             <img src="/img/beauty/folder.svg" alt="directories" width="17" class="menu-icon">
             {$item['directory']}
+            {$htmlFileTotal}
         </a></li>
 eof;
                     }
@@ -104,7 +124,6 @@ eof;
 <!-- 内容主题 -->
 <div class="img_main <?=$main_view_cls?>">
 <?php
-$cacheData = !empty($viewData['cacheData']) ? $viewData['cacheData'] : [];
 $btnSetSnap = '';
 
 $total = 0;
@@ -168,7 +187,11 @@ eof;
 
         echo '<ul class="nav nav-tabs ml-1 mb-1">';
         foreach ($arrShowTypes as $key => $title) {
-            $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
+            $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array(
+                'show' => $key,
+                'page' => 1,
+                'month' => '',
+            ));
             $activedClass = $key == $viewData['showType'] ? 'active' : '';
             echo <<<eof
             <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
@@ -191,9 +214,14 @@ eof;
             <li role="presentation" class="{$activedClass}"><a href="{$monthLink}">所有</a></li>
 eof;
 
-            $months = $viewData['cacheData_keys'][$viewData['para_year']];
-            asort($months);        //排序
+            $months = $viewData['monthsByType'];
+            if ($viewData['showType'] == 'all') {
+                $months = $viewData['cacheData_keys'][$viewData['para_year']];
+                sort($months);        //排序
+            }
+
             foreach ($months as $month) {
+                if (strpos($month, 'm') === false) {continue;}
                 $intMonth = str_replace('m', '', $month);
                 $activedClass = $month == $viewData['para_month'] ? 'active' : '';
                 $monthLink = Html::getLinkByParams(FSC::$app['requestUrl'], array(

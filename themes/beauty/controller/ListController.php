@@ -10,6 +10,7 @@ require_once __DIR__ . '/../../../plugins/Html.php';
 Class ListController extends Controller {
     protected $dateIndexCacheKey = 'MainBotDateIndex';      //索引数据的key单独缓存，缓存key为此{cacheKey}_keys
     protected $allFilesCacheKey = 'MainBotAllFiles';
+    protected $dirCounterCacheKey = 'MainBotDirCounter';        //缓存所有目录包含的文件数量
     protected $noOriginalCtimeFilesCacheKey = 'MainBotNoOriginalCtimeFiles';
 
     public function actionIndex() {
@@ -304,12 +305,14 @@ Class ListController extends Controller {
 
         //从缓存文件获取按年份、月份归类的索引数据
         $cacheDataByDate = Common::getCacheFromFile($this->dateIndexCacheKey . '_keys', 86400*365, 'index');
+        //从缓存文件获取所有目录文件数量数据
+        $dirCounters = Common::getCacheFromFile($this->dirCounterCacheKey, 86400*365, 'index');
 
         $viewName = '//site/index';     //共享视图
         $params = compact(
             'cateId', 'dirTree', 'scanResults', 'menus', 'htmlReadme', 'breadcrumbs', 'htmlCateReadme',
             'mp3File', 'page', 'pageSize', 'cacheDataId', 'copyright', 'showType', 'isAdminIp', 'allFiles',
-            'cacheDataByDate'
+            'cacheDataByDate', 'dirCounters'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -495,6 +498,15 @@ Class ListController extends Controller {
             }
         }
 
+        //只显示有数据的月份
+        $monthsByType = [];
+        foreach($cacheData as $month => $arr) {
+            if ($month != 'total' && !empty($arr)) {
+                array_push($monthsByType, $month);
+            }
+        }
+        sort($monthsByType);
+
         //按月份筛选数据
         if (!empty($para_month)) {
             $newData = [];
@@ -509,7 +521,9 @@ Class ListController extends Controller {
         //把所有文件拼接到一个数组里
         $allFiles = [];
         foreach($cacheData as $month => $files) {
-            $allFiles = array_merge($allFiles, $files);
+            if (is_array($files)) {
+                $allFiles = array_merge($allFiles, $files);
+            }
         }
 
 
@@ -597,6 +611,8 @@ Class ListController extends Controller {
             return $this->renderJson(compact('page', 'pageSize', 'audios'));
         }
 
+        //从缓存文件获取所有目录文件数量数据
+        $dirCounters = Common::getCacheFromFile($this->dirCounterCacheKey, 86400*365, 'index');
 
         $pageTitlePrefix = "{$intYear}年的";
         if (!empty($para_month)) {
@@ -612,8 +628,8 @@ Class ListController extends Controller {
             'page', 'pageSize', 'showType',
             'allFiles',
             'cacheData',
-            'cacheData_keys',
-            'para_year', 'para_month'
+            'cacheData_keys', 'monthsByType',
+            'para_year', 'para_month', 'dirCounters'
         );
         return $this->render($viewName, $params, $pageTitle);
     }

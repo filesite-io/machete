@@ -222,6 +222,15 @@ https://git.filesite.io/filesite/machete/archive/master.zip
 有了Machete，你可以保留现有的本地内容创作习惯，并非常容易地把它们制作成一个网站分享给他人。
 
 
+补充说明：
+
+由于按年、月归类文件功能需要在服务器端执行php脚本来扫描图片、视频等，手动部署后需要进入项目根目录并执行以下命令扫描所有图片、视频：
+```
+php bin/command.php mainBot
+```
+
+
+
 ## 常见问题与解答
 
 请参考文档：
