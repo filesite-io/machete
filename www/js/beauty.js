@@ -595,8 +595,11 @@ var getVideoMetaAndShowIt = function(videoId, videoUrl) {
 
 $('.video-poster').each(function(index, el) {
     var videoId = $(el).attr('data-video-id'),
-        videoUrl = $(el).attr('data-video-url');
-    getVideoMetaAndShowIt(videoId, videoUrl);
+        videoUrl = $(el).attr('data-video-url'),
+        isLocked = $(el).attr('data-lock');
+    if (!isLocked) {
+        getVideoMetaAndShowIt(videoId, videoUrl);
+    }
 });
 
 //保存视频/音乐meta数据
@@ -781,8 +784,11 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
                 setTimeout(function() {
                     $('.othervideos .video-poster').each(function(index, el) {
                         var videoId = $(el).attr('data-video-id'),
-                            videoUrl = $(el).attr('data-video-url');
-                        getVideoMetaAndShowIt(videoId, videoUrl);
+                            videoUrl = $(el).attr('data-video-url'),
+                            isLocked = $(el).attr('data-lock');
+                        if (!isLocked) {
+                            getVideoMetaAndShowIt(videoId, videoUrl);
+                        }
                     });
                 }, 50);
 
@@ -795,8 +801,11 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
                 setTimeout(function() {
                     $('.othervideos .video-poster').each(function(index, el) {
                         var videoId = $(el).attr('data-video-id'),
-                            videoUrl = $(el).attr('data-video-url');
-                        getVideoMetaAndShowIt(videoId, videoUrl);
+                            videoUrl = $(el).attr('data-video-url'),
+                            isLocked = $(el).attr('data-lock');
+                        if (!isLocked) {
+                            getVideoMetaAndShowIt(videoId, videoUrl);
+                        };
                     });
                 }, 50);
 

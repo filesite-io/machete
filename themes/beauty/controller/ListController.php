@@ -436,7 +436,7 @@ Class ListController extends Controller {
         $breadcrumbs = [
             [
                 'id' => $para_year,
-                'name' => $intYear,
+                'name' => "{$intYear}年",
                 'url' => "/list/bydate?year={$para_year}",
             ]
         ];
@@ -444,7 +444,7 @@ Class ListController extends Controller {
             array_push($breadcrumbs,
                 [
                     'id' => $para_month,
-                    'name' => $intMonth,
+                    'name' => "{$intMonth}月",
                     'url' => "/list/bydate?year={$para_year}&month={$para_month}",
                 ]
             );
@@ -456,11 +456,20 @@ Class ListController extends Controller {
         $htmlCateReadme = '';   //当前目录下的Readme.md 内容
         $copyright = '';
 
+        //获取根目录下的readme
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
         $readmeFile = Common::getCacheFromFile($cacheKey, $expireSeconds);
+        if (!empty($readmeFile)) {
+            $htmlReadme = $readmeFile['htmlReadme'];
+        }
+
+        if (!empty($readmeFile['copyright'])) {
+            $copyright = $readmeFile['copyright'];
+        }
 
         $cacheKey = $this->getCacheKey('root', 'mp3', $maxScanDeep);
         $mp3File = Common::getCacheFromFile($cacheKey, $expireSeconds);
+
 
         //翻页支持
         $page = $this->get('page', 1);

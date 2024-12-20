@@ -11,6 +11,9 @@ if ($viewData['showType'] == 'image') {
     $supportedExts = $audioExts;
 }
 
+//需密码授权的目录显示lock图标
+$authConfig = !empty(FSC::$app['config']['password_auth']) ? FSC::$app['config']['password_auth'] : array();
+
 $dir_ext_status = !empty($_COOKIE['dir_ext_status']) ? $_COOKIE['dir_ext_status'] : 'opened';
 $menu_ext_status = !empty($_COOKIE['menu_ext_status']) ? $_COOKIE['menu_ext_status'] : FSC::$app['config']['defaultMenuStatusInPC'];
 
@@ -105,9 +108,22 @@ eof;
                             <small class="badge">{$fileTotal}</small>
 eof;
                         }
+
+                        //目录图标支持加密目录
+                        $dirIcon = "folder.svg";
+                        if (!empty($authConfig['enable']) && $authConfig['enable'] !== 'false'
+                            && (
+                                ( empty($authConfig['default']) && !empty($authConfig['allow'][$item['directory']]) )
+                                ||
+                                !empty($authConfig['default'])       //如果所有目录都需要密码
+                            )
+                        ) {
+                            $dirIcon = "lock-fill.svg";
+                        }
+
                         echo <<<eof
         <li><a href="{$item['path']}">
-            <img src="/img/beauty/folder.svg" alt="directories" width="17" class="menu-icon">
+            <img src="/img/beauty/{$dirIcon}" alt="directories" width="17" class="menu-icon">
             {$item['directory']}
             {$htmlFileTotal}
         </a></li>
@@ -201,7 +217,7 @@ eof;
 
 
         //显示月份导航菜单
-        if (!empty($viewData['para_year']) && !empty($viewData['cacheData_keys'][$viewData['para_year']])) {
+        if (!empty($viewData['allFiles']) && !empty($viewData['para_year']) && !empty($viewData['cacheData_keys'][$viewData['para_year']])) {
             echo '<ul class="nav nav-pills ml-1 mb-1">';
 
             $activedClass = empty($viewData['para_month']) ? 'active' : '';
@@ -281,12 +297,20 @@ eof;
                         $bigUrl = $file['path'];
                     }
 
+                    //权限检查
+                    $originUrl = $file['path'];
+                    $isAllowedToVisit = Common::isUserAllowedToFile($file['realpath']);
+                    if (!$isAllowedToVisit) {
+                        $smallUrl = '/img/beauty/lock-fill.svg';
+                        $bigUrl = $originUrl = '/img/beauty/lazy.svg';
+                    }
+
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
     <a href="javascript:;" class="bor_radius" data-fancybox="gallery"
         data-src="{$bigUrl}"
         data-thumb="{$smallUrl}"
-        data-download-src="{$file['path']}"
+        data-download-src="{$originUrl}"
         data-download-filename="{$file['filename']}.{$file['extension']}"
         data-caption="{$title} - {$file['filename']}"
         data-pid="{$file['pid']}"
@@ -317,12 +341,26 @@ eof;
                         $linkUrl .= "&name=" . urlencode($file['filename']);
                     }
 
+                    //权限检查
+                    $linkTarget = '_blank';
+                    $videoCover = '/img/beauty/video_snap.jpg';
+                    $lockedAttr = '';
+                    $isAllowedToVisit = Common::isUserAllowedToFile($file['realpath']);
+                    if (!$isAllowedToVisit) {
+                        $linkUrl = 'javascript:;';
+                        $linkTarget = '_self';
+                        $videoCover = '/img/beauty/lock-fill.svg';
+                        $lockedAttr = 'data-lock="true"';
+                    }
+
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2">
-    <a href="{$linkUrl}" target="_blank" class="bor_radius" title="{$title} - {$file['filename']}">
-        <img src="/img/beauty/video_snap.jpg" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
+    <a href="{$linkUrl}" target="{$linkTarget}" class="bor_radius" title="{$title} - {$file['filename']}">
+        <img src="{$videoCover}" class="bor_radius im_img video-poster"
+            id="poster_{$file['id']}"
             data-video-id="{$file['id']}"
             data-video-url="{$file['path']}"
+            {$lockedAttr}
             alt="{$file['filename']}">
         <div class="im_img_title">
             <span class="right-bottom">
@@ -354,12 +392,24 @@ eof;
                         }
                     }
 
+                    //权限检查
+                    $linkTarget = '_blank';
+                    $lockedAttr = '';
+                    $isAllowedToVisit = Common::isUserAllowedToFile($file['realpath']);
+                    if (!$isAllowedToVisit) {
+                        $linkUrl = 'javascript:;';
+                        $linkTarget = '_self';
+                        $snapshot = '/img/beauty/lock-fill.svg';
+                        $lockedAttr = 'data-lock="true"';
+                    }
+
                     echo <<<eof
 <div class="im_item bor_radius col-xs-6 col-sm-4 col-md-3 col-lg-2 audio-list-item">
-    <a href="{$linkUrl}" target="_blank" class="bor_radius vercenter" title="{$title} - {$file['filename']}">
+    <a href="{$linkUrl}" target="{$linkTarget}" class="bor_radius vercenter" title="{$title} - {$file['filename']}">
         <img src="{$snapshot}" class="bor_radius im_img video-poster" id="poster_{$file['id']}"
             data-video-id="{$file['id']}"
             data-video-url="{$file['path']}"
+            {$lockedAttr}
             alt="{$file['filename']}">
         <span class="title">{$title}</span>
         <img src="/img/video-play.svg" class="playbtn hide" alt="video play button">
@@ -372,6 +422,13 @@ eof;
 
                 $index++;
             }
+        }else {
+            echo <<<eof
+        <div class="alert alert-warning mt-1 mr-1 ml-1">
+            <h2>咦？没有文件哦</h2>
+            <p class="mt-1">人面不知何处去，桃花依旧笑春风...</p>
+        </div>
+eof;
         }
 ?>
     </div><!--im_mainl-->

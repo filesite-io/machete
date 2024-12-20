@@ -119,10 +119,22 @@ eof;
 eof;
                         }
 
+                        //目录图标支持加密目录
+                        $dirIcon = "folder.svg";
+                        if (!empty($authConfig['enable']) && $authConfig['enable'] !== 'false'
+                            && (
+                                ( empty($authConfig['default']) && !empty($authConfig['allow'][$item['directory']]) )
+                                ||
+                                !empty($authConfig['default'])       //如果所有目录都需要密码
+                            )
+                        ) {
+                            $dirIcon = "lock-fill.svg";
+                        }
+
                         $selected = $item['id'] == $selectedId || (!empty($breadcrumbs) && $item['id'] == $breadcrumbs[0]['id']) ? 'active' : '';
                         echo <<<eof
         <li class="{$selected}"><a href="{$item['path']}">
-            <img src="/img/beauty/folder.svg" alt="directories" width="17" class="menu-icon">
+            <img src="/img/beauty/{$dirIcon}" alt="directories" width="17" class="menu-icon">
             {$item['directory']}
             {$htmlFileTotal}
         </a></li>

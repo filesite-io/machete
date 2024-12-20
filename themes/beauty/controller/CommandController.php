@@ -117,10 +117,7 @@ eof;
         echo "{$botLogPrefix} Main bot started @{$thisTime}\n";
 
 
-        //$menus = array();        //菜单，一级目录
-        //$htmlReadme = array();   //Readme.md 内容，底部网站详细介绍
-        //$htmlCateReadme = '';   //当前目录下的Readme.md 内容
-        //$menus_sorted = array(); //Readme_sort.txt 说明文件内容，一级目录菜单从上到下的排序
+        //TODO: 跳过加密的目录扫描，或者在保存到年、月索引数据的时候，跳过加密目录下的文件
 
         while (true) {
             $time = date('Y-m-d H:i:s');

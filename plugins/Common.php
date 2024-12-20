@@ -651,6 +651,34 @@ Class Common {
         return $authDirs;
     }
 
+    //判断当前文件是否允许访问
+    public static function isUserAllowedToFile($filepath) {
+        if( empty(FSC::$app['config']['password_auth']) ) {
+            return true;
+        }
+
+        $authConfig = FSC::$app['config']['password_auth'];
+        if (empty($authConfig['enable']) || $authConfig['enable'] === 'false') {
+            return true;
+        }
+
+        $allowed = true;
+
+        $filepath = preg_replace('/\/[^\/]+$/', '', $filepath);
+        $filepath = trim($filepath, '/');
+        $arr = explode('/', $filepath);
+        if (!empty($arr)) {
+            foreach($arr as $dir) {
+                $allowed = self::isUserAllowedToDir($dir);
+                if (!$allowed) {
+                    break;
+                }
+            }
+        }
+
+        return $allowed;
+    }
+
     //判断当前目录是否允许访问
     public static function isUserAllowedToDir($dir) {
         if( empty(FSC::$app['config']['password_auth']) ) {
