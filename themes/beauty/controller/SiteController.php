@@ -10,6 +10,7 @@ require_once __DIR__ . '/../../../plugins/Html.php';
 Class SiteController extends Controller {
     protected $dateIndexCacheKey = 'MainBotDateIndex';      //索引数据的key单独缓存，缓存key为此{cacheKey}_keys
     protected $allFilesCacheKey = 'MainBotAllFiles';
+    protected $dirCounterCacheKey = 'MainBotDirCounter';        //缓存所有目录包含的文件数量
     protected $noOriginalCtimeFilesCacheKey = 'MainBotNoOriginalCtimeFiles';
 
     public function actionIndex() {
@@ -263,13 +264,15 @@ Class SiteController extends Controller {
 
         //从缓存文件获取按年份、月份归类的索引数据
         $cacheDataByDate = Common::getCacheFromFile($this->dateIndexCacheKey . '_keys', 86400*365, 'index');
+        //从缓存文件获取所有目录文件数量数据
+        $dirCounters = Common::getCacheFromFile($this->dirCounterCacheKey, 86400*365, 'index');
 
         $viewName = 'index';
         $params = compact(
             'page', 'pageSize', 'cacheDataId', 'showType',
             'dirTree', 'scanResults', 'menus', 'htmlReadme', 'htmlCateReadme', 'mp3File', 'copyright',
             'alertWarning', 'isAdminIp', 'allFiles',
-            'cacheDataByDate'
+            'cacheDataByDate', 'dirCounters'
         );
         return $this->render($viewName, $params, $pageTitle);
     }
@@ -1039,6 +1042,73 @@ Class SiteController extends Controller {
             'errorMsg'
         );
         return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //获取MainBot扫描状态
+    public function actionBotstats() {
+        $code = 0;
+        $msg = 'OK';
+        $percent = 5;
+
+        $statsFile = __DIR__ . '/../../../runtime/cache/stats_scan.json';
+        if (!file_exists($statsFile)) {
+            $code = 1;
+            $msg = '还没执行过文件扫描任务';
+        }else {
+            try {
+                $code = 1;
+                $msg = "状态：未知";
+
+                $json = file_get_contents($statsFile);
+                $stats = json_decode($json, true);
+                if (!empty($stats['percent'])) {
+                    $percent = $stats['percent'];
+                }
+
+                if (!empty($stats['status'])) {
+                    $statusNames = [
+                        'running' => '执行中',
+                        'finished' => '已完成',
+                    ];
+
+                    $status = !empty($statusNames[$stats['status']]) ? $statusNames[$stats['status']] : '未知';
+                    $msg = "状态：{$status}";
+                }
+
+                if (!empty($stats['updatetime'])) {
+                    $msg .= "，更新时间：" . date('Y-m-d H:i:s', $stats['updatetime']);
+                }
+            }catch(Exception $e) {
+                $msg = '获取文件扫描状态失败：' . $e->getMessage();
+            }
+        }
+
+        return $this->renderJson(compact('code', 'percent', 'msg'));
+    }
+
+    //启动MainBot扫描
+    public function actionStartbot() {
+        $code = 0;
+        $msg = 'Fail';
+
+        $statsFile = __DIR__ . '/../../../runtime/cache/stats_scan.json';
+        if (file_exists($statsFile)) {
+            try {
+                $json = file_get_contents($statsFile);
+                $stats = json_decode($json, true);
+                if (!empty($stats['status']) && $stats['status'] == 'finished') {
+                    unlink($statsFile);
+                    $code = 1;
+                    $msg = '文件扫描即将开始';
+                }else {
+                    $msg = "文件扫描任务还在执行中，请刷新网页查看进度";
+                }
+            }catch(Exception $e) {
+                $msg = '文件扫描任务启动失败：' . $e->getMessage();
+            }
+        }
+
+        return $this->renderJson(compact('code', 'msg'));
     }
 
 }

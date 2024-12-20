@@ -98,6 +98,13 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
             你的浏览器不支持<code>audio</code>标签
         </audio>
         <?php } ?>
+
+    </div><!--main_style-->
+
+    <div class="progress navbar-fixed-bottom botstats hide">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+            ...
+        </div>
     </div>
 
     <!--for theme beauty-->

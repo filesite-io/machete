@@ -63,6 +63,7 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
 
             <!--侧边栏-->
             <ul class="nav navbar-fixed-left <?=$menu_expand_icon_cls?>">
+            <?php if (!empty(FSC::$app['config']['showYearMonthMenus'])) { ?>
                 <li class="menu-title">
                     年月
                     <?php if (!empty($viewData['isAdminIp'])) { ?>
@@ -75,29 +76,65 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
                     arsort($arrYears);
                     foreach($arrYears as $year) {
                         $intYear = str_replace('y', '', $year);
+                        $htmlFileTotal = '';
+                        if (!empty($viewData['cacheDataByDate'][$year]['total'])) {
+                            $htmlFileTotal = <<<eof
+                            <small class="badge">{$viewData['cacheDataByDate'][$year]['total']}</small>
+eof;
+                        }
                         echo <<<eof
-                <li><a href="/list/bydate?year={$year}"><img src="/img/beauty/calendar.svg?gray" alt="calendar" width="14" class="menu-icon"> {$intYear}年</a></li>
+                <li><a href="/list/bydate?year={$year}">
+                    <img src="/img/beauty/calendar.svg?gray" alt="calendar" width="14" class="menu-icon">
+                    {$intYear}年
+                    {$htmlFileTotal}
+                </a></li>
 eof;
                     }
                 }else {
                     echo <<<eof
                 <li class="text-center">
                     还没有索引数据！
-                    <button class="btnStartScan btn btn-xs btn-primary disabled">点我开始扫描</button>
+                    <br>
+                    <button class="btnStartScan btn btn-xs btn-primary">点我开始扫描</button>
+                    <br>
+                    请在完成后刷新网页查看
                 </li>
 eof;
                 }
+            }
                 ?>
                 <li class="menu-title mt-1">目录</li>
                 <?php
                 $breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
                 if (!empty($viewData['menus'])) {        //只显示第一级目录
                     foreach ($viewData['menus'] as $index => $item) {
+                        $htmlFileTotal = '';
+                        if ( !empty($viewData['dirCounters']) && !empty($viewData['dirCounters'][$item['id']]) ) {
+                            $dirTotal = $viewData['dirCounters'][$item['id']];
+                            $fileTotal = $dirTotal['image_total'] + $dirTotal['video_total'] + $dirTotal['audio_total'];
+                            $htmlFileTotal = <<<eof
+                            <small class="badge">{$fileTotal}</small>
+eof;
+                        }
+
+                        //目录图标支持加密目录
+                        $dirIcon = "folder.svg";
+                        if (!empty($authConfig['enable']) && $authConfig['enable'] !== 'false'
+                            && (
+                                ( empty($authConfig['default']) && !empty($authConfig['allow'][$item['directory']]) )
+                                ||
+                                !empty($authConfig['default'])       //如果所有目录都需要密码
+                            )
+                        ) {
+                            $dirIcon = "lock-fill.svg";
+                        }
+
                         $selected = $item['id'] == $selectedId || (!empty($breadcrumbs) && $item['id'] == $breadcrumbs[0]['id']) ? 'active' : '';
                         echo <<<eof
         <li class="{$selected}"><a href="{$item['path']}">
-            <img src="/img/beauty/folder.svg" alt="directories" width="17" class="menu-icon">
+            <img src="/img/beauty/{$dirIcon}" alt="directories" width="17" class="menu-icon">
             {$item['directory']}
+            {$htmlFileTotal}
         </a></li>
 eof;
                     }
@@ -269,11 +306,20 @@ eof;
                 }
 
                 $title = !empty($dir['title']) ? $dir['title'] : $dir['directory'];
+                $htmlFileTotal = '';
+                if ( !empty($viewData['dirCounters']) && !empty($viewData['dirCounters'][$dir['id']]) ) {
+                    $dirTotal = $viewData['dirCounters'][$dir['id']];
+                    $fileTotal = $dirTotal['image_total'] + $dirTotal['video_total'] + $dirTotal['audio_total'];
+                    $htmlFileTotal = <<<eof
+                    <small class="badge">{$fileTotal}</small>
+eof;
+                }
                 echo <<<eof
                 <div class="im_img_title">
                     <span class="folder_title">
                         <img src="/img/beauty/folder.svg" alt="folder" width="20">
                         {$title}
+                        {$htmlFileTotal}
                     </span>
                 </div>
                 {$lockIcon}
@@ -329,7 +375,7 @@ eof;
     <div class="alert alert-warning mt-1 mr-1 ml-1">
         <h2>咦？没有文件哦</h2>
         <p class="mt-2">
-            空目录吗？复制照片目录或文件到目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存。
+            空目录吗？复制照片、视频等文件到目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存。
             <br>
             如果不是空目录，点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存，网页有 10 分钟缓存。
         </p>
