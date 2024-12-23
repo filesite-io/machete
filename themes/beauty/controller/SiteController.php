@@ -1048,7 +1048,7 @@ Class SiteController extends Controller {
     public function actionBotstats() {
         $code = 0;
         $msg = 'OK';
-        $percent = 5;
+        $percent = 1;
 
         $statsFile = __DIR__ . '/../../../runtime/cache/stats_scan.json';
         if (!file_exists($statsFile)) {

@@ -6,6 +6,11 @@ $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config
 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
 $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
 $supportedExts = array_merge($imgExts, $videoExts, $audioExts);
+//首页单独获取所有支持的文件总数
+$totalForIndex = 0;
+if (empty($selectedId) && !empty($viewData['allFiles'])) {
+    $totalForIndex = Html::getDataTotal($viewData['allFiles'], $supportedExts);
+}
 if ($viewData['showType'] == 'image') {
     $supportedExts = $imgExts;
 }else if ($viewData['showType'] == 'video') {
@@ -337,7 +342,7 @@ eof;
         //分割目录和文件
         echo '</div>';
 
-        if (!empty($category['directories'])) {        //两级目录支持
+        if (!empty($selectedId) && !empty($category['directories'])) {        //两级目录支持
             $arrowImg = $dir_ext_status == 'opened' ? 'arrow-up.svg' : 'arrow-down.svg';
             $btnTxt = $dir_ext_status == 'opened' ? '收拢目录' : '展开目录';
             echo <<<eof
@@ -350,36 +355,49 @@ eof;
 
 
         //显示图片、视频、音乐筛选链接
-        $arrShowTypes = array(
-            'all' => '所有',
-            'image' => '照片',
-            'video' => '视频',
-            'audio' => '音乐',
-        );
+        if (
+            !empty($selectedId)     //非首页
+            ||
+            empty($selectedId) && $totalForIndex > 0  //首页空数据时不显示
+        ) {
+            $arrShowTypes = array(
+                'all' => '所有',
+                'image' => '照片',
+                'video' => '视频',
+                'audio' => '音乐',
+            );
 
-        echo '<ul class="nav nav-tabs ml-1 mb-1">';
-        foreach ($arrShowTypes as $key => $title) {
-            $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
-            $activedClass = $key == $viewData['showType'] ? 'active' : '';
-            echo <<<eof
-            <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
+            echo '<ul class="nav nav-tabs ml-1 mb-1">';
+            foreach ($arrShowTypes as $key => $title) {
+                $showLink = Html::getLinkByParams(FSC::$app['requestUrl'], array('show' => $key, 'page' => 1));
+                $activedClass = $key == $viewData['showType'] ? 'active' : '';
+                echo <<<eof
+                <li role="presentation" class="{$activedClass}"><a href="{$showLink}">{$title}</a></li>
 eof;
+            }
+            echo '</ul>';
         }
-        echo '</ul>';
 
 
         //空目录显示提示信息
         if (
-            ( empty($selectedId) && empty($category['directories']) ) || 
-            ( !empty($selectedId) && empty($category['files']) )
+            (!empty($selectedId) && $total == 0)                        //非首页
+            ||
+            (empty($selectedId) && $totalForIndex > 0 && $total == 0)   //首页空数据时不显示
         ) {
+            $tipPrefix = '照片、视频';
+            if ($viewData['showType'] == 'image') {
+                $tipPrefix = '照片';
+            }else if ($viewData['showType'] == 'video') {
+                $tipPrefix = '视频';
+            }else if ($viewData['showType'] == 'audio') {
+                $tipPrefix = '音乐';
+            }
             echo <<<eof
     <div class="alert alert-warning mt-1 mr-1 ml-1">
-        <h2>咦？没有文件哦</h2>
+        <h2>咦？当前目录没有{$tipPrefix}文件哦</h2>
         <p class="mt-2">
-            空目录吗？复制照片、视频等文件到目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存。
-            <br>
-            如果不是空目录，点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">刷新”图标清空缓存，网页有 10 分钟缓存。
+            复制{$tipPrefix}到此目录后点右上角“<img width="18" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据">”刷新图标清空缓存。
         </p>
     </div>
 eof;

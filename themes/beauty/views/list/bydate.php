@@ -423,9 +423,17 @@ eof;
                 $index++;
             }
         }else {
+            $tipPrefix = '照片、视频';
+            if ($viewData['showType'] == 'image') {
+                $tipPrefix = '照片';
+            }else if ($viewData['showType'] == 'video') {
+                $tipPrefix = '视频';
+            }else if ($viewData['showType'] == 'audio') {
+                $tipPrefix = '音乐';
+            }
             echo <<<eof
         <div class="alert alert-warning mt-1 mr-1 ml-1">
-            <h2>咦？没有文件哦</h2>
+            <h2>咦？没有{$tipPrefix}文件哦</h2>
             <p class="mt-1">人面不知何处去，桃花依旧笑春风...</p>
         </div>
 eof;

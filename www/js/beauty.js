@@ -946,10 +946,10 @@ if ($('.botstats').length > 0) {
                 console.warn('Bot stats获取失败', data.msg);
             }else {
                 $('.botstats .progress-bar').css('width', data.percent + '%');
-                if (data.percent >= 10) {
+                if (data.percent >= 5) {
                     $('.botstats .progress-bar').text('扫描已完成 ' + data.percent + '%');
                 }else {
-                    $('.botstats .progress-bar').text(data.percent + '%');
+                    $('.botstats .progress-bar').text('');
                 }
                 if (data.percent < 100) {
                     didScan = true;

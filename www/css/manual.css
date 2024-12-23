@@ -15,6 +15,7 @@
 .indexes h5{font-size:0.9em}
 .indexes h6{font-size:0.8em}
 .indexes a{background-color:transparent;color:#0969da;text-decoration:none}
+.author{margin-top:1em;padding:.5em;border:1px solid #EEE}
 @media (max-width: 640px) {
     .header{position: static}
     .indexes{position:static;width:auto;padding-bottom:0.5em;margin-bottom:0.5em;margin-top: 0}
