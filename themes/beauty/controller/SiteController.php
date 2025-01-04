@@ -164,17 +164,17 @@ Class SiteController extends Controller {
         if ($showType == 'image') {
             $scanResults = array_filter($scanResults, function($item) {
                 $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
-                return !empty($item['extension']) && in_array($item['extension'], $imgExts);
+                return !empty($item['extname']) && in_array($item['extname'], $imgExts);
             });
         }else if ($showType == 'video') {
             $scanResults = array_filter($scanResults, function($item) {
                 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
-                return !empty($item['extension']) && in_array($item['extension'], $videoExts);
+                return !empty($item['extname']) && in_array($item['extname'], $videoExts);
             });
         }else if ($showType == 'audio') {
             $scanResults = array_filter($scanResults, function($item) {
                 $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
-                return !empty($item['extension']) && in_array($item['extension'], $audioExts);
+                return !empty($item['extname']) && in_array($item['extname'], $audioExts);
             });
         }
 
@@ -201,7 +201,7 @@ Class SiteController extends Controller {
                 }
                 $item['caption'] = "{$title} - {$item['filename']}";
 
-                if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
+                if (!empty($item['extname']) && in_array($item['extname'], $imgExts)) {
                     array_push($imgs, $item);
                     $index ++;
                 }
@@ -220,7 +220,7 @@ Class SiteController extends Controller {
                     break;
                 }
 
-                if (!empty($item['extension']) && in_array($item['extension'], $videoExts)) {
+                if (!empty($item['extname']) && in_array($item['extname'], $videoExts)) {
                     array_push($videos, $item);
                     $index ++;
                 }
@@ -239,7 +239,7 @@ Class SiteController extends Controller {
                     break;
                 }
 
-                if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                if (!empty($item['extname']) && in_array($item['extname'], $audioExts)) {
                     //为音乐文件获取封面图
                     if (empty($item['snapshot'])) {
                         $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');

@@ -269,16 +269,16 @@ eof;
                     }
                 } else if (!empty($dir['files'])) {
                     $first_img = array_shift($dir['files']);
-                    if (!in_array($first_img['extension'], $imgExts)) {
+                    if (!in_array($first_img['extname'], $imgExts)) {
                         foreach ($dir['files'] as $file) {
-                            if (in_array($file['extension'], $imgExts)) {
+                            if (in_array($file['extname'], $imgExts)) {
                                 $first_img = $file;
                                 break;
                             }
                         }
                     }
 
-                    if (in_array($first_img['extension'], $imgExts)) {
+                    if (in_array($first_img['extname'], $imgExts)) {
                         $imgUrl = urlencode($first_img['path']);
                         $smallUrl = "/site/smallimg/?id={$first_img['id']}&url={$imgUrl}";
                         if (empty(FSC::$app['config']['enableSmallImage']) || FSC::$app['config']['enableSmallImage'] === 'false') {
@@ -413,7 +413,7 @@ eof;
             $index = 0;
 
             foreach ($category['files'] as $file) {
-                if (empty($file['extension']) || !in_array($file['extension'], $supportedExts)) {
+                if (empty($file['extname']) || !in_array($file['extname'], $supportedExts)) {
                     continue;
                 }
 
@@ -435,7 +435,7 @@ eof;
                     }
                 }
 
-                if (in_array($file['extension'], $imgExts)) {
+                if (in_array($file['extname'], $imgExts)) {
                     //缩略图
                     $imgUrl = urlencode($file['path']);
                     $smallUrl = "/site/smallimg/?id={$file['id']}&url={$imgUrl}";
@@ -472,9 +472,9 @@ eof;
     </a>
 </div>
 eof;
-                }else if (in_array($file['extension'], $videoExts)) {       //输出视频
+                }else if (in_array($file['extname'], $videoExts)) {       //输出视频
                     //m3u8支持
-                    if ($file['extension'] == 'm3u8') {
+                    if ($file['extname'] == 'm3u8') {
                         $videoUrl = urlencode("{$file['path']}&cid={$viewData['cacheDataId']}");
                     }else {
                         $videoUrl = urlencode($file['path']);
@@ -485,7 +485,7 @@ eof;
                         $linkUrl .= "&page={$viewData['page']}&limit={$viewData['pageSize']}";
                     }
 
-                    if ($file['extension'] == 'm3u8') {
+                    if ($file['extname'] == 'm3u8') {
                         $linkUrl .= "&name=" . urlencode($file['filename']);
                     }
 
@@ -506,7 +506,7 @@ eof;
     </a>
 </div>
 eof;
-                }else if (in_array($file['extension'], $audioExts)) {       //输出音乐
+                }else if (in_array($file['extname'], $audioExts)) {       //输出音乐
                     $title = !empty($file['title']) ? $file['title'] : $file['filename'];
                     $videoUrl = urlencode($file['path']);
                     $linkUrl = "/site/audioplayer?id={$file['id']}&pid={$file['pid']}&cid={$viewData['cacheDataId']}&url={$videoUrl}";

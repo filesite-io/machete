@@ -145,8 +145,7 @@ Class DirScanner {
                 fclose($fp);
                 $img_filename = $this->getFilenameWithoutExtension($img_realpath);
                 $img_pathinfo = pathinfo($img_realpath);
-                $extension = strtolower($img_pathinfo['extension']);
-                $content = $this->getFilePath( $id, $this->getRelativeDirname($img_pathinfo['dirname']), $img_filename, $extension, $fstat['mtime'] );
+                $content = $this->getFilePath( $id, $this->getRelativeDirname($img_pathinfo['dirname']), $img_filename, $img_pathinfo['extension'], $fstat['mtime'] );
             }
         }
 
@@ -302,12 +301,14 @@ Class DirScanner {
         $fstat = fstat($fp);
         fclose($fp);
         $pathinfo = pathinfo($realpath);
-        $extension = strtolower($pathinfo['extension']);
+        $extension = $pathinfo['extension'];
+        $extname = strtolower($pathinfo['extension']);
         $filename = $this->getFilenameWithoutExtension($realpath);
         $data = array(
             'id' => $id,
             'filename' => $filename,
-            'extension' => $extension,
+            'extname' => $extname,          //把后缀转小写，程序内部使用
+            'extension' => $extension,      //保持原文件后缀大小写
             'fstat' => array(
                 'size' => $fstat['size'],
                 'atime' => $fstat['atime'],
@@ -315,12 +316,12 @@ Class DirScanner {
                 'ctime' => $fstat['ctime'],
             ),
             'realpath' => $this->isApi ? $this->getRelativeDirname($realpath) : $realpath,
-            'path' => $this->getFilePath( $id, $this->getRelativeDirname($pathinfo['dirname']), $filename, $extension, $fstat['mtime'] ),
+            'path' => $this->getFilePath( $id, $this->getRelativeDirname($pathinfo['dirname']), $filename, $pathinfo['extension'], $fstat['mtime'] ),
         );
 
-        if ($extension == 'url') {
+        if ($extname == 'url') {
             $data['shortcut'] = $this->parseShortCuts($realpath, $filename);
-        }else if (in_array($extension, $this->exifSupportFileExtensions) || in_array($extension, $this->iptcSupportFileExtensions)) {
+        }else if (in_array($extname, $this->exifSupportFileExtensions) || in_array($extname, $this->iptcSupportFileExtensions)) {
             $photo_create_time = $this->getCreateDateFromExifMeta($realpath);
             if ($photo_create_time == 0) {
                 $photo_create_time = $this->getCreateDateFromIPTCMeta($realpath);
@@ -329,7 +330,7 @@ Class DirScanner {
             if ($photo_create_time > 0) {
                 $data['original_ctime'] = $photo_create_time;
             }
-        }else if ($this->exiftoolSupported && in_array($extension, $this->exiftoolSupportFileExtensions)) {
+        }else if ($this->exiftoolSupported && in_array($extname, $this->exiftoolSupportFileExtensions)) {
             //try to exec command to get original create time of videos
             try {
                 $output = shell_exec( sprintf("exiftool -createdate %s", escapeshellarg($realpath)) );
@@ -502,10 +503,11 @@ Class DirScanner {
             'ts' => "{$webRoot}{$directory}{$filename}.{$extension}",
         );
 
-        $path = isset($extensionPathMap[$extension]) ? $extensionPathMap[$extension] : '';
+        $extname = strtolower($extension);
+        $path = isset($extensionPathMap[$extname]) ? $extensionPathMap[$extname] : '';
 
-        if (!empty($path) && in_array($extension, ['md', 'url', 'm3u8'])) {
-            if ($this->nginxSecureOn && $extension == 'm3u8') {
+        if (!empty($path) && in_array($extname, ['md', 'url', 'm3u8'])) {
+            if ($this->nginxSecureOn && $extname == 'm3u8') {
                 $path = $this->getSecureLink($path);
                 $path = "{$path}&id={$id}";
             }else {
@@ -516,7 +518,7 @@ Class DirScanner {
         }
 
         //增加版本号ver参数
-        if (!in_array($extension, ['md', 'url', 'txt'])) {
+        if (!in_array($extname, ['md', 'url', 'txt'])) {
             $path .= strpos($path, '?') !== false ? "&ver={$mtime}" : "?ver={$mtime}";
         }
 
@@ -850,9 +852,7 @@ Class DirScanner {
                     fclose($fp);
                     $src_filename = $this->getFilenameWithoutExtension($src_realpath);
                     $src_pathinfo = pathinfo($src_realpath);
-                    $extension = strtolower($src_pathinfo['extension']);
-
-                    $src_path = $this->getFilePath( $id, $this->getRelativeDirname($src_pathinfo['dirname']), $src_filename, $extension, $fstat['mtime'] );
+                    $src_path = $this->getFilePath( $id, $this->getRelativeDirname($src_pathinfo['dirname']), $src_filename, $src_pathinfo['extension'], $fstat['mtime'] );
 
                     $html = str_replace("\"{$url}\"", "\"{$src_path}\"", $html);
                 }

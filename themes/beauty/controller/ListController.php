@@ -149,17 +149,17 @@ Class ListController extends Controller {
         if ($showType == 'image' && !empty($scanResults[$cateId]['files'])) {
             $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
                 $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
-                return !empty($item['extension']) && in_array($item['extension'], $imgExts);
+                return !empty($item['extname']) && in_array($item['extname'], $imgExts);
             });
         }else if ($showType == 'video' && !empty($scanResults[$cateId]['files'])) {
             $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
                 $videoExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
-                return !empty($item['extension']) && in_array($item['extension'], $videoExts);
+                return !empty($item['extname']) && in_array($item['extname'], $videoExts);
             });
         }else if ($showType == 'audio' && !empty($scanResults[$cateId]['files'])) {
             $scanResults[$cateId]['files'] = array_filter($scanResults[$cateId]['files'], function($item) {
                 $audioExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
-                return !empty($item['extension']) && in_array($item['extension'], $audioExts);
+                return !empty($item['extname']) && in_array($item['extname'], $audioExts);
             });
         }
 
@@ -235,7 +235,7 @@ Class ListController extends Controller {
                 }
                 $item['caption'] = "{$title} - {$item['filename']}";
 
-                if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
+                if (!empty($item['extname']) && in_array($item['extname'], $imgExts)) {
                     array_push($imgs, $item);
                     $index ++;
                 }
@@ -255,12 +255,12 @@ Class ListController extends Controller {
                     break;
                 }
 
-                if (!empty($item['extension']) && in_array($item['extension'], $videoExts)) {
-                    if ($item['extension'] == 'm3u8') {
+                if (!empty($item['extname']) && in_array($item['extname'], $videoExts)) {
+                    if ($item['extname'] == 'm3u8') {
                         $item['path'] .= "&cid={$cacheParentDataId}";
                     }
 
-                    $item['videoType'] = Html::getMediaSourceType($item['extension']);
+                    $item['videoType'] = Html::getMediaSourceType($item['extname']);
 
                     array_push($videos, $item);
                     $index ++;
@@ -281,7 +281,7 @@ Class ListController extends Controller {
                     break;
                 }
 
-                if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                if (!empty($item['extname']) && in_array($item['extname'], $audioExts)) {
                     //为音乐文件获取封面图
                     if (empty($item['snapshot'])) {
                         $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
@@ -486,7 +486,7 @@ Class ListController extends Controller {
             foreach($cacheData as $month => $arr) {
                 $cacheData[$month] = array_filter($arr, function($item) {
                     $filtExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');
-                    return !empty($item['extension']) && in_array($item['extension'], $filtExts);
+                    return !empty($item['extname']) && in_array($item['extname'], $filtExts);
                 });
             }
         }else if ($showType == 'video') {
@@ -494,7 +494,7 @@ Class ListController extends Controller {
             foreach($cacheData as $month => $arr) {
                 $cacheData[$month] = array_filter($arr, function($item) {
                     $filtExts = !empty(FSC::$app['config']['supportedVideoExts']) ? FSC::$app['config']['supportedVideoExts'] : array('mp4', 'mov', 'm3u8');
-                    return !empty($item['extension']) && in_array($item['extension'], $filtExts);
+                    return !empty($item['extname']) && in_array($item['extname'], $filtExts);
                 });
             }
         }else if ($showType == 'audio') {
@@ -502,7 +502,7 @@ Class ListController extends Controller {
             foreach($cacheData as $month => $arr) {
                 $cacheData[$month] = array_filter($arr, function($item) {
                     $filtExts = !empty(FSC::$app['config']['supportedAudioExts']) ? FSC::$app['config']['supportedAudioExts'] : array('mp3');
-                    return !empty($item['extension']) && in_array($item['extension'], $filtExts);
+                    return !empty($item['extname']) && in_array($item['extname'], $filtExts);
                 });
             }
         }
@@ -559,7 +559,7 @@ Class ListController extends Controller {
                 }
                 $item['caption'] = "{$title} - {$item['filename']}";
 
-                if (!empty($item['extension']) && in_array($item['extension'], $imgExts)) {
+                if (!empty($item['extname']) && in_array($item['extname'], $imgExts)) {
                     array_push($imgs, $item);
                     $index ++;
                 }
@@ -579,8 +579,8 @@ Class ListController extends Controller {
                     break;
                 }
 
-                if (!empty($item['extension']) && in_array($item['extension'], $videoExts)) {
-                    $item['videoType'] = Html::getMediaSourceType($item['extension']);
+                if (!empty($item['extname']) && in_array($item['extname'], $videoExts)) {
+                    $item['videoType'] = Html::getMediaSourceType($item['extname']);
 
                     array_push($videos, $item);
                     $index ++;
@@ -601,7 +601,7 @@ Class ListController extends Controller {
                     break;
                 }
 
-                if (!empty($item['extension']) && in_array($item['extension'], $audioExts)) {
+                if (!empty($item['extname']) && in_array($item['extname'], $audioExts)) {
                     //为音乐文件获取封面图
                     if (empty($item['snapshot'])) {
                         $imgExts = !empty(FSC::$app['config']['supportedImageExts']) ? FSC::$app['config']['supportedImageExts'] : array('jpg', 'jpeg', 'png', 'webp', 'gif');

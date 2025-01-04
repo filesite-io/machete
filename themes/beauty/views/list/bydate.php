@@ -261,7 +261,7 @@ eof;
             $index = 0;
 
             foreach ($allFiles as $file) {
-                if (empty($file['extension']) || !in_array($file['extension'], $supportedExts)) {
+                if (empty($file['extname']) || !in_array($file['extname'], $supportedExts)) {
                     continue;
                 }
 
@@ -283,7 +283,7 @@ eof;
                     }
                 }
 
-                if (in_array($file['extension'], $imgExts)) {
+                if (in_array($file['extname'], $imgExts)) {
                     //缩略图
                     $imgUrl = urlencode($file['path']);
                     $smallUrl = "/site/smallimg/?id={$file['id']}&url={$imgUrl}";
@@ -328,7 +328,7 @@ eof;
     </a>
 </div>
 eof;
-                }else if (in_array($file['extension'], $videoExts)) {       //输出视频
+                }else if (in_array($file['extname'], $videoExts)) {       //输出视频
                     $videoUrl = urlencode($file['path']);
                     $linkUrl = "/site/player?id={$file['id']}&pid={$file['pid']}&url={$videoUrl}";
                     if ($viewData['showType'] == 'video') {
@@ -337,7 +337,7 @@ eof;
                         $linkUrl .= "&year={$viewData['para_year']}&month={$viewData['para_month']}";
                     }
 
-                    if ($file['extension'] == 'm3u8') {
+                    if ($file['extname'] == 'm3u8') {
                         $linkUrl .= "&name=" . urlencode($file['filename']);
                     }
 
@@ -372,7 +372,7 @@ eof;
     </a>
 </div>
 eof;
-                }else if (in_array($file['extension'], $audioExts)) {       //输出音乐
+                }else if (in_array($file['extname'], $audioExts)) {       //输出音乐
                     $title = !empty($file['title']) ? $file['title'] : $file['filename'];
                     $videoUrl = urlencode($file['path']);
                     $linkUrl = "/site/audioplayer?id={$file['id']}&pid={$file['pid']}&url={$videoUrl}";
