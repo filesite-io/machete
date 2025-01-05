@@ -230,11 +230,11 @@ eof;
 
                 //忽略.txt描述文件
                 if (
-                    !empty($item['filename']) && !empty($item['extension'])
+                    !empty($item['filename']) && !empty($item['extname'])
                     && (
-                        in_array($item['extension'], $supportedImageExts)
-                        || in_array($item['extension'], $supportedVideoExts)
-                        || in_array($item['extension'], $supportedAudioExts)
+                        in_array($item['extname'], $supportedImageExts)
+                        || in_array($item['extname'], $supportedVideoExts)
+                        || in_array($item['extname'], $supportedAudioExts)
                     )
                 ) {
                     //保存所有文件到索引
@@ -248,14 +248,14 @@ eof;
                 if (
                     !empty($item['filename'])
                     && empty($item['original_ctime'])
-                    && in_array($item['extension'], $supportedImageExts)
-                    && !in_array($item['extension'], $scanner->exifSupportFileExtensions)
+                    && in_array($item['extname'], $supportedImageExts)
+                    && !in_array($item['extname'], $scanner->exifSupportFileExtensions)
                 ) {
                     echo "Image file no original_ctime: {$item['filename']}.{$item['extension']}, {$item['realpath']}\n";
                 }else if (
                     !empty($item['filename'])
                     && empty($item['original_ctime'])
-                    && (in_array($item['extension'], $supportedVideoExts) || in_array($item['extension'], $supportedAudioExts))
+                    && (in_array($item['extname'], $supportedVideoExts) || in_array($item['extname'], $supportedAudioExts))
                 ) {
                     echo "Video or audio file no original_ctime: {$item['filename']}.{$item['extension']}, {$item['realpath']}\n";
                 }else if (!empty($item['directory']) && empty($hadScanedDirs[$id])) {     //if it's directory
@@ -486,15 +486,15 @@ eof;
             }
 
             if (
-                !empty($item['filename']) && in_array($item['extension'], $supportedImageExts)
+                !empty($item['filename']) && in_array($item['extname'], $supportedImageExts)
             ) {
                 $imgNum ++;
             }else if (
-                !empty($item['filename']) && in_array($item['extension'], $supportedVideoExts)
+                !empty($item['filename']) && in_array($item['extname'], $supportedVideoExts)
             ) {
                 $videoNum ++;
             }else if (
-                !empty($item['filename']) && in_array($item['extension'], $supportedAudioExts)
+                !empty($item['filename']) && in_array($item['extname'], $supportedAudioExts)
             ) {
                 $audioNum ++;
             }

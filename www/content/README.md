@@ -123,7 +123,8 @@
     'filename' => '第一章',
     'realpath' => '/www/webroot/content/倚天屠龙记/第一章.md',
     'path' => '/view/?id={id}',
-    'extension' => 'md',
+    'extname' => 'md',
+    'extension' => 'MD',
     'fstat' => [...],       //同php方法fstat: https://www.php.net/manual/en/function.fstat.php
     'content' => '文章内容...',
     'description' => '文章简介...',
@@ -131,6 +132,10 @@
     'snapshot' => '/content/倚天屠龙记/第一章封面图.jpg',
 ]
 ```
+
+其中：  
+extension区分大小写，extname只有小写。
+
 
 .txt，.md和.url 3 种文件说明：
 * .txt文件是其它所有文件的描述文件，不会出现在文件列表里；
@@ -149,6 +154,7 @@
     'filename' => 'filesite.io',
     'realpath' => '/www/webroot/content/网址导航/filesite.io.url',
     'path' => '/link/?id={id}',
+    'extname' => 'url',
     'extension' => 'url',
     'fstat' => [...],       //同php方法fstat: https://www.php.net/manual/en/function.fstat.php
     'shortcut' => [    
