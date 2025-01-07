@@ -123,7 +123,8 @@ Articles, pictures, and video files other than URLs.
      'filename' => 'Chapter 1',
      'realpath' => '/www/webroot/content/天杀龙记/Chapter 1.md',
      'path' => '/view/?id={id}',
-     'extension' => 'md',
+     'extname' => 'md',
+     'extension' => 'MD',
      'fstat' => [...], //Same as PHP method fstat: https://www.php.net/manual/en/function.fstat.php
      'content' => 'Article content...',
      'description' => 'Article introduction...',
@@ -131,6 +132,12 @@ Articles, pictures, and video files other than URLs.
      'snapshot' => '/content/Eternal Dragon Sword/Chapter 1 Cover Picture.jpg',
 ]
 ```
+
+
+Special fields:    
+* extname is lower case, case insensitive
+* extension is case sensitive
+
 
 .txt, .md and .url 3 file descriptions:
 * .txt files are description files for all other files and will not appear in the file list;
@@ -149,6 +156,7 @@ The .url file is a universal web page shortcut. Its data structure has one more 
      'filename' => 'filesite.io',
      'realpath' => '/www/webroot/content/URL Navigation/filesite.io.url',
      'path' => '/link/?id={id}',
+     'extname' => 'url',
      'extension' => 'url',
      'fstat' => [...], //Same as PHP method fstat: https://www.php.net/manual/en/function.fstat.php
      'shortcut' => [
@@ -197,4 +205,4 @@ machete@filesite.io
 
 ## 简体中文版
 
-[FileSite.io，一个基于文件和目录管理网址、文章、图片、视频的标准](../README.md)
+[FileSite.io，一个基于文件和目录管理网址、文章、图片、视频的标准](../zh-cn/README.md)

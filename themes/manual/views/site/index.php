@@ -13,12 +13,12 @@ eof;
         <?php
         if (!empty($viewData['author'])) {
             echo <<<eof
-        作者：<small>{$viewData['author']}</small>
+        author: <small>{$viewData['author']}</small>
         <br>
 eof;
         }
         ?>
-        修改：<small><?php echo date('Y-m-d H:i:s', $viewData['updateTime']); ?></small>
+        updated: <small><?php echo date('Y-m-d H:i:s', $viewData['updateTime']); ?></small>
     </div>
 </div>
 
