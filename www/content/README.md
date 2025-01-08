@@ -43,8 +43,9 @@ The current version supports the following types of data:
 | ---- | ---- |
 | URL | .url shortcut |
 | Article | .md markdown file |
-| Pictures | .jpg, .png, .gif, .ico |
-| Video | .mp4, .m3u8, .ts |
+| Pictures | .jpg, .png, .gif, .ico, .webp, .svg |
+| Video | .mp4, .mov, .m3u8, .ts |
+| Audio | .mp3 |
 
 
 ## Data description
@@ -71,7 +72,7 @@ Several commonly used attribute description files are as follows:
 
 The directory can contain subdirectories and files, and the directory hierarchy supports up to 5 levels**.
 
-Use directories to **group** data, and put files in the same group in the same directory.
+Use directories to **group** data, and put files of a group in the same directory.
 
 Example (the letters **d** represent directories and the letters **f** represent files):
 ```
@@ -134,8 +135,8 @@ Articles, pictures, and video files other than URLs.
 ```
 
 Special fields:    
-* extname is lower case, case insensitive
 * extension is case sensitive
+* extname is lower case of extension
 
 
 .txt, .md and .url 3 file descriptions:

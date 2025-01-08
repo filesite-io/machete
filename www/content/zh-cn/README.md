@@ -43,8 +43,9 @@
 | ---- | ---- |
 | 网址 | .url 快捷方式 |
 | 文章 | .md markdown文件 |
-| 图片 | .jpg, .png, .gif, .ico |
-| 视频 | .mp4, .m3u8, .ts |
+| 图片 | .jpg, .png, .gif, .ico, .webp, .svg |
+| 视频 | .mp4, .mov, .m3u8, .ts |
+| 音乐 | .mp3 |
 
 
 ## 数据说明
@@ -134,7 +135,7 @@
 ```
 
 其中：  
-extension区分大小写，extname只有小写。
+extension区分大小写，extname是小写的extension。
 
 
 .txt，.md和.url 3 种文件说明：
