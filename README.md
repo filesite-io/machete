@@ -13,7 +13,8 @@
 ## 目录
 
 * [在线体验](#在线体验)
-* [基于Docker部署](#基于Docker部署)
+* [基于Docker Compose部署](#基于docker-compose部署)
+* [基于Docker部署](#基于docker部署)
     * [视频教程](#视频教程)
     * [下载镜像](#下载镜像)
     * [启动machete容器](#启动machete容器)
@@ -36,6 +37,27 @@ Machete是单入口模式PHP源码，**不支持子目录方式访问**，以下
 | 视频分享站 | Ta荐 | <a href="https://tajian.tv" target="_blank">TaJian.tv</a> |
 | 文档站 | FileSite | <a href="https://filesite.io" target="_blank">Filesite.io</a> |
 | 导航站 | 站长手册 | <a href="https://webdirectory.filesite.io" target="_blank">WebDir</a> |
+
+
+## 基于Docker Compose部署
+
+如果你已经安装了Docker Desktop，并确认已经支持docker compose命令，可**进入本源码根目录**后执行以下命令进行安装：
+
+```
+# cd /machete源码根目录/
+docker compose up -d
+```
+
+如果你是在支持docker compose的NAS系统里安装，请参考下面配置：  
+[Docker Compose配置参考](./compose.yaml)
+
+
+注意启动容器之前先修改配置里的本地照片、视频文件夹路径：
+```
+  - "${PWD}/www/girls:/var/www/machete/www/girls/"
+```
+
+把其中的"${PWD}/www/girls“修改为你本地照片目录绝对路径。
 
 
 ## 基于Docker部署

@@ -503,7 +503,7 @@ eof;
         $cacheData[$dirId]['image_total'] = $imgNum;
         $cacheData[$dirId]['video_total'] = $videoNum;
         $cacheData[$dirId]['audio_total'] = $audioNum;
-        echo "File total: {$dirId}: image {$imgNum}, video {$videoNum}, audio {$audioNum}\n";
+        echo "File total: image {$imgNum}, video {$videoNum}, audio {$audioNum}\n";
 
         //更新所有父目录数据
         $parentDir = $this->getParentDir($dirpath);

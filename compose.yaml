@@ -1,0 +1,23 @@
+# source code: https://github.com/filesite-io/machete
+# docker-compose download in linux: https://github.com/docker/compose/releases
+# example for centos 7.*:
+# ```
+# wget "https://github.com/docker/compose/releases/download/v2.32.2/docker-compose-linux-x86_64"
+# chmod +x docker-compose-linux-x86_64
+# ./docker-compose-linux-x86_64 --help
+# ```
+name: filesite_machete
+services:
+    web:
+        build: .
+        ports:
+            - "1080:80"
+        image: "filesite/machete:latest"
+        container_name: filesite_machete
+        volumes:
+            # Cache files will save into ./runtime
+            - "${PWD}/runtime:/var/www/machete/runtime"
+            # 
+            # **[IMPORTANT]**
+            # Change this path (${PWD}/wwww/girls) to your photos' directory
+            - "${PWD}/www/girls:/var/www/machete/www/girls/"
