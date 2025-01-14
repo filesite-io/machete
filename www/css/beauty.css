@@ -51,7 +51,6 @@ a:link{text-decoration:none}
 .navbar .navbar-toggle:focus,
 .navbar .navbar-toggle:hover{background:none}
 .nb_right{padding:10px 13px 0 0}
-.nb_right .iconr2{margin:3px 0 0 10px}
 
 .navbar-fixed-left{
     position: fixed;
@@ -69,8 +68,8 @@ a:link{text-decoration:none}
 .navbar-fixed-left .active a{background-color:#e7e7e7;color:#555}
 .lampshow .navbar-fixed-left{background-color:#222}
 .lampshow .navbar-fixed-left a{color:#DDD}
-.lampshow .navbar-fixed-left .active a{background-color:#e7e7e7;color:#555}
-.lampshow .navbar-fixed-left a:hover{background-color:#CCC;color:#444}
+.lampshow .navbar-fixed-left .active a{background-color:#5c5858;color:#CCC}
+.lampshow .navbar-fixed-left a:hover{background-color:#6d5d5d;color:#BBB}
 
 .img_main{min-height:510px;margin-left:160px}
 .im_mainl{margin:0 10px 12px 10px}
@@ -90,11 +89,13 @@ a:link{text-decoration:none}
 
 .navbar-fixed-left .menu-title{font-size:12px;color:#999;padding-left:5px}
 .navbar-fixed-left .menu-icon{vertical-align:text-top}
-.navbar-fixed-left .expand-icon{position:fixed;top:54px;left:130px;cursor:pointer;padding:5px}
+.navbar-fixed-left .expand-icon{position:fixed;top:54px;left:140px;cursor:pointer;padding:5px}
 .navbar-fixed-left.closed{width:28px;overflow:hidden}
 .navbar-fixed-left.closed li{display:none}
 .navbar-fixed-left.closed li.expand-icon{display:block;left:5px}
 .expand-icon img{background-color:#FFF;border-radius:9px;border:1px solid #FFF}
+.expand-icon button{padding:1px 2px}
+.expand-icon button:focus{border:none;outline-offset:0}
 .img_main.full{margin-left:28px}
 
 .locked_dir{position:absolute;right:3px;top:5px}
@@ -187,6 +188,15 @@ a:link{text-decoration:none}
 .has-slideshow.is-idle .fancybox__toolbar{display:none}
 .has-slideshow.is-idle .fancybox__slide.has-image>.fancybox__content{width:100% !important;height:100% !important}
 
+.light-switcher{display:inline-block;margin:0 10px;padding:3px}
+
+a:focus,button.btn:focus{outline-color:lightblue}
+.lampshow .nav>li>a:focus,.lampshow .navbar-fixed-left a:focus{background-color:lightgray;color:#444}
+.im_item a:focus{outline:none;border:2px solid blue;border-radius:12px}
+.lampshow .im_item a:focus{border-color:orange}
+.lampshow .expand-icon button:focus{background-color:lightgray}
+
+
 
 /* 主题切换 */
 .lampshow .web_info{border-color:#363636}
@@ -194,7 +204,7 @@ a:link{text-decoration:none}
 .lampshow .right_sidebox{background-color:#222;color:#FFF}
 .lampshow .right_sidebox>h5{border-color: #363636}
 .lampshow .text_dark{color:#808080}
-.lampshow .text_dark a, .lampshow .nav-tabs a{color:#f4f7fd}
+.lampshow .text_dark a, .lampshow .nav a{color:#f4f7fd}
 .lampshow .nav-tabs a:hover{background-color:#CCC;color:#444}
 .lampshow .othervideos{background-color:inherit}
 .lampshow .btn-default{background-color:#EEE}
@@ -203,6 +213,7 @@ a:link{text-decoration:none}
 .lampshow .audio-item .title{color:#999}
 .lampshow .audio-list-item .im_img{opacity:0.65}
 .lampshow .audio-list-item .title{color:#999}
+.lampshow .markdown-body .highlight pre, .lampshow .markdown-body pre{color:#999}
 
 
 @media screen and (max-width: 1199px) {

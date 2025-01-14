@@ -45,13 +45,13 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
                 }else {
                 ?>
                 <span>&copy;2022 - <?=date('Y')?></span>
-                by <a href="https://filesite.io/" target="_blank">FileSite.io</a>
+                by <a href="https://filesite.io/" target="_blank" tabindex="-1">FileSite.io</a>
                 <br>
                 <?php if (!empty(FSC::$app['config']['theme'])) { ?>
                     当前皮肤 <strong><?php echo FSC::$app['config']['theme']; ?></strong>
                     - 执行耗时: {page_time_cost} ms
                 <?php } ?>
-                <br>友情链接：<a href="https://tajian.tv" target="_blank">Ta荐 - 你的聚宝盆</a>
+                <br>友情链接：<a href="https://tajian.tv" target="_blank" tabindex="-1">Ta荐 - 你的聚宝盆</a>
             <?php } ?>
             </p>
         </footer>
@@ -61,7 +61,7 @@ require_once __DIR__ . '/../../../../plugins/Html.php';
         <div class="right_sidebox right_sideboxJS elementNone">
             <h5>
                 <span>关于我们</span>
-                <a class="rtcloseJS" href="javascript:;">
+                <a class="rtcloseJS" href="javascript:;" tabindex="-1">
                     <img class="icon svgimg verMiddle" src="/img/beauty/clos.svg" alt="关闭" title="关闭">
                 </a>
             </h5>

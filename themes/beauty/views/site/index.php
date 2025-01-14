@@ -39,13 +39,13 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
                 <?php } ?>
                 <img class="svg icon1 svgimg lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
                 <img class="icon1 svg connectmeJS svgimg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
-                <button type="button" class="collapsed mr_button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <button type="button" class="collapsed mr_button" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false" tabindex="-1">
                     <span class="sr-only">Toggle navigation</span>
                     <img class="svg icon1 svgimg verMiddle" src="/img/beauty/navshow.svg" alt="展开列表" title="展开列表">
                 </button>
             </div>
 
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/" tabindex="-1">
                 <span class="verMiddle"><?php echo $pageTitle; ?></span>
             </a>
         </div>
@@ -55,8 +55,10 @@ $main_view_cls = $menu_ext_status == 'opened' ? '' : 'full';
                 <?php if (!empty($viewData['isAdminIp'])) { ?>
                 <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
                 <?php } ?>
-                <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
-                <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
+                <a href="javascript:;" class="light-switcher lampJS">
+                    <img class="svg icon1 svgimg verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
+                </a>
+                <img class="icon1 svg connectmeJS svgimg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
             </div>
             
             <?php /*
@@ -147,7 +149,11 @@ eof;
                     }
                 }
                 ?>
-                <li class="expand-icon hidden-xs" data-status="<?=$menu_ext_status?>"><img src="/img/beauty/<?=$menu_expand_icon_url?>" width="18" alt="arrow"></li>
+                <li class="expand-icon hidden-xs" data-status="<?=$menu_ext_status?>">
+                    <button class="btn btn-default btn-xs">
+                        <img src="/img/beauty/<?=$menu_expand_icon_url?>" width="100%" alt="arrow">
+                    </button>
+                </li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -196,14 +202,14 @@ echo <<<eof
     <div class="breadcrumbs text_dark">
         {$totalNum}
         <small>当前位置：</small>
-        <a href="/">首页</a>
+        <a href="/" tabindex="-1">首页</a>
 eof;
 
 if (!empty($breadcrumbs)) {
     foreach ($breadcrumbs as $bread) {
         if ($bread['id'] != $selectedId) {
             echo <<<eof
-        / <a href="{$bread['url']}">{$bread['name']}</a>
+        / <a href="{$bread['url']}" tabindex="-1">{$bread['name']}</a>
 eof;
         } else {
             echo <<<eof
@@ -548,7 +554,7 @@ eof;
     </div>
 </div>
 
-<div class="text-center">
+<div class="text-center pagination-con">
 <?php
 if ($total > $viewData['pageSize']) {
     $pagination = Html::getPaginationHtmlCode($viewData['page'], $viewData['pageSize'], $total);

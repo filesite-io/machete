@@ -11,7 +11,7 @@
                 <img class="svg icon1 svgimg lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
             </div>
 
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/" tabindex="-1">
                 <span class="verMiddle">正在播放</span>
             </a>
             <span class="navbar-text videotitle"><?php echo !empty($viewData['videoName']) ? $viewData['videoName'] : $viewData['videoFilename']; ?></span>

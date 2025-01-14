@@ -5,6 +5,71 @@
 //关闭videojs的ga统计
 window.HELP_IMPROVE_VIDEOJS = false;
 
+//fancybox自定义显示原图按钮
+var customToolbar_show1to1 = {
+    tpl: $('#btn_show1to1_tmp').html(),
+    click: function() {
+        var fancybox = this.instance;
+        var slide = fancybox.getSlide();
+
+        if (slide.src == slide.downloadSrc) {
+            slide.panzoom.toggleZoom();
+            return false;
+        }
+
+        fancybox.showLoading(slide);
+        //如果没有自动显示loading图标，主动加上
+        if ($(slide.el).find('.fancybox-spinner').length == 0) {
+            var spinner = '<div class="f-spinner fancybox-spinner"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20"></circle><circle cx="25" cy="25" r="20"></circle></svg></div>';
+            $(spinner).insertBefore(slide.contentEl);
+        }
+
+        $(slide.imageEl).one('load', function() {
+            //console.log('image loaded');
+            fancybox.hideLoading(slide);
+            $(slide.el).find('.fancybox-spinner').remove();
+            slide.panzoom.toggleZoom();
+        });
+
+        slide.src = slide.downloadSrc;
+        slide.imageEl.src = slide.downloadSrc;
+    }
+};
+var fancyboxToolbar = {
+    items: {'show1to1': customToolbar_show1to1},
+    display: {
+        left: ["infobar"],
+        middle: [
+            "zoomIn",
+            "zoomOut",
+            "show1to1",
+            "rotateCCW",
+            "rotateCW",
+            "flipX",
+            "flipY",
+            "fitX",
+            "fitY",
+            "reset"
+        ],
+        right: ["slideshow", "fullscreen", "thumbs", "download", "close"],
+    },
+};
+if ($(window).width() < 640) {  //小屏幕只显示部分按钮
+    fancyboxToolbar = {
+        items: {'show1to1': customToolbar_show1to1},
+        display: {
+            left: ["infobar"],
+            middle: [
+                "zoomIn",
+                "zoomOut",
+                "show1to1",
+                "rotateCW"
+            ],
+            right: ["download", "close"]
+        }
+    };
+}
+
 if ($('#image_site').get(0)) {
 
     //获取下一页图片/视频json数据
@@ -85,72 +150,7 @@ if ($('#image_site').get(0)) {
         }, 1000);
     };
 
-    //自定义显示原图按钮
-    var customToolbar_show1to1 = {
-        tpl: $('#btn_show1to1_tmp').html(),
-        click: function() {
-            var fancybox = this.instance;
-            var slide = fancybox.getSlide();
-
-            if (slide.src == slide.downloadSrc) {
-                slide.panzoom.toggleZoom();
-                return false;
-            }
-
-            fancybox.showLoading(slide);
-            //如果没有自动显示loading图标，主动加上
-            if ($(slide.el).find('.fancybox-spinner').length == 0) {
-                var spinner = '<div class="f-spinner fancybox-spinner"><svg viewBox="0 0 50 50"><circle cx="25" cy="25" r="20"></circle><circle cx="25" cy="25" r="20"></circle></svg></div>';
-                $(spinner).insertBefore(slide.contentEl);
-            }
-
-            $(slide.imageEl).one('load', function() {
-                console.log('image loaded');
-                fancybox.hideLoading(slide);
-                $(slide.el).find('.fancybox-spinner').remove();
-                slide.panzoom.toggleZoom();
-            });
-
-            slide.src = slide.downloadSrc;
-            slide.imageEl.src = slide.downloadSrc;
-        }
-    };
-
     // 图片浏览
-    var fancyboxToolbar = {
-        items: {'show1to1': customToolbar_show1to1},
-        display: {
-            left: ["infobar"],
-            middle: [
-                "zoomIn",
-                "zoomOut",
-                "show1to1",
-                "rotateCCW",
-                "rotateCW",
-                "flipX",
-                "flipY",
-                "fitX",
-                "fitY",
-                "reset"
-            ],
-            right: ["slideshow", "fullscreen", "thumbs", "download", "close"],
-        },
-    };
-    if ($(window).width() < 640) {  //小屏幕只显示部分按钮
-        fancyboxToolbar = {
-            items: {'show1to1': customToolbar_show1to1},
-            display: {
-                left: ["infobar"],
-                middle: [
-                    "zoomIn",
-                    "zoomOut",
-                    "show1to1",
-                    "rotateCW"
-                ],
-                right: ["download", "close"]
-            }
-        };
-    }
     Fancybox.bind('[data-fancybox]', {
         Toolbar: fancyboxToolbar,
         loop: true,
@@ -990,4 +990,178 @@ $('.btnStartScan').click(function() {
         alert('文件扫描开始失败，错误信息：' + errorThrown);
         console.error('文件扫描开始失败，错误信息：' + errorThrown);
     });
+});
+
+/* tv remote control event handle */
+//remote control key codes
+var RC_LEFT = 37;
+    RC_UP = 38;
+    RC_RIGHT = 39;
+    RC_DOWN = 40;
+    RC_ENTER = 13;
+
+    RC_PLAY_PC = 80,    //Key p
+    RC_STOP_PC = 83,    //Key s
+
+    //tv only
+    RC_PLAY = 415,
+    RC_STOP = 413;
+
+
+//support a and button
+var getNextSibling = function(el, way) {
+    var next = null;
+    var tagName = el.tagName.toLowerCase();
+    if (way == 'right' && $(el).parents('.img_main').length > 0) {
+        next = tagName == 'a' ? $(el).parent().next() : $(el).next();
+    }else if (way == 'right' && $(el).parents('.navbar-fixed-left').length > 0) {
+        next = $('.img_main li a').first();
+        if (next.length > 0) {
+            next.focus();
+        }
+    }else if (way == 'right' && $(el).parents('.pagination-con').length > 0) {
+        next = $(el).parent().nextAll('li:not(.disabled)').not('.active').first();
+    }else if (way == 'left' && $(el).parents('.pagination-con').length > 0) {
+        next = $(el).parent().prevAll('li:not(.disabled)').not('.active').first();
+    }else if (way == 'up' && $(el).parents('.pagination-con').length > 0) {
+        next = $('.img_main .im_item').last();
+    }else if (way == 'left' && $(el).parents('.img_main').length > 0) {
+        next = tagName == 'a' ? $(el).parent().prev() : $(el).prev();
+
+        if (next.length == 0) {
+            next = $('.navbar-fixed-left li a').first();
+            if (next.length > 0) {
+                next.focus();
+            }
+        }
+    }else if (way == 'up' && $(el).parents('.navbar-fixed-left').length > 0) {
+        next = tagName == 'a' ? $(el).parent().prevAll('li:not(.menu-title)').first() : $(el).prev();
+    }else if (way == 'up' && $(el).parents('.img_main').length > 0) {
+        if ($(el).parent('li').length > 0) {
+            next = $(el).parents('ul').prevAll('.nav').find('li').first();
+            if (next.length == 0) {
+                //next = $(el).parents('ul').prev('.im_mainl').find('.im_item').first();
+                if ($(el).parents('.im_mainl').length > 0) {
+                    next = $(el).parents('ul').first().prevAll('.im_item').first();
+                }else {
+                    next = $(el).parents('ul').first().prevAll('.im_mainl').find('.im_item').first();
+                }
+            }
+        }else if ($(el).parent('.im_item').length > 0) {
+            next = $(el).parent().prevAll('.im_item');       //6 images in one row
+            if (next.length >= 6) {
+                next = $(next.get(5));
+            }else {
+                next = null;
+            }
+
+            if (!next) {
+                next = $(el).parent('.im_item').prevAll('ul').first().find('li').first();
+                if (next.length == 0) {
+                    next = $(el).parents('.im_mainl').prevAll('.nav').first().find('li.active');
+                }
+            }
+        }
+
+        if (next && next.length == 0) {
+            next = $('.light-switcher').parent();
+        }
+    }else if (way == 'down' && $(el).parents('.navbar-fixed-left').length > 0) {
+        next = tagName == 'a' ? $(el).parent().nextAll('li:not(.menu-title)').first() : $(el).next();
+    }else if (way == 'down' && $(el).parents('.img_main').length > 0) {
+        if ($(el).parent('li').length > 0) {
+            next = $(el).parents('ul').nextAll('.nav').find('li').first();
+            if (next.length == 0) {
+                if ($(el).parents('.im_mainl').length > 0) {
+                    next = $(el).parents('ul').first().nextAll('.im_item').first();
+                }else {
+                    next = $(el).parents('ul').first().nextAll('.im_mainl').find('.im_item').first();
+                }
+            }
+        }else if ($(el).parent('.im_item').length > 0) {
+            next = $(el).parent().nextAll('.im_item');       //6 images in one row
+            if (next.length >= 6) {
+                next = $(next.get(5));
+            }else {
+                next = null;
+            }
+
+            if (!next && $(el).parents('.im_mainl').nextAll('.nav').length > 0) {
+                next = $(el).parents('.im_mainl').nextAll('.nav').first().find('li.active');
+            }else if (!next && $('div.pagination-con').length > 0) {
+                next = $('div.pagination-con').find('li.active').next();
+            }
+        }
+    }else if (way == 'down' && $(el).hasClass('light-switcher')) {
+        next = $('.im_item').first();
+        console.log('light switcher');
+    }
+
+    if (next && next.length > 0) {
+        next = next.find(tagName);
+    }
+
+    return next;
+};
+
+var keyPress = function(way) {
+    var focusedEl = $(':focus');
+    if (focusedEl.length == 0) {
+        //get img el first
+        focusedEl = $('.im_item a').first();
+
+        //get nav item second
+        if (focusedEl.length == 0) {
+            focusedEl = $('.img_main li.active a').first();
+            focusedEl.focus();
+        }else {
+            focusedEl.focus();
+            return;
+        }
+    }
+
+    if (focusedEl.length > 0) {
+        var next = getNextSibling(focusedEl.get(0), way);
+        if (next) {
+            next.focus();
+        }else {
+            console.warn('No next sibling');
+        }
+    }else {
+        console.warn('No focused element');
+    }
+};
+
+//handle key press
+$(document.body).on('keydown', function(e) {
+    //console.log('Key pressed', e.keyCode);
+
+    if (e.keyCode == RC_RIGHT) {
+        keyPress('right');
+    }else if (e.keyCode == RC_LEFT) {
+        keyPress('left');
+    }else if (e.keyCode == RC_UP) {
+        keyPress('up');
+    }else if (e.keyCode == RC_DOWN) {
+        keyPress('down');
+    }else if (e.keyCode == RC_PLAY || e.keyCode == RC_PLAY_PC) {
+        //play images
+        var fancybox = Fancybox.getInstance();
+        if (fancybox) {
+            var autoplay = fancybox.plugins.Slideshow.ref;
+            autoplay.start();
+        //}else {
+            //Fancybox.fromSelector('[data-fancybox]');
+        }
+    }else if (e.keyCode == RC_STOP || e.keyCode == RC_STOP_PC) {
+        //stop play images
+        var fancybox = Fancybox.getInstance();
+        if (fancybox) {
+            var autoplay = fancybox.plugins.Slideshow.ref;
+            autoplay.stop();
+            if (e.keyCode == RC_STOP) {
+                fancybox.close();
+            }
+        }
+    }
 });

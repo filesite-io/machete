@@ -44,7 +44,7 @@ $cacheData = !empty($viewData['cacheData']) ? $viewData['cacheData'] : [];
                 </button>
             </div>
 
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/" tabindex="-1">
                 <span class="verMiddle"><?php echo $pageTitle; ?></span>
             </a>
         </div>
@@ -54,8 +54,10 @@ $cacheData = !empty($viewData['cacheData']) ? $viewData['cacheData'] : [];
                 <?php if (!empty($viewData['isAdminIp'])) { ?>
                 <img class="svg icon1 svgimg verMiddle cleanCacheJS" src="/img/beauty/refresh.svg" alt="清空缓存数据" title="刷新缓存数据" style="padding-top:2px;margin-top:2px">
                 <?php } ?>
-                <img class="svg icon1 svgimg iconr2 lampJS verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
-                <img class="icon1 svg connectmeJS svgimg iconr2 verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们" />
+                <a href="javascript:;" class="light-switcher lampJS">
+                    <img class="svg icon1 svgimg verMiddle" src="/img/beauty/buld.svg" alt="点击关灯/开灯" title="点击关灯/开灯">
+                </a>
+                <img class="icon1 svg connectmeJS svgimg verMiddle" src="/img/beauty/contactUs.svg" alt="联系我们" title="联系我们">
             </div>
 
             <!--侧边栏-->
@@ -131,7 +133,11 @@ eof;
                     }
                 }
                 ?>
-                <li class="expand-icon hidden-xs" data-status="<?=$menu_ext_status?>"><img src="/img/beauty/<?=$menu_expand_icon_url?>" width="18" alt="arrow"></li>
+                <li class="expand-icon hidden-xs" data-status="<?=$menu_ext_status?>">
+                    <button class="btn btn-default btn-xs">
+                        <img src="/img/beauty/<?=$menu_expand_icon_url?>" width="18" alt="arrow">
+                    </button>
+                </li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -168,7 +174,7 @@ echo <<<eof
     <div class="breadcrumbs text_dark">
         {$totalNum}
         <small>当前位置：</small>
-        <a href="/">首页</a>
+        <a href="/" tabindex="-1">首页</a>
 eof;
 
 $breadcrumbs = !empty($viewData['breadcrumbs']) ? $viewData['breadcrumbs'] : [];
@@ -176,7 +182,7 @@ if (!empty($breadcrumbs)) {
     foreach ($breadcrumbs as $bread) {
         if ($bread['id'] != $selectedId) {
             echo <<<eof
-        / <a href="{$bread['url']}">{$bread['name']}</a>
+        / <a href="{$bread['url']}" tabindex="-1">{$bread['name']}</a>
 eof;
         } else {
             echo <<<eof
@@ -442,7 +448,7 @@ eof;
     </div><!--im_mainl-->
 </div><!--img_main-->
 
-<div class="text-center">
+<div class="text-center pagination-con">
 <?php
 if ($total > $viewData['pageSize']) {
     $pagination = Html::getPaginationHtmlCode($viewData['page'], $viewData['pageSize'], $total);

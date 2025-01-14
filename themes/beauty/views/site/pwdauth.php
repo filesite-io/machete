@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <!-- Brand and toggle get grouped for better mobile display navbar-inverse-->
         <div class="navbar-header">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand" href="/" tabindex="-1">
                 <span class="verMiddle"><?php echo $pageTitle; ?></span>
             </a>
         </div>
