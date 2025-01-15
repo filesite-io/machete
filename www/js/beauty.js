@@ -1002,6 +1002,10 @@ var RC_LEFT = 37;
 
     RC_PLAY_PC = 80,    //Key p
     RC_STOP_PC = 83,    //Key s
+    RC_FULL_PC = 70,    //Key f
+    RC_ZOOM_OUT_PC = 187,   //Key +
+    RC_ZOOM_IN_PC = 189,    //key -
+    RC_ZOOM_1v1_PC = 79,    //key o
 
     //tv only
     RC_PLAY = 415,
@@ -1125,10 +1129,10 @@ var keyPress = function(way) {
         if (next) {
             next.focus();
         }else {
-            console.warn('No next sibling');
+            //console.warn('No next sibling');
         }
     }else {
-        console.warn('No focused element');
+        //console.warn('No focused element');
     }
 };
 
@@ -1137,15 +1141,19 @@ $(document.body).on('keydown', function(e) {
     //console.log('Key pressed', e.keyCode);
 
     if (e.keyCode == RC_RIGHT) {
+        e.preventDefault();
         keyPress('right');
     }else if (e.keyCode == RC_LEFT) {
+        e.preventDefault();
         keyPress('left');
     }else if (e.keyCode == RC_UP) {
+        e.preventDefault();
         keyPress('up');
     }else if (e.keyCode == RC_DOWN) {
+        e.preventDefault();
         keyPress('down');
     }else if (e.keyCode == RC_PLAY || e.keyCode == RC_PLAY_PC) {
-        //play images
+        //autoplay images
         var fancybox = Fancybox.getInstance();
         if (fancybox) {
             var autoplay = fancybox.plugins.Slideshow.ref;
@@ -1162,6 +1170,26 @@ $(document.body).on('keydown', function(e) {
             if (e.keyCode == RC_STOP) {
                 fancybox.close();
             }
+        }
+    }else if (e.keyCode == RC_FULL_PC) {
+        var fancybox = Fancybox.getInstance();
+        if (fancybox) {
+            fancybox.toggleFullscreen();
+        }
+    }else if (e.keyCode == RC_ZOOM_OUT_PC) {
+        var fancybox = Fancybox.getInstance();
+        if (fancybox) {
+            fancybox.getSlide().panzoom.zoomIn();
+        }
+    }else if (e.keyCode == RC_ZOOM_IN_PC) {
+        var fancybox = Fancybox.getInstance();
+        if (fancybox) {
+            fancybox.getSlide().panzoom.zoomOut();
+        }
+    }else if (e.keyCode == RC_ZOOM_1v1_PC) {
+        var fancybox = Fancybox.getInstance();
+        if (fancybox) {
+            $('.btn-original-1v1').click();
         }
     }
 });
