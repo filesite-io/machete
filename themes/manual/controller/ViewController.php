@@ -36,7 +36,7 @@ Class ViewController extends Controller {
             $html = $scanner->fixMDUrls($readmeFile['realpath'], $html);
 
             $publishTime = Common::getFileCreateTime($readmeFile);
-            $updateTime = $readmeFile['fstat']['atime'];
+            $updateTime = $readmeFile['fstat']['mtime'];
             if (!empty($readmeFile['author'])) {
                 $author = $readmeFile['author'];
             }
