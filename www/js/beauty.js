@@ -5,6 +5,44 @@
 //关闭videojs的ga统计
 window.HELP_IMPROVE_VIDEOJS = false;
 
+// Create a reference for the Wake Lock.
+var wakeLock = null;
+
+var keepScreenWake = async function() {
+    // create an async function to request a wake lock
+    try {
+        if ("wakeLock" in navigator) {
+            wakeLock = await navigator.wakeLock.request("screen");
+            //console.log("Wake Lock is active!");
+        }else {
+            console.warn('Wake lock is not supported by this browser.');
+        }
+    } catch (err) {
+        // The Wake Lock request has failed - usually system related, such as battery.
+        console.error('Wake Lock request has failed', err.name, err.message);
+    }
+};
+
+var releaseWakeLock = function() {
+    try {
+        if (wakeLock) {
+            wakeLock.release().then(() => {
+                wakeLock = null;
+                //console.log("Wake Lock has been released!");
+            });
+        }
+    }catch(err) {
+        console.error('Wake Lock release has failed', err.name, err.message);
+    }
+};
+
+//Reacquiring a wake lock
+document.addEventListener("visibilitychange", async function() {
+    if (wakeLock !== null && document.visibilityState === "visible") {
+        await keepScreenWake();
+    }
+});
+
 //fancybox自定义显示原图按钮
 var customToolbar_show1to1 = {
     tpl: $('#btn_show1to1_tmp').html(),
@@ -165,9 +203,11 @@ if ($('#image_site').get(0)) {
                 $('.fancybox__footer .fancybox__thumbs').addClass('is-masked'); //hide thumbs
                 refreshFancyBoxStatus = 'on';
                 autoRefreshFancybox(fancybox);
+                keepScreenWake();
             },
             endSlideshow: function(fancybox) {
                 refreshFancyBoxStatus = 'off';
+                releaseWakeLock();
             }
         }
     });
@@ -529,7 +569,7 @@ if ($('#pr-player').length > 0 && typeof(videojs) != 'undefined') {
             //区分media类型，视频生成快照，音乐只获取时长
             var mediaType = myPlayer.currentType();
             if (mediaType.indexOf('mp3') > -1) {
-                console.log('media type', mediaType);
+                //console.log('media type', mediaType);
             }else {
                 var height = myPlayer.videoHeight(), width = myPlayer.videoWidth(),
                     aspect = height / width;
@@ -1098,7 +1138,7 @@ var getNextSibling = function(el, way) {
         }
     }else if (way == 'down' && $(el).hasClass('light-switcher')) {
         next = $('.im_item').first();
-        console.log('light switcher');
+        //console.log('light switcher');
     }
 
     if (next && next.length > 0) {
@@ -1158,8 +1198,7 @@ $(document.body).on('keydown', function(e) {
         if (fancybox) {
             var autoplay = fancybox.plugins.Slideshow.ref;
             autoplay.start();
-        //}else {
-            //Fancybox.fromSelector('[data-fancybox]');
+            keepScreenWake();
         }
     }else if (e.keyCode == RC_STOP || e.keyCode == RC_STOP_PC) {
         //stop play images
@@ -1167,6 +1206,7 @@ $(document.body).on('keydown', function(e) {
         if (fancybox) {
             var autoplay = fancybox.plugins.Slideshow.ref;
             autoplay.stop();
+            releaseWakeLock();
             if (e.keyCode == RC_STOP) {
                 fancybox.close();
             }
