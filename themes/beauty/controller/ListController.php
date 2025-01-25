@@ -193,6 +193,13 @@ Class ListController extends Controller {
         //当前目录数据
         $subcate = !empty($scanResults[$cateId]) ? $scanResults[$cateId] : array();
 
+        //支持子目录下的MP3音乐优先
+        $mp3FileInSubcate = $scanner->getDefaultFile('mp3');
+        if (!empty($mp3FileInSubcate)) {
+            $mp3File = $mp3FileInSubcate;
+        }
+
+
         //翻页支持
         $page = $this->get('page', 1);
         $pageSize = $this->get('limit', FSC::$app['config']['default_page_size']);
