@@ -9,10 +9,86 @@ require_once __DIR__ . '/../../../plugins/TajianStats.php';
 
 Class SiteController extends Controller {
 
+    //广告跟踪，通过cookie保存广告参数
+    protected function trackAdParameters() {
+        if (empty(FSC::$app['config']['ad_tracker']) || empty(FSC::$app['config']['ad_tracker']['enable'])) {
+            return false;
+        }
+
+        $params = FSC::$app['config']['ad_tracker']['parameters'];
+        if (empty($params)) {
+            return false;
+        }
+
+        $adParaData = array();
+        foreach ($params as $key) {
+            $val = $this->get($key);
+            if (!empty($val)) {
+                $adParaData[$key] = $val;
+            }
+        }
+
+        if (!empty($adParaData)) {
+            //30天内有效
+            setcookie('ad_tracker', json_encode($adParaData), time() + 86400*30, '/');
+        }
+    }
+
+    //广告跟踪回调
+    protected function adTrackPostBack() {
+        if (empty(FSC::$app['config']['ad_tracker']) || empty(FSC::$app['config']['ad_tracker']['enable'])) {
+            return false;
+        }
+
+        $params = FSC::$app['config']['ad_tracker']['parameters'];
+        if (empty($params)) {
+            return false;
+        }
+
+        $postbackApi = FSC::$app['config']['ad_tracker']['postbackApi'];
+        if (empty($postbackApi)) {
+            return false;
+        }
+
+        //为追加get参数做准备
+        if (strpos($postbackApi, "?") === false) {
+            $postbackApi .= "?timestamp=" . time();
+        }
+
+        //从cookie中获取跟踪到的广告参数
+        $adParaDataFromCookie = !empty($_COOKIE['ad_tracker']) ? json_decode( urldecode($_COOKIE['ad_tracker']), true ) : array();
+
+        //用记录下来的广告参数值替换回调API中的变量
+        $postbackParaMap = FSC::$app['config']['ad_tracker']['postbackParaMap'];
+        if (!empty($postbackParaMap)) {
+            foreach ($postbackParaMap as $find => $replace) {
+                if (!empty($adParaDataFromCookie[$replace])) {
+                    $postbackApi = str_replace("{{$find}}", $adParaDataFromCookie[$replace], $postbackApi);
+                }
+            }
+        }
+
+        //把广告参数追加到回调API网址中
+        /*
+        foreach($adParaDataFromCookie as $key => $val) {
+            $postbackApi .= "&{$key}=" . urlencode($val);
+        }
+        */
+
+        //GET方式请求回调API
+        $timeout = 10;
+        return $this->request($postbackApi, null, $timeout);
+    }
+
+    //增加cookie跟踪同意/不同意选择，确保用户知道cookie跟踪了哪些数据
+    //在3个页面显示cookies协议：首页、注册、登录
     public function actionIndex() {
         if (function_exists('mb_strlen') == false) {
             throw new Exception('Please install php extension php-mbstring first!', 500);
         }
+
+        //只在广告着陆页跟踪广告参数
+        $this->trackAdParameters();
 
         //如果没有开启多用户支持，或者当前用户不为空
         if (empty(FSC::$app['config']['multipleUserUriParse']) || !empty(FSC::$app['user_id'])) {

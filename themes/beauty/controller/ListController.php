@@ -104,9 +104,9 @@ Class ListController extends Controller {
             $files = array();
             $dir_exts = array();
             foreach ($scanResults as $id => $item) {
-                if (!empty($item['directory'])) {
+                if (strlen($item['directory']) > 0) {
                     array_push($dirs, $item);
-                }else if (!empty($item['filename'])) {
+                }else if (strlen($item['filename']) > 0) {
                     array_push($files, $item);
                 }else {
                     $dir_exts = array_merge($item, $dir_exts);
@@ -137,7 +137,7 @@ Class ListController extends Controller {
 
         //获取根目录下的readme
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $expireSeconds = 86400;
+        $expireSeconds = 86400 * 365;
         $readmeFile = Common::getCacheFromFile($cacheKey, $expireSeconds);
         if (!empty($readmeFile)) {
             $htmlReadme = $readmeFile['htmlReadme'];
@@ -465,6 +465,7 @@ Class ListController extends Controller {
 
         //获取根目录下的readme
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
+        $expireSeconds = 86400 * 365;
         $readmeFile = Common::getCacheFromFile($cacheKey, $expireSeconds);
         if (!empty($readmeFile)) {
             $htmlReadme = $readmeFile['htmlReadme'];

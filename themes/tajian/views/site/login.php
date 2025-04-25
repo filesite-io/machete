@@ -8,7 +8,7 @@
             <label for="text_input_sm" class="form-label">验证码</label>
             <input id="text_input_sm" name="smscode" placeholder="输入收到的短信验证码" type="number">
             <button class="smsbtn bt_sms_JS button button-sm button-shadow">发送验证码</button>
-            <p><small>如发送后 20 秒内没收到，请稍后重新发送</small></p>
+            <p><small class="sms_tip_JS">验证码当天有效，收到请保留 24 小时</small></p>
         </div>
         <div class="avform_bt vercenter">
             <button class="jsbtn" aria-label="登录" type="submit">
@@ -30,3 +30,5 @@
         </div>
     </form>
 </main>
+
+<?php include_once __DIR__ . '/cookies_accept.php'; ?>

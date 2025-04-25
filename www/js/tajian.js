@@ -17,6 +17,9 @@ var taJian = {
         shareFav2Friend: '/frontapi/sharedir',                  //共享收藏夹给朋友
         deleteSharedFav: '/frontapi/delsharedir',               //取消共享收藏夹给朋友
 
+        adPostback: '/frontapi/adpostback',                     //广告跟踪回传
+        cookiesAccept: '/frontapi/acceptcookies',               //同意或不同意cookies协议
+
         sendSmsCode: '/frontapi/sendsmscode',   //发送短信验证码
         register: '/frontapi/createuser',       //注册
         login: '/frontapi/loginuser'            //登入
@@ -24,9 +27,9 @@ var taJian = {
 };
 
 var publicAjax = function(apiUrl, method, datas, callback, fail) {
-    let self = this;
+    var self = this;
 
-    let Options = {
+    var Options = {
         url: apiUrl,
         method: method,
         data: datas,
@@ -42,9 +45,7 @@ var publicAjax = function(apiUrl, method, datas, callback, fail) {
     $.ajax(Options).done(function(data) {
         callback(data);
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        
         fail(jqXHR, textStatus, errorThrown);
-       
     });
 };
 
@@ -138,17 +139,18 @@ if ($('#add_video_form').get(0)) {
             return false;
         }
         
-        let bt = $(this), btLoading = bt.children('.bt_class_JS'), btText = bt.children('.bt_text_JS');
+        var bt = $(this), btLoading = bt.children('.bt_class_JS'), btText = bt.children('.bt_text_JS');
         btLoading.removeClass('elementNone');
         bt.prop('disabled', true);
         btText.text('提交中...');
 
-        let datas = {
+        var datas = {
             'content': inputList[0].value,
             'tag': selectedTag
         }
 
-        let apiUrl = taJian.debug ? taJian.domain + taJian.apis.addVideos : taJian.apis.addVideos;
+        //var apiUrl = taJian.debug ? taJian.domain + taJian.apis.addVideos : taJian.apis.addVideos;
+        var apiUrl = taJian.apis.addVideos;
         publicAjax(apiUrl, 'POST', datas, function (data) {
             bt.prop('disabled', false);
             btText.text('提交');
@@ -159,7 +161,6 @@ if ($('#add_video_form').get(0)) {
                 }else {
                     $(inputList[0]).val('');
                 }
-                //alert(data.msg || data.err);
             } else {
                 alert(data.err);
             }
@@ -218,6 +219,11 @@ if ($('.bt_sms_JS').get(0)) {
         publicAjax(taJian.apis.sendSmsCode, 'POST', datas, function (data) {
             if (data.code == 0 && data.err) {
                 alert(data.err);
+            }else {
+                $('.sms_tip_JS').text(data.msg);
+                if (typeof(data.autofill) != 'undefined' && data.autofill) {
+                    $('input[name=smscode]').val(data.autofill);
+                }
             }
         }, function (jqXHR, textStatus, errorThrown) {
             alert('网络请求失败，请重试。');
@@ -316,7 +322,6 @@ if ($('#login_form').get(0)) {
             btLoading.addClass('elementNone');
             if (data.code == 1 && data.shareUrl) {
                 btText.text('完成');
-                //alert(data.msg);
                 setTimeout(function() {
                     location.href = data.shareUrl;
                 }, 100);
@@ -726,6 +731,35 @@ if ($('#share_dir_form').get(0)) {
         }
     };
     $('.my_share_dirs .btn-del').click(handle_delete_share);
+}
+
+// 广告跟踪回传
+if ($('.ad_postback_JS').get(0)) {
+    var datas = {};
+    publicAjax(taJian.apis.adPostback, 'POST', datas, function (data) {
+        if (data.code != 1) {
+            console.error('Ad postback error', data.err);
+        }
+    }, function (jqXHR, textStatus, errorThrown) {
+        console.error('Ad postback exception', errorThrown);
+    });
+}
+
+if ($('.cookie-banner').get(0)) {
+    $('.cookie-banner .button').click(function(e) {
+        $('.cookie-banner').addClass('elementNone');
+        var btn = e.target;
+        var datas = {
+            'accept': $(btn).hasClass('button-primary') ? 'yes' : 'no'
+        };
+        publicAjax(taJian.apis.cookiesAccept, 'POST', datas, function (data) {
+            if (data.code != 1) {
+                console.error('Cookie accept error', data.err);
+            }
+        }, function (jqXHR, textStatus, errorThrown) {
+            console.error('Cookie accept exception', errorThrown);
+        });
+    });
 }
 
 })();

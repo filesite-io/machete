@@ -270,7 +270,7 @@ eof;
                 $stats = $this->updateScanStats($dirpath, $scanTotal, $scanIndex);
             }
 
-            sleep(1);
+            sleep(rand(1, 5));
         }
     }
 

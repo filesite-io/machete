@@ -38,7 +38,7 @@ eof;
     <?php
         $imgExts = array('jpg', 'jpeg', 'png', 'gif');
         $videoExts = array('url');
-        $category = $viewData['scanResults'][$selectedId];
+        $category = !empty($viewData['scanResults'][$selectedId]) ? $viewData['scanResults'][$selectedId] : array();
 
         //当前目录的描述介绍
         if (!empty($category['description'])) {

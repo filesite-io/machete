@@ -67,12 +67,16 @@ Class ListController extends SiteController {
         }
 
         //获取目录面包屑
+        $breadcrumbs = $tagItem = array();
         $tagId = $cateId = $this->get('id', '');
-        $tagItem = $tags[$tagId];
-        $breadcrumbs = $this->getBreadcrumbs($scanResults, $tagItem);
 
         //根据tag获取相关数据，并传给视图；调整视图兼容tag的数据结构
         if (!empty($tags)) {
+            if (!empty($tagId) && !empty($tags[$tagId])) {
+                $tagItem = $tags[$tagId];
+                $breadcrumbs = $this->getBreadcrumbs($tagItem);
+            }
+
             foreach($tags as $id => $tag) {
                 $scanResults[$id]['files'] = $this->getTagFiles($tag, $scanResults);
             }
@@ -97,7 +101,7 @@ Class ListController extends SiteController {
     }
 
     //根据目录结构以及当前目录获取面包屑
-    protected function getBreadcrumbs($menus, $tag) {
+    protected function getBreadcrumbs($tag) {
         $breads = array();
 
         array_push($breads, [

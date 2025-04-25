@@ -563,6 +563,8 @@ eof;
     }
 
     //短信验证码 10 分钟内有效
+    //弃用：@2025-04-24
+    //用方法getTodaySmsCode代替，验证码当天有效（00:00:01 - 23:59:59）
     protected function getMySmsCode($cellphone) {
         if(session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
@@ -583,7 +585,45 @@ eof;
         return $rndCode;
     }
 
+    //保存当天最新发送过的验证码
+    //改为根据手机号码保存到缓存文件
+    protected function saveTodaySmsCode($cellphone, $sms_code) {
+        $cacheKey = $cellphone;
+        $cacheDir = 'sms';
+        $date = date('Ymd');
+        $time = time();
+        $data = compact('sms_code', 'date', 'time');
+        return Common::saveCacheToFile($cacheKey, $data, $cacheDir);
+    }
+
+    //获取当天最新发送过的验证码
+    protected function getTodaySmsCode($cellphone) {
+        $cacheKey = $cellphone;
+        $cacheDir = 'sms';
+        $cacheTime = 86400;
+        $cacheData = Common::getCacheFromFile($cacheKey, $cacheTime, $cacheDir);
+        if (empty($cacheData)) {
+            return false;
+        }
+
+        $sms_code = $cacheData['sms_code'];
+        $sms_date = $cacheData['date'];
+        $sms_created = $cacheData['time'];
+        $today = date('Ymd');
+
+        if ($today == $sms_date && !empty($sms_code)) {
+            return $sms_code;
+        }
+
+        return false;
+    }
+
     //获取短信验证码
+    //@2025-04-24 调整发送逻辑，发送前，先查询当天发送详情，从而限制一个手机号码每天最多2次发送验证码的机会
+    //查询结果判断
+    //rescode == 2 当天发送过，但是失败了，直接返回验证码，帮用户填上
+    //rescode == 3 当天发送过，且成功了，需要用户自己填（暂不实现：考虑用户删除了验证码短信，可在距离上一次发送超1小时后当天再给用户一次获取验证码的机会）
+    //rescode == 0 当天没发送过，则发送验证码
     public function actionSendsmscode() {
         $ip = $this->getUserIp();
         $check_key = "sendsmscode_{$ip}";
@@ -598,8 +638,10 @@ eof;
 
         //返回给视图的变量
         $code = 0;
+        $rescode = -1;      //短信发送详情结果：-1 默认值，0 - 未发送，1 - 发送中，2 - 发送失败，3 - 发送成功
         $msg = '';
         $err = '';
+        $autofill = '';     //自动帮用户填上验证码
 
         $postParams = $this->post();
         if (!empty($postParams)) {
@@ -620,36 +662,74 @@ eof;
                 }
 
 
-                //尝试发送短信验证码
+                //获取当天最新发送过的验证码
+                $sms_code = $this->getTodaySmsCode($cellphone);
+                if (empty($sms_code)) {
+                    $sms_code = $this->generateRandSmsCode($cellphone);
+                    $this->saveTodaySmsCode($cellphone, $sms_code);
+                }
+
                 $params = array(
                     'phoneNumber' => $cellphone,
-                    'codeNumber' => $this->generateRandSmsCode($cellphone),
                     'action' => $action,
                 );
                 $params['sign'] = $this->sign($params, FSC::$app['config']['service_3rd_api_key']);
-
-                $api = FSC::$app['config']['service_3rd_api_domain'] . '/aliyun/sendverifycode/';
                 $timeout = 30;      //api请求超时时长
-                $pc = false;
-                $headers = array("Content-Type: application/json");
                 //以json格式post数据
-                $res = $this->request($api, json_encode($params), $timeout, $pc, $headers);
+                $headers = array("Content-Type: application/json");
+                $pc = false;
 
-                if (!empty($res) && $res['status'] == 200) {
-                    $resData = json_decode($res['result'], true);
+
+                //发送之前先查询当天该手机号码的发送情况，并根据发送结果来决定是否发送验证码短信
+                $api_query = FSC::$app['config']['service_3rd_api_domain'] . '/aliyun/querysendresult/';
+                $res_query = $this->request($api_query, json_encode($params), $timeout, $pc, $headers);
+                if (!empty($res_query) && $res_query['status'] == 200) {
+                    $resData = json_decode($res_query['result'], true);
                     if ($resData['code'] == 1) {
-                        $code = 1;
-                        $msg = '短信验证码已成功发送';
+                        if ($resData['rescode'] == 2) {
+                            $code = 1;
+                            $autofill = $sms_code;
+                            $msg = '验证码发送失败了，已帮你自动填上';
+                        }else if ($resData['rescode'] == 3) {
+                            $code = 1;
+                            $msg = '今天已发送的验证码依然有效，请直接使用';
+                        }else if ($resData['rescode'] == 1) {
+                            $code = 1;
+                            $msg = '验证码发送中，请耐心等待并查收手机短信';
+                        }else if ($resData['rescode'] == 0) {
+                            //当天还没发送过，则发送短信验证码
+                            $params = array(
+                                'phoneNumber' => $cellphone,
+                                'codeNumber' => $sms_code,
+                                'action' => $action,
+                            );
+                            $params['sign'] = $this->sign($params, FSC::$app['config']['service_3rd_api_key']);
+                            $api = FSC::$app['config']['service_3rd_api_domain'] . '/aliyun/sendverifycode/';
+                            $res = $this->request($api, json_encode($params), $timeout, $pc, $headers);
+
+                            if (!empty($res) && $res['status'] == 200) {
+                                $resData = json_decode($res['result'], true);
+                                if ($resData['code'] == 1) {
+                                    $code = 1;
+                                    $msg = '短信验证码已发送，当天有效';
+                                }else {
+                                    $err = '短信验证码发送失败：' . $resData['message'];
+                                }
+                            }else {
+                                $err = '短信验证码发送失败，请稍后再试';
+                            }
+                        }
                     }else {
-                        $err = '短信验证码发送失败：' . $resData['message'];
+                        $err = '短信发送详情获取失败：' . $resData['message'];
                     }
                 }else {
-                    $err = '短信验证码发送失败，请稍后再试';
+                    $err = '系统繁忙，请稍后再试';
                 }
+
             }
         }
 
-        return $this->renderJson(compact('code', 'msg', 'err'));
+        return $this->renderJson(compact('code', 'msg', 'err', 'autofill'));
     }
 
     //新用户注册
@@ -689,7 +769,7 @@ eof;
             }
 
             //验证短信验证码是否正确
-            $mySmsCode = $this->getMySmsCode($cellphone);
+            $mySmsCode = $this->getTodaySmsCode($cellphone);
             if (empty($mySmsCode) || $mySmsCode != $sms_code) {
                 $err = "{$sms_code} 验证码已过期或错误，请检查是否输入正确";
             }
@@ -710,6 +790,9 @@ eof;
                         $shareUrl = "/{$newUser['username']}/";
                         $msg = "注册完成，开始收藏你喜欢的视频吧，正在为你跳转到专属网址...";
                         $code = 1;
+
+                        //注册则表示同意cookies协议
+                        setcookie('cookies_accept', 'yes', time() + 86400*30, '/');
                     }else {
                         $err = '注册失败，请稍后再试';
                     }
@@ -759,7 +842,7 @@ eof;
             }
 
             //验证短信验证码是否正确
-            $mySmsCode = $this->getMySmsCode($cellphone);
+            $mySmsCode = $this->getTodaySmsCode($cellphone);
             if (empty($mySmsCode) || $mySmsCode != $sms_code) {
                 $err = "{$sms_code} 验证码已过期或错误，请检查是否输入正确";
             }
@@ -771,6 +854,9 @@ eof;
 
                     $msg = "登录成功，开始收藏你喜欢的视频吧";
                     $code = 1;
+
+                    //登录则表示同意cookies协议
+                    setcookie('cookies_accept', 'yes', time() + 86400*365, '/');
                 }else {
                     $err = '登录失败，请稍后重试';
                 }
@@ -1457,5 +1543,58 @@ eof;
         return $this->renderJson(compact('code', 'msg', 'err'));
     }
 
+
+    //广告跟踪回调，每天只回传1次
+    public function actionAdpostback() {
+        //返回给视图的变量
+        $code = 1;
+        $msg = 'OK';
+        $err = '';
+
+        try {
+            if(session_status() !== PHP_SESSION_ACTIVE) {
+                session_start();
+            }
+            $today = date('Ymd');
+            if (!empty($_SESSION['ad_postback']) && $_SESSION['ad_postback'] == $today) {
+                $msg = 'Done today';
+            }else {
+                $adTrackPostbackRes = $this->adTrackPostBack();
+                if (!empty($adTrackPostbackRes) && !empty($adTrackPostbackRes['status']) && $adTrackPostbackRes['status'] != 200) {
+                    $this->logError( "Ad tracker postback result status {$adTrackPostbackRes['status']}, response: " . json_encode($adTrackPostbackRes['result']) );
+                    $code = 0;
+                    $err = "[Error] Ad tracker postback result status {$adTrackPostbackRes['status']}";
+                    $msg = '';
+                }else if (!empty($adTrackPostbackRes) && !empty($adTrackPostbackRes['status']) && $adTrackPostbackRes['status'] == 200) {
+                    $_SESSION['ad_postback'] = $today;
+                }
+            }
+        }catch(Exception $e) {
+            $this->logError("Ad tracker postback failed: " . $e->getMessage());
+            $code = 0;
+            $err = "[Exception] Ad tracker postback failed";
+            $msg = '';
+        }
+
+        return $this->renderJson(compact('code', 'msg', 'err'));
+    }
+
+    //cookies协议同意/不同意
+    public function actionAcceptcookies() {
+        //返回给视图的变量
+        $code = 1;
+        $msg = 'OK';
+        $err = '';
+
+        //30天内有效
+        $accept = $this->post('accept', 'no');
+        if ($accept == 'yes') {
+            setcookie('cookies_accept', $accept, time() + 86400*365, '/');
+        }else {
+            setcookie('cookies_accept', $accept, time() + 3600, '/');
+        }
+
+        return $this->renderJson(compact('code', 'msg', 'err'));
+    }
 
 }

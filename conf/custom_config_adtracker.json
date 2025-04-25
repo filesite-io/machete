@@ -1,0 +1,10 @@
+{
+    "ad_tracker": {
+        "enable": false,
+        "parameters": ["gclid", "gadid"],
+        "postbackApi": "",
+        "postbackParaMap": {
+            "clickid": "gclid"
+        }
+    }
+}

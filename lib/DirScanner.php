@@ -30,7 +30,6 @@ Class DirScanner {
 
         'original_ctime' => '照片拍摄时间',
 
-        //TODO: 待启用
         'exif' => '照片EXIF信息',
         'iptc' => '照片IPTC信息',
     );
@@ -41,7 +40,7 @@ Class DirScanner {
     private $scanResults = array();                 //目录扫描结果
     private $tree = array();                        //目录扫描树形结构
 
-    protected $supportFileExtensions = array(            //支持的文件类型
+    public $supportFileExtensions = array(            //支持的文件类型
         'txt',     //纯文本
         'md',      //纯文本
         'url',     //快捷方式
@@ -75,46 +74,12 @@ Class DirScanner {
         'mov',     //视频
     );
 
-    //暂未使用
-    /*
-    protected $maxReadFilesize = array(                  //默认每种文件读取内容最大大小
-        'txt' => 102400,          //纯文本
-        'md' => 5242880,          //纯文本
-        'url' => 20480,           //快捷方式
-        'jpg' => 512000,          //图片
-        'jpeg' => 512000,         //图片
-        'png' => 512000,          //图片
-        'webp' => 512000,         //图片
-        'gif' => 512000,          //图片
-        'ico' => 51200,           //图标
-        'mp3' => 10485760,        //音乐，10M
-        'mp4' => 104857600,       //视频，100M
-        'mov' => 104857600,       //视频，100M
-        'ts' => 10485760,         //视频，10M
-        'm3u8' => 10485760,       //视频，10M
-    );
-
-    protected $securedFileExtensions = array(            //开启Nginx防盗链的文件类型
-        'jpg',     //图片
-        'jpeg',    //图片
-        'png',     //图片
-        'webp',    //图片
-        'gif',     //图片
-        'ico',     //图标
-        'mp3',     //音乐
-        'mp4',     //视频
-        'mov',     //视频
-        'ts',      //视频
-        'm3u8',    //视频
-    );
-    */
-
     public $scanTimeCost = 0;                       //上一次目录扫描耗时，单位：毫秒
     public $isApi = false;                          //如果为API获取数据，则realpath只返回相对路径
 
 
     //判断目录名或文件名是否合法
-    //不允许包含斜杠/，反斜杠\，单引号'，双引号"，空格字符
+    //不允许包含斜杠/，反斜杠\，单引号'，双引号"字符
     //忽略.开头的隐藏文件
     private function isValid($name) {
         return str_replace(['/', '\\', "'", '"'], '', $name) == $name && !preg_match('/^\..+/', $name);
@@ -575,14 +540,14 @@ Class DirScanner {
         return $this->nginxSecret;
     }
 
-    //设置Nginx防盗链密钥
+    //设置用户IP
     public function setUserIp($userIp) {
         if (!empty($userIp) && is_string($userIp)) {
             $this->userIp = $userIp;
         }
     }
 
-    //获取Nginx防盗链密钥
+    //获取用户IP
     public function getUserIp() {
         return $this->userIp;
     }
@@ -695,7 +660,7 @@ Class DirScanner {
                     }
                 }else {
                     $pathinfo = pathinfo($realpath);
-                    $extension = strtolower($pathinfo['extension']);
+                    $extension = !empty($pathinfo['extension']) ? strtolower($pathinfo['extension']) : '';
                     if ( in_array($extension, $this->supportFileExtensions) ) {
                         if ($extension != 'txt') {
                             $branch = $this->getFileData($realpath);

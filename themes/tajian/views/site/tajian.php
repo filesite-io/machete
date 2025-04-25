@@ -294,3 +294,5 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
         </div>
     </section>
 </main>
+
+<?php include_once __DIR__ . '/cookies_accept.php'; ?>

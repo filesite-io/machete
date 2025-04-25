@@ -90,7 +90,8 @@ Class SiteController extends Controller {
         //获取联系方式
         $titles = array();
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $cachedData = Common::getCacheFromFile($cacheKey);
+        $cacheSeconds = 86400 * 365;
+        $cachedData = Common::getCacheFromFile($cacheKey, $cacheSeconds);
         if (empty($cachedData)) {
             $readmeFile = $scanner->getDefaultReadme();
             if (!empty($readmeFile)) {
@@ -790,7 +791,8 @@ Class SiteController extends Controller {
         //获取联系方式
         $maxScanDeep = 0;       //最大扫描目录级数
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $readmeFile = Common::getCacheFromFile($cacheKey);
+        $cacheSeconds = 86400 * 365;
+        $readmeFile = Common::getCacheFromFile($cacheKey, $cacheSeconds);
 
         //底部版权申明配置支持
         $copyright = '';
@@ -858,7 +860,8 @@ Class SiteController extends Controller {
         //获取联系方式
         $maxScanDeep = 0;       //最大扫描目录级数
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $readmeFile = Common::getCacheFromFile($cacheKey);
+        $cacheSeconds = 86400 * 365;
+        $readmeFile = Common::getCacheFromFile($cacheKey, $cacheSeconds);
 
         //底部版权申明配置支持
         $copyright = '';
@@ -1020,7 +1023,7 @@ Class SiteController extends Controller {
         //获取根目录下的readme
         $htmlReadme = '';
         $cacheKey = $this->getCacheKey('root', 'readme', $maxScanDeep);
-        $expireSeconds = 86400;
+        $expireSeconds = 86400 * 365;
         $readmeFile = Common::getCacheFromFile($cacheKey, $expireSeconds);
         if (!empty($readmeFile)) {
             $htmlReadme = $readmeFile['htmlReadme'];

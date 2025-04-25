@@ -32,7 +32,9 @@
         <div class="videoplayer">
             <video
                 data-id="<?php echo $viewData['videoId']; ?>"
+                <?php if (!empty($viewData['isAdminIp'])) { ?>
                 data-screenshot-start="<?php echo FSC::$app['config']['screenshot_start']; ?>"
+                <?php } ?>
                 class="video-js vjs-big-play-centered vjs-fluid vjs-16-9"
                 controls
                 playsinline

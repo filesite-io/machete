@@ -700,14 +700,11 @@ if ($('#my-player').length > 0 && typeof(videojs) != 'undefined') {
 
     myPlayer.one('playing', function() {
         var screenshot_start = $('video.vjs-tech').attr('data-screenshot-start');
-
-        if (screenshot_start) {
-            screenshot_start = parseInt(screenshot_start);
-        }
-
         if (!screenshot_start) {
-            screenshot_start = 1000;
+            return false;
         }
+
+        screenshot_start = parseInt(screenshot_start);
 
         //区分media类型，视频生成快照，音乐只获取时长
         var mediaType = myPlayer.currentType();

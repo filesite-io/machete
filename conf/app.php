@@ -204,6 +204,22 @@ $configs = array(
     "password_auth" => array(
         "enable" => false,
     ),
+
+
+    //广告跟踪参数配置
+    "ad_tracker" => array(
+        "enable" => false,
+        "parameters" => array(
+            "gclid",
+            "gadid",
+        ),
+
+        //广告跟踪回调接口
+        "postbackApi" => "",
+        "postbackParaMap" => array(
+            "clickid" => 'gclid',
+        ),
+    ),
 );
 
 //自定义配置支持
@@ -249,6 +265,16 @@ if (file_exists($customConfigFile)) {
 
 //VIP用户自定义配置
 $customConfigFile = __DIR__ . "/../runtime/custom_config_vip.json";
+if (file_exists($customConfigFile)) {
+    try {
+        $json = file_get_contents($customConfigFile);
+        $customConfigs = json_decode($json, true);
+        $configs = array_merge($configs, $customConfigs);
+    }catch(Exception $e) {}
+}
+
+//广告跟踪自定义配置
+$customConfigFile = __DIR__ . "/../runtime/custom_config_adtracker.json";
 if (file_exists($customConfigFile)) {
     try {
         $json = file_get_contents($customConfigFile);

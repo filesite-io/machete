@@ -32,3 +32,5 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
         </ul>
     </div>
 </main>
+
+<div class="elementNone ad_postback_JS"><!--Ad track postback trigger--></div>
