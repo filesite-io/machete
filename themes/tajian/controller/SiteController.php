@@ -69,15 +69,19 @@ Class SiteController extends Controller {
         }
 
         //把广告参数追加到回调API网址中
-        /*
-        foreach($adParaDataFromCookie as $key => $val) {
-            $postbackApi .= "&{$key}=" . urlencode($val);
-        }
-        */
-
-        //GET方式请求回调API
         $timeout = 10;
-        return $this->request($postbackApi, null, $timeout);
+        $postbackMethod = !empty(FSC::$app['config']['ad_tracker']['postbackMethod']) ? FSC::$app['config']['ad_tracker']['postbackMethod'] : 'GET';
+        if ($postbackMethod == 'GET') {
+            foreach($adParaDataFromCookie as $key => $val) {
+                $postbackApi .= "&{$key}=" . urlencode($val);
+            }
+
+            //GET方式请求回调API
+            return $this->request($postbackApi, null, $timeout);
+        }else {
+            //POST方式请求回调API
+            return $this->request($postbackApi, $adParaDataFromCookie, $timeout);
+        }
     }
 
     //增加cookie跟踪同意/不同意选择，确保用户知道cookie跟踪了哪些数据

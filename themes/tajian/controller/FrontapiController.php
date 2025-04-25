@@ -1544,7 +1544,7 @@ eof;
     }
 
 
-    //广告跟踪回调，每天只回传1次
+    //广告跟踪回调，1 小时内只回传 1 次
     public function actionAdpostback() {
         //返回给视图的变量
         $code = 1;
@@ -1555,8 +1555,9 @@ eof;
             if(session_status() !== PHP_SESSION_ACTIVE) {
                 session_start();
             }
-            $today = date('Ymd');
-            if (!empty($_SESSION['ad_postback']) && $_SESSION['ad_postback'] == $today) {
+
+            $current_time = time();
+            if (!empty($_SESSION['ad_postback']) && $current_time - $_SESSION['ad_postback'] < 3600) {
                 $msg = 'Done today';
             }else {
                 $adTrackPostbackRes = $this->adTrackPostBack();
@@ -1566,7 +1567,7 @@ eof;
                     $err = "[Error] Ad tracker postback result status {$adTrackPostbackRes['status']}";
                     $msg = '';
                 }else if (!empty($adTrackPostbackRes) && !empty($adTrackPostbackRes['status']) && $adTrackPostbackRes['status'] == 200) {
-                    $_SESSION['ad_postback'] = $today;
+                    $_SESSION['ad_postback'] = $current_time;
                 }
             }
         }catch(Exception $e) {

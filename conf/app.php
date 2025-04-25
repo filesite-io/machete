@@ -216,6 +216,7 @@ $configs = array(
 
         //广告跟踪回调接口
         "postbackApi" => "",
+        "postbackMethod" => "GET",
         "postbackParaMap" => array(
             "clickid" => 'gclid',
         ),
