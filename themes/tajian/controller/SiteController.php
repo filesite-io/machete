@@ -553,4 +553,28 @@ Class SiteController extends Controller {
         return $this->redirect('/site/login');
     }
 
+    //Privacy & cookies
+    public function actionPrivacy() {
+        $pageTitle = "Privacy & cookies 隐私政策 | TaJian.tv";
+
+        $this->layout = 'index';
+        $viewName = 'privacy';
+        $params = compact(
+                'pageTitle'
+            );
+        return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //Terms of use
+    public function actionTerms() {
+        $pageTitle = "Terms of use 服务条款 | TaJian.tv";
+
+        $this->layout = 'index';
+        $viewName = 'terms';
+        $params = compact(
+                'pageTitle'
+            );
+        return $this->render($viewName, $params, $pageTitle);
+    }
+
 }
