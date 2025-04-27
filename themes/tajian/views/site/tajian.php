@@ -232,7 +232,7 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                             </div>
                             <h3 class="feature-title">我要搭建</h3>
                             <p class="text-sm">
-                                付费协助搭建<strong>视频分享网站</strong>，请发Email联系：<strong>machete#filesite.io</strong>，替换#为@
+                                付费协助搭建<strong>视频分享网站</strong>，欢迎随时<a href="/site/contact">与我们联系</a>
                             </p>
                         </div>
                     </div>

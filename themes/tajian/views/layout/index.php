@@ -62,9 +62,8 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
                         <li><a href="https://github.com/filesite-io/machete" target="_blank">源码下载</a></li>
                     </ul>
                     <ul class="footer-social-links list-reset">
-                        <li>
-                            <a href="https://jq.qq.com/?_wv=1027&k=WoH3Pv7d" target="_blank"><img src="/img/qq.png" width="20" alt="qq" class="inline">群: 44123711</a>
-                        </li>
+                        <li><a href="/site/about/">About</a></li>
+                        <li><a href="/site/contact/">Contact</a></li>
                         <li>
                             <a href="https://space.bilibili.com/3461581318916273" target="_blank">
                                 <span class="screen-reader-text">B站</span>

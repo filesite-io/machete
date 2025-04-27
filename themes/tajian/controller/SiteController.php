@@ -581,4 +581,28 @@ Class SiteController extends Controller {
         return $this->render($viewName, $params, $pageTitle);
     }
 
+    //Contact
+    public function actionContact() {
+        $pageTitle = "Contact 联系我们 | TaJian.tv";
+
+        $this->layout = 'index';
+        $viewName = 'contact';
+        $params = compact(
+                'pageTitle'
+            );
+        return $this->render($viewName, $params, $pageTitle);
+    }
+
+    //About
+    public function actionAbout() {
+        $pageTitle = "About 关于Ta荐 | TaJian.tv";
+
+        $this->layout = 'index';
+        $viewName = 'about';
+        $params = compact(
+                'pageTitle'
+            );
+        return $this->render($viewName, $params, $pageTitle);
+    }
+
 }
