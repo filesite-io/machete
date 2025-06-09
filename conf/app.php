@@ -200,6 +200,10 @@ $configs = array(
     //Google Adwords目标跟踪ID
     'GAD_MEASUREMENT_ID' => '',
 
+    //Google Adwords conversion配置
+    //示例：{'controller': 'xx', 'action': 'yy', 'send_to': 'zzz'}
+    'GA_MEASUREMENT_CONVERSIONS' => array(),
+
     //密码授权默认关闭
     "password_auth" => array(
         "enable" => false,

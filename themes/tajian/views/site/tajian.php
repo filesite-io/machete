@@ -18,19 +18,18 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                 </p>
                 <div class="hero-form newsletter-form field field-grouped is-revealing">
                     <div class="control">
-                        <a class="button button-block button-shadow" href="/2000" target="_blank">
-                            <img class="btn_icon" src="/img/share.png" alt="在线演示">
-                            查看演示收藏夹
+                        <a class="button button-block button-shadow" href="/2001" target="_blank">
+                            <img class="btn_icon" src="/img/share.png" alt="Ta荐收藏夹示例 - 秒懂AI">
+                            <strong style="font-size:16px;color:red">阅人无数</strong>&nbsp;— 查看演示
                         </a>
                     </div>
                     <div class="control">
                         <a class="button button-primary button-block button-shadow" href="/site/register">
-                            <img class="btn_icon" src="/img/favorite.png" alt="Create your favorite tajian link.">
+                            <img class="btn_icon" src="/img/favorite.png" alt="创建Ta荐聚宝盆账号">
                             创建我的聚宝盆
                         </a>
                     </div>
                     <?php /*
-                    <span class="mt10 inline-block">&nbsp;&nbsp;马上整理你喜欢的视频吧！</span>
                     <div class="control">
                         <a class="button button-block button-shadow" href="/site/login/?go=<?=$loginBackUrl?>">
                             <img class="btn_icon" src="/img/share.png" alt="分享给朋友">
@@ -45,6 +44,8 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                     </div>
                     */ ?>
                 </div>
+                <div class="mt10"><a href="https://zhuanlan.zhihu.com/p/1904181970277210072" target="_blank">不只是工具，更是视频时代的觉醒！</a></div>
+
                 <div class="hero-browser">
                     <div class="bubble-3 is-revealing">
                         <svg width="427" height="286" viewBox="0 0 427 286" xmlns="https://www.w3.org/2000/svg" xmlns:xlink="https://www.w3.org/1999/xlink">
@@ -126,6 +127,7 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                                 poster="/img/bg/learning_by_watching_500.jpg"
                                 src="https://static.jialuoma.cn/mp4/machete/add_video_share_url.mp4" style="width:100%;height:100%" controls>
                             </video>
+                            <p style="font-size:14px;margin-top:-8px;color:#666">点击观看抖音视频收藏演示</p>
                         </div>
                     </div>
                     <div class="bubble-1 is-revealing">
@@ -172,51 +174,16 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                             <div class="feature-icon">
                                 <svg width="80" height="80" xmlns="https://www.w3.org/2000/svg">
                                     <g fill="none" fill-rule="evenodd">
-                                        <path d="M48.066 61.627c6.628 0 10.087-16.79 10.087-23.418 0-6.627-5.025-9.209-11.652-9.209C39.874 29 24 42.507 24 49.135c0 6.627 17.439 12.492 24.066 12.492z" fill-opacity=".24" fill="#A0A6EE"></path>
-                                        <path d="M26 54l28-28" stroke="#838DEA" stroke-width="2" stroke-linecap="square"></path>
-                                        <path d="M26 46l20-20M26 38l12-12M26 30l4-4M34 54l20-20M42 54l12-12" stroke="#767DE1" stroke-width="2" stroke-linecap="square"></path>
-                                        <path d="M50 54l4-4" stroke="#838DEA" stroke-width="2" stroke-linecap="square"></path>
-                                    </g>
-                                </svg>
-                            </div>
-                            <h3 class="feature-title">谁在用Ta荐</h3>
-                            <p class="text-sm">
-                                布道者、意见领袖，发烧友、分享达人，有<strong>收藏、整理</strong>知识库习惯的朋友...
-                            </p>
-                        </div>
-                    </div>
-                    <div class="feature is-revealing">
-                        <div class="feature-inner">
-                            <div class="feature-icon">
-                                <svg width="80" height="80" xmlns="https://www.w3.org/2000/svg">
-                                    <g fill="none" fill-rule="evenodd">
-                                        <path d="M48.066 61.627c6.628 0 10.087-16.79 10.087-23.418 0-6.627-5.025-9.209-11.652-9.209C39.874 29 24 42.507 24 49.135c0 6.627 17.439 12.492 24.066 12.492z" fill-opacity=".24" fill="#75ABF3"></path>
-                                        <path d="M34 52V35M40 52V42M46 52V35M52 52V42M28 52V28" stroke="#4D8EF7" stroke-width="2" stroke-linecap="square"></path>
-                                    </g>
-                                </svg>
-                            </div>
-                            <h3 class="feature-title">使用步骤</h3>
-                            <p class="text-sm">
-                                从各视频App、网站<strong>复制分享链接</strong>，登录后在“<strong>添加收藏</strong>”里<strong>粘贴</strong>保存
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="features-wrap">
-                    <div class="feature is-revealing">
-                        <div class="feature-inner">
-                            <div class="feature-icon">
-                                <svg width="80" height="80" xmlns="https://www.w3.org/2000/svg">
-                                    <g fill="none" fill-rule="evenodd">
                                         <path d="M48.066 61.627c6.628 0 10.087-16.79 10.087-23.418 0-6.627-5.025-9.209-11.652-9.209C39.874 29 24 42.507 24 49.135c0 6.627 17.439 12.492 24.066 12.492z" fill-opacity=".32" fill="#FF97AC"></path>
                                         <path stroke="#FF6D8B" stroke-width="2" stroke-linecap="square" d="M49 45h6V25H35v6M43 55h2v-2M25 53v2h2M27 35h-2v2"></path>
                                         <path stroke="#FF6D8B" stroke-width="2" stroke-linecap="square" d="M43 35h2v2M39 55h-2M33 55h-2M39 35h-2M33 35h-2M45 49v-2M25 49v-2M25 43v-2M45 43v-2"></path>
                                     </g>
                                 </svg>
-
                             </div>
-                            <h3 class="feature-title">支持的平台</h3>
-                            <p class="text-sm">B站（bilibili）、抖音、快手、西瓜视频，其它<strong>任何网址</strong>（限VIP使用）</p>
+                            <h3 class="feature-title">收藏视频</h3>
+                            <p class="text-sm">
+                                从各视频App、网站<strong>复制分享链接</strong>，登录后在“<strong>添加收藏</strong>”里<strong>粘贴</strong>保存
+                            </p>
                         </div>
                     </div>
                     <div class="feature is-revealing" id="contact">
@@ -230,9 +197,43 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                                     </g>
                                 </svg>
                             </div>
-                            <h3 class="feature-title">我要搭建</h3>
+                            <h3 class="feature-title">分享收藏夹</h3>
                             <p class="text-sm">
-                                付费协助搭建<strong>视频分享网站</strong>，欢迎随时<a href="/site/contact">与我们联系</a>
+                                注册/登录、管理分类、添加收藏，进入<strong>分享收藏</strong>，复制分享链接发给朋友
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="features-wrap">
+                    <div class="feature is-revealing">
+                        <div class="feature-inner">
+                            <div class="feature-icon">
+                                <svg width="80" height="80" xmlns="https://www.w3.org/2000/svg">
+                                    <g fill="none" fill-rule="evenodd">
+                                        <path d="M48.066 61.627c6.628 0 10.087-16.79 10.087-23.418 0-6.627-5.025-9.209-11.652-9.209C39.874 29 24 42.507 24 49.135c0 6.627 17.439 12.492 24.066 12.492z" fill-opacity=".24" fill="#75ABF3"></path>
+                                        <path d="M34 52V35M40 52V42M46 52V35M52 52V42M28 52V28" stroke="#4D8EF7" stroke-width="2" stroke-linecap="square"></path>
+                                    </g>
+                                </svg>
+                            </div>
+                            <h3 class="feature-title">支持的平台</h3>
+                            <p class="text-sm">B站（bilibili）、抖音、快手、西瓜视频，其它<strong>任何网址</strong>（限VIP使用）</p>
+                        </div>
+                    </div>
+                    <div class="feature is-revealing">
+                        <div class="feature-inner">
+                            <div class="feature-icon">
+                                <svg width="80" height="80" xmlns="https://www.w3.org/2000/svg">
+                                    <g fill="none" fill-rule="evenodd">
+                                        <path d="M48.066 61.627c6.628 0 10.087-16.79 10.087-23.418 0-6.627-5.025-9.209-11.652-9.209C39.874 29 24 42.507 24 49.135c0 6.627 17.439 12.492 24.066 12.492z" fill-opacity=".24" fill="#A0A6EE"></path>
+                                        <path d="M26 54l28-28" stroke="#838DEA" stroke-width="2" stroke-linecap="square"></path>
+                                        <path d="M26 46l20-20M26 38l12-12M26 30l4-4M34 54l20-20M42 54l12-12" stroke="#767DE1" stroke-width="2" stroke-linecap="square"></path>
+                                        <path d="M50 54l4-4" stroke="#838DEA" stroke-width="2" stroke-linecap="square"></path>
+                                    </g>
+                                </svg>
+                            </div>
+                            <h3 class="feature-title">谁在用Ta荐</h3>
+                            <p class="text-sm">
+                                分享达人、发烧友、有<strong>收藏、整理</strong>知识库习惯的朋友们...
                             </p>
                         </div>
                     </div>

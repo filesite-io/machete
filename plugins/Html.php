@@ -98,6 +98,7 @@ Class Html {
     }
 
     //生成GA统计代码
+    //支持conversion代码，示例：gtag('event', 'conversion', {'send_to': 'xxx/NUaEOrczuQD'});
     public static function getGACode() {
         if (!empty(FSC::$app['config']['debug'])) {return '';}
         $msid = !empty(FSC::$app['config']['GA_MEASUREMENT_ID']) ? FSC::$app['config']['GA_MEASUREMENT_ID'] : '';
@@ -121,6 +122,22 @@ eof;
 
   gtag('config', '{$adwords_id}');
 eof;
+        }
+
+
+        $conversions = !empty(FSC::$app['config']['GA_MEASUREMENT_CONVERSIONS']) ? FSC::$app['config']['GA_MEASUREMENT_CONVERSIONS'] : array();
+        if (!empty($conversions)) {
+            //格式：{'controller': 'xx', 'action': 'yy', 'send_to': 'zzz'}
+            foreach ($conversions as $item) {
+                if (FSC::$app['controller'] == $item['controller'] && FSC::$app['action'] == $item['action']) {
+                    $gacode .= <<<eof
+
+  gtag('event', 'conversion', {'send_to': '{$item['send_to']}'});
+eof;
+                    break;
+                }
+            }
+
         }
 
         $gacode .= <<<eof

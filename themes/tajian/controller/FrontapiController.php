@@ -692,10 +692,10 @@ eof;
                             $msg = '验证码发送失败了，已帮你自动填上';
                         }else if ($resData['rescode'] == 3) {
                             $code = 1;
-                            $msg = '今天已发送的验证码依然有效，请直接使用';
+                            $msg = '之前的验证码依然有效，请直接使用';
                         }else if ($resData['rescode'] == 1) {
                             $code = 1;
-                            $msg = '验证码发送中，请耐心等待并查收手机短信';
+                            $msg = '发送中，如果15秒内没收到，刷新重试';
                         }else if ($resData['rescode'] == 0) {
                             //当天还没发送过，则发送短信验证码
                             $params = array(
@@ -711,19 +711,21 @@ eof;
                                 $resData = json_decode($res['result'], true);
                                 if ($resData['code'] == 1) {
                                     $code = 1;
-                                    $msg = '短信验证码已发送，当天有效';
+                                    $msg = '已发送，如果15秒内没收到，刷新重试';
                                 }else {
-                                    $err = '短信验证码发送失败：' . $resData['message'];
+                                    //$err = '发送失败：' . $resData['message'];
+                                    $err = '发送失败，刷新网页重试';
                                 }
                             }else {
-                                $err = '短信验证码发送失败，请稍后再试';
+                                $err = '发送异常，请稍后重试';
                             }
                         }
                     }else {
-                        $err = '短信发送详情获取失败：' . $resData['message'];
+                        //$err = '短信发送详情获取失败：' . $resData['message'];
+                        $err = '发送详情获取异常，请稍后重试';
                     }
                 }else {
-                    $err = '系统繁忙，请稍后再试';
+                    $err = '系统繁忙，请稍后重试';
                 }
 
             }

@@ -10,7 +10,7 @@
             <input id="text_input_username" name="username" placeholder="请填写手机号码" type="text">
         </div>
         <div class="mb-3 twocol">
-            <label for="text_input_sm" class="form-label">验证码</label>
+            <label for="text_input_sm" class="form-label">验证码<small style="font-size:14px;font-weight:bold">（15秒内没收到，请刷新重试）</small></label>
             <input id="text_input_sm" name="smscode" placeholder="输入收到的短信验证码" type="number">
             <button type="button" class="smsbtn bt_sms_JS button button-sm button-shadow">发送验证码</button>
             <p><small class="sms_tip_JS">验证码<strong>当天有效</strong>，收到请保留 24 小时</small></p>

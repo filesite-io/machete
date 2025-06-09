@@ -67,13 +67,13 @@ docker compose up -d
 主要步骤：
 1. docker pull filesite/machete
 2. docker run ...
-3. 本地测试网站和后台
+3. 本地测试网站
 4. 在docker容器中升级最新版
 
 
 ### 视频教程
 
-点击下面图片观看如何使用Docker部署安装machete的视频教程。
+点击下面图片观看如何使用Docker部署安装machete的视频教程（视频中的后台已不再维护，新版本不再包含后台功能）。
 
 [![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
 

@@ -130,13 +130,13 @@ eof;
     <?php if (in_array(FSC::$app['controller'], array('site', 'my')) && FSC::$app['action'] == 'index') { ?>
     <div class="footer">
         <div class="copyright">
-            从GitHub下 <a href="https://github.com/filesite-io/machete" target="_blank">Machete源码</a> 部署到本地
+            从GitHub下 <a href="https://github.com/filesite-io/machete" target="_blank">Filesite/Machete源码</a> 部署到本地
             <br>
             数据采集由
             <a href="https://herounion.filesite.io" target="_blank">HeroUnion英雄联盟</a>
             提供技术支持
             <br>
-            <a href="https://filesite.io" target="_blank">&copy;FileSite.io</a> 2022 - execute time: {page_time_cost} ms
+            <a href="https://filesite.io" target="_blank">&copy;FileSite.io</a> 2022，耗时 {page_time_cost} ms
         </div>
     </div>
 

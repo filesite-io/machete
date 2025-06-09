@@ -56,9 +56,6 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
                         <li>
                             <a href="https://herounion.filesite.io" target="_blank">HeroUnion</a>
                         </li>
-                        <li>
-                            <a href="https://filesite.io" target="_blank">FileSite.io</a>
-                        </li>
                         <li><a href="https://github.com/filesite-io/machete" target="_blank">源码下载</a></li>
                     </ul>
                     <ul class="footer-social-links list-reset">
@@ -86,7 +83,7 @@ if (!empty(FSC::$app['config']['multipleUserUriParse']) && !empty(FSC::$app['use
                             </a>
                         </li>
                     </ul>
-                    <div class="footer-copyright">&copy; 2024 Machete, execute {page_time_cost} ms</div>
+                    <div class="footer-copyright"><a href="https://filesite.io" target="_blank">&copy;FileSite.io</a>&nbsp;2022，耗时 {page_time_cost} ms</div>
                 </div>
             </div>
         </footer>
