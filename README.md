@@ -78,6 +78,12 @@ docker compose up -d
 [![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
 
 
+管理相册里的目录及照片，只需维护本地照片目录，按自己的需要对照片用目录进行分类；  
+如果需要把相册系统部署到远程服务器，建议只维护本地照片目录再通过自动同步软件把本地照片目录同步到远程服务器对应的文件夹。
+
+免费同步软件参考：[FreeFileSync](https://freefilesync.org/)
+
+
 ### 下载镜像
 
 从dockerhub下载：
