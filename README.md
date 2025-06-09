@@ -73,7 +73,7 @@ docker compose up -d
 
 ### 视频教程
 
-点击下面图片观看如何使用Docker部署安装machete的视频教程（视频中的后台已不再维护，新版本不再包含后台功能）。
+点击下面图片观看如何使用Docker部署安装machete的视频教程（视频中的后台已停止维护，新版不含后台）。
 
 [![用Docker安装machete](https://static.jialuoma.cn/img/video_docker_pull_run_machete_1210_snap.png)](https://static.jialuoma.cn/mp4/video_docker_pull_run_machete_1210.mp4)
 
