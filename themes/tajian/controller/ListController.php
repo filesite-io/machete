@@ -45,12 +45,19 @@ Class ListController extends SiteController {
 
         $titles = array();
         $readmeFile = $scanner->getDefaultReadme();
+        $defaultTitle = FSC::$app['config']['site_name'];
         if (!empty($readmeFile)) {
             if (!empty($readmeFile['sort'])) {
                 $menus_sorted = explode("\n", $readmeFile['sort']);
             }
 
             $titles = $scanner->getMDTitles($readmeFile['id']);
+
+            if (!empty($readmeFile['title'])) {
+                $defaultTitle = $readmeFile['title'];
+            }else if (!empty($titles)) {
+                $defaultTitle = $titles[0]['name'];
+            }
 
             $Parsedown = new Parsedown();
             $content = file_get_contents($readmeFile['realpath']);
@@ -85,7 +92,7 @@ Class ListController extends SiteController {
         //昵称支持
         $nickname = $this->getNickname($readmeFile);
 
-        $pageTitle = $defaultTitle = !empty($titles) ? $titles[0]['name'] : FSC::$app['config']['site_name'];
+        $pageTitle = $defaultTitle;
         if (!empty($tagItem)) {
             $pageTitle = "{$nickname}收藏的{$tagItem['name']}精选视频，来自{$defaultTitle}";
             if (!empty($tagItem['title'])) {
