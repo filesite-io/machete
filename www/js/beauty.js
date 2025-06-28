@@ -513,9 +513,15 @@ if ($('#qrimg').length > 0 && typeof(QRCode) != 'undefined') {
     });
 }
 
+//支持直播视频
 var formatDuration = function(duration) {
-    var str = '00:00:00';
+    if (duration == 'Infinity') {
+        return 'Live';
+    }else if (isNaN(duration)) {    //not number
+        return duration;
+    }
 
+    var str = '00:00:00';
     var hours = 0, minutes = 0;
 
     if (duration > 3600) {

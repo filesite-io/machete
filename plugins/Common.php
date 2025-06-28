@@ -520,7 +520,7 @@ Class Common {
     public static function getShareUrlFromContent($content) {
         $url = '';
 
-        preg_match("/http(s)?:\/\/[\w\-\.]+\.([a-z]){2,}[\/\w\-\.\?\=]*/i", $content, $matches);
+        preg_match("/http(s)?:\/\/[\w\-\.]+\.([a-z]){2,}[\/\w\-\.\?\=_&]*/i", $content, $matches);
         if (!empty($matches)) {
             $url = $matches[0];
         }

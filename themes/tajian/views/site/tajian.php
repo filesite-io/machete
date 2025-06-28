@@ -18,9 +18,9 @@ $loginBackUrl = !empty($viewData['loginedUser']['username']) ? "/{$viewData['log
                 </p>
                 <div class="hero-form newsletter-form field field-grouped is-revealing">
                     <div class="control">
-                        <a class="button button-block button-shadow" href="/2001" target="_blank">
-                            <img class="btn_icon" src="/img/share.png" alt="Ta荐收藏夹示例 - 秒懂AI">
-                            <strong style="font-size:16px;color:red">阅人无数</strong>&nbsp;— 查看演示
+                        <a class="button button-block button-shadow" href="/2000" target="_blank">
+                            <img class="btn_icon" src="/img/share.png" alt="Ta荐收藏夹示例">
+                            <strong style="font-size:16px;color:red">电影收藏</strong>&nbsp;— 查看演示
                         </a>
                     </div>
                     <div class="control">

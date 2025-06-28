@@ -213,10 +213,12 @@ Class ListController extends Controller {
             $copyright = $readmeFile['copyright'];
         }
 
-        $pageTitle = !empty($readmeFile['titles']) ? $readmeFile['titles'][0]['name']: $currentDir['directory'];
+        $pageTitle = !empty($readmeFile['titles']) ? $readmeFile['titles'][0]['name']: '';
         if (!empty($readmeFile['title'])) {
             $pageTitle = $readmeFile['title'];
         }
+        //把当前目录作为标题的前缀
+        $pageTitle = "{$currentDir['directory']} - {$pageTitle}";
 
 
         //dataType支持：[image, video]
